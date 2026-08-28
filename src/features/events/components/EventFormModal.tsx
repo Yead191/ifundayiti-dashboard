@@ -177,7 +177,7 @@ export function EventFormModal({
       <p className="mb-5 text-sm text-mist-400">
         {isEdit
           ? "Update schedule, media, organization details, or publication status."
-          : "Create an event for the Hubology calendar — cover, gallery, and organizer info included."}
+          : "Create an event for the IFundAyiti calendar — cover, gallery, and organizer info included."}
       </p>
 
       <Form form={form} layout="vertical" requiredMark={false} onFinish={handleFinish}>

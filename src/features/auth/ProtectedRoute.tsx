@@ -13,7 +13,7 @@ export function ProtectedRoute() {
   const handleLogout = () => {
     logout();
     toast.message("Signed out", {
-      description: "You've been logged out of Hubology admin.",
+      description: "You've been logged out of IFundAyiti admin.",
     });
     navigate("/login", { replace: true });
   };

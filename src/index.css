@@ -1,34 +1,34 @@
 @import "tailwindcss";
 
 @theme {
-  /* ---- Brand palette (from Hubology frontend design system) ---- */
-  --color-navy-950: #060712;
-  --color-navy-900: #090b1b;
-  --color-navy-850: #0d1026;
-  --color-navy-800: #121531;
-  --color-navy-700: #191d3f;
-  --color-navy-600: #23274f;
-  --color-navy-500: #313564;
+  /* ---- Brand palette (from IFundAyiti light green design system) ---- */
+  --color-navy-950: #f0f4f2;
+  --color-navy-900: #f7faf8;
+  --color-navy-850: #ffffff;
+  --color-navy-800: #ffffff;
+  --color-navy-700: #e2eae6;
+  --color-navy-600: #c5d5ce;
+  --color-navy-500: #8ca399;
 
-  --color-violet-600: #8131f0;
-  --color-violet-700: #6b26cc;
-  --color-violet-900: #4a1c8a;
-  --color-violet-glow: #9d5cf5;
+  --color-violet-600: #0b3d2e;
+  --color-violet-700: #082c22;
+  --color-violet-900: #051c15;
+  --color-violet-glow: #105440;
 
-  --color-cloud-100: #eef0fb;
-  --color-mist-400: #9ca3c9;
-  --color-mist-600: #6b7299;
+  --color-cloud-100: #142921;
+  --color-mist-400: #455850;
+  --color-mist-600: #6b7f76;
 
-  --color-success: #34d399;
-  --color-warning: #f5b544;
-  --color-danger: #f2617a;
-  --color-info: #5cc8f5;
+  --color-success: #0d8a5f;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-info: #0284c7;
 
   --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
 
-  --shadow-glow-violet: 0 0 0 1px rgba(129, 49, 240, 0.15), 0 8px 30px -8px rgba(129, 49, 240, 0.45);
-  --shadow-panel: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset, 0 20px 60px -20px rgba(0, 0, 0, 0.6);
+  --shadow-glow-violet: 0 0 0 1px rgba(11, 61, 46, 0.1), 0 4px 20px -4px rgba(11, 61, 46, 0.15);
+  --shadow-panel: 0 1px 0 0 rgba(255, 255, 255, 0.8) inset, 0 10px 30px -10px rgba(11, 61, 46, 0.08);
 }
 
 @layer base {
@@ -122,7 +122,7 @@
   /* Glassmorphic panel with 1px gradient hairline border */
   .glass-panel {
     position: relative;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: 20px;
@@ -134,7 +134,7 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, rgba(129, 49, 240, 0.55), rgba(255, 255, 255, 0.06) 40%, rgba(74, 28, 138, 0.4));
+    background: linear-gradient(135deg, rgba(11, 61, 46, 0.15), rgba(255, 255, 255, 0.6) 40%, rgba(230, 213, 184, 0.3));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -142,25 +142,26 @@
   }
 
   .glass-panel-flat {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(11, 61, 46, 0.08);
     border-radius: 16px;
   }
 
   .gradient-text {
-    background: linear-gradient(120deg, #c9a4fb, var(--color-violet-glow) 45%, var(--color-violet-600));
+    background: linear-gradient(120deg, #0b3d2e, #105440 45%, #8ca399);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
   .gradient-ring {
-    box-shadow: 0 0 0 1px rgba(129, 49, 240, 0.4);
+    box-shadow: 0 0 0 1px rgba(11, 61, 46, 0.2);
   }
 
   .btn-gradient {
-    background: linear-gradient(135deg, var(--color-violet-600), var(--color-violet-900));
+    background: linear-gradient(135deg, var(--color-violet-600), var(--color-violet-700));
     box-shadow: var(--shadow-glow-violet);
+    color: #ffffff !important;
   }
 
   .surface-hover {

@@ -1,26 +1,15 @@
 import {
   DashboardOutlined,
-  AppstoreOutlined,
-  TeamOutlined,
+  CalendarOutlined,
+  BookOutlined,
   ShopOutlined,
   ShoppingOutlined,
-  CrownOutlined,
-  HistoryOutlined,
-  MessageOutlined,
-  SettingOutlined,
-  BookOutlined,
-  UserOutlined,
-  CommentOutlined,
-  FormOutlined,
-  FileTextOutlined,
-  QuestionCircleOutlined,
   TagOutlined,
   RollbackOutlined,
-  CalendarOutlined,
-  ApartmentOutlined,
+  HistoryOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
-import { DISCLAIMER_PAGES } from "@/features/disclaimer/disclaimerConfig";
 
 export interface NavItem {
   key: string;
@@ -32,12 +21,23 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { key: "overview", label: "Overview", path: "/", icon: DashboardOutlined },
   {
-    key: "users",
-    label: "Users",
-    path: "/users",
-    icon: UserOutlined,
+    key: "overview",
+    label: "Overview",
+    path: "/",
+    icon: DashboardOutlined,
+  },
+  {
+    key: "periods",
+    label: "Grant Cycles",
+    path: "/periods",
+    icon: CalendarOutlined,
+  },
+  {
+    key: "applications",
+    label: "Applications",
+    path: "/applications",
+    icon: BookOutlined,
   },
   {
     key: "store",
@@ -72,39 +72,21 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
-    key: "transactions",
-    label: "Transactions",
-    path: "/transactions",
-    icon: HistoryOutlined,
-  },
-  {
-    key: "testimonials",
-    label: "Testimonials",
-    path: "/testimonials",
-    icon: CommentOutlined,
-  },
-  {
     key: "events",
     label: "Events",
     path: "/events",
     icon: CalendarOutlined,
   },
   {
-    key: "inquiries",
-    label: "Inquiries",
-    path: "/inquiries",
-    icon: FormOutlined,
+    key: "donations",
+    label: "Finances & Donations",
+    path: "/donations",
+    icon: HistoryOutlined,
   },
   {
-    key: "disclaimer",
-    label: "Disclaimer",
-    path: "/disclaimer/user-terms",
-    icon: FileTextOutlined,
-    children: DISCLAIMER_PAGES.map((page) => ({
-      key: `disclaimer-${page.type}`,
-      label: page.label,
-      path: page.path,
-      icon: page.icon,
-    })),
+    key: "team",
+    label: "Team & Volunteers",
+    path: "/team",
+    icon: TeamOutlined,
   },
 ];

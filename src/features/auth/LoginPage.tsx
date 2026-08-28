@@ -43,7 +43,7 @@ export default function LoginPage() {
 
       dispatch(setCredentials({ user: res.data?.user ?? null, token }));
       toast.success("Welcome back", {
-        description: "You're signed in to Hubology admin.",
+        description: "You're signed in to IFundAyiti admin.",
       });
       navigate(from, { replace: true });
     } catch (error) {
@@ -72,8 +72,8 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-105">
         <div className="mb-8 flex flex-col items-center text-center">
           <img
-            src="/logo-hubology.svg"
-            alt="Hubology"
+            src="/logo-ifundayiti.png"
+            alt="IFundAyiti"
             className="mb-4 h-14 w-auto"
           />
           <p className="mt-1 text-sm text-mist-400">
@@ -142,7 +142,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-mist-600">
-          Hubology Admin Dashboard — internal tool, not for client access.
+          IFundAyiti Admin Dashboard — internal tool, not for client access.
         </p>
       </div>
     </div>

@@ -276,7 +276,7 @@ export default function EventDetailPage() {
       <ConfirmDeleteModal
         open={deleteFlow.isOpen}
         title={`Delete ${deleteFlow.target?.title}?`}
-        description="This permanently removes the event and its media from Hubology. This can't be undone."
+        description="This permanently removes the event and its media from IFundAyiti. This can't be undone."
         confirmLabel="Delete event"
         loading={deleteFlow.loading}
         onConfirm={deleteFlow.confirm}

@@ -29,7 +29,7 @@ export function Topbar({
   const handleLogout = () => {
     logout();
     toast.message("Signed out", {
-      description: "You've been logged out of Hubology admin.",
+      description: "You've been logged out of IFundAyiti admin.",
     });
     navigate("/login", { replace: true });
   };
@@ -57,18 +57,18 @@ export function Topbar({
   ];
 
   return (
-    <div className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-navy-700/60 bg-navy-900/75 px-4 backdrop-blur-xl md:px-6">
+    <div className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-[#e2eae6]/80 bg-white/70 px-4 backdrop-blur-md md:px-6 shadow-xs shadow-green-950/[0.01]">
       <button
         type="button"
         onClick={onOpenMobileNav}
-        className="rounded-lg p-2 text-mist-400 hover:bg-white/5 hover:text-cloud-100 md:hidden"
+        className="rounded-lg p-2 text-mist-400 hover:bg-black/5 hover:text-[#0B3D2E] md:hidden"
         aria-label="Open navigation"
       >
         <MenuOutlined />
       </button>
 
       <div className="min-w-0 flex-1">
-        <h1 className="truncate font-display text-[17px] font-semibold text-cloud-100">
+        <h1 className="truncate font-display text-[16px] font-semibold text-cloud-100">
           {title}
         </h1>
         {subtitle && (
@@ -78,18 +78,21 @@ export function Topbar({
 
       <div className="hidden w-64 shrink-0 lg:block">
         <Input
-          prefix={<SearchOutlined className="text-mist-600" />}
+          prefix={<SearchOutlined className="text-mist-500" />}
           placeholder="Search anything…"
-          className="bg-navy-800/70!"
+          className="!rounded-full !bg-slate-50/50 hover:!border-[#0B3D2E]/30 focus:!border-[#0B3D2E] hover:!bg-white focus:!bg-white !transition-all !duration-200"
         />
       </div>
 
       <TopbarNotifications userId={user?._id} />
 
       <Dropdown menu={{ items: userMenuItems }} trigger={["click"]} placement="bottomRight">
-        <button type="button" className="flex items-center gap-2 rounded-full pl-1 pr-2 hover:bg-white/5">
-          <Avatar src={getImageUrl(user?.image)} icon={<UserOutlined />} size={32} />
-          <span className="hidden text-sm font-medium text-cloud-100 sm:inline">{user?.name}</span>
+        <button
+          type="button"
+          className="flex items-center gap-2 rounded-full pl-1.5 pr-3 py-1 border border-[#e2eae6] bg-white/60 hover:bg-white transition-all shadow-xs hover:shadow-sm duration-200"
+        >
+          <Avatar src={getImageUrl(user?.image)} icon={<UserOutlined />} size={28} className="border border-[#e2eae6]" />
+          <span className="hidden text-xs font-semibold text-[#0B3D2E] sm:inline">{user?.name}</span>
         </button>
       </Dropdown>
     </div>

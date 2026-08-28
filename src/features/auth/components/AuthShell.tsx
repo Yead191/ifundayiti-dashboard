@@ -41,7 +41,7 @@ export function AuthShell({
 
       <div className="relative z-10 w-full max-w-105">
         <div className="mb-8 flex flex-col items-center text-center">
-          <img src="/logo-hubology.svg" alt="Hubology" className="mb-4 h-14 w-auto" />
+          <img src="/logo-ifundayiti.png" alt="IFundAyiti" className="mb-4 h-14 w-auto" />
           <h1 className="font-display text-xl font-semibold tracking-tight text-cloud-100">{title}</h1>
           {subtitle && <p className="mt-1.5 max-w-sm text-sm text-mist-400">{subtitle}</p>}
 
@@ -56,9 +56,9 @@ export function AuthShell({
                     <div
                       className={cn(
                         "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition",
-                        done && "border-violet-600/40 bg-violet-600/20 text-violet-glow",
-                        active && "border-violet-glow bg-linear-to-br from-[#8131F0] to-[#4A1C8A] text-white shadow-[0_8px_20px_-8px_rgba(129,49,240,0.8)]",
-                        !done && !active && "border-navy-600 bg-navy-800/40 text-mist-600"
+                        done && "border-violet-600/40 bg-violet-600/10 text-violet-600",
+                        active && "border-violet-600 bg-linear-to-br from-[#0B3D2E] to-[#051C15] text-white shadow-[0_8px_20px_-8px_rgba(11,61,46,0.35)]",
+                        !done && !active && "border-navy-650 bg-navy-900/10 text-mist-500"
                       )}
                     >
                       {stepNumber}
@@ -84,7 +84,7 @@ export function AuthShell({
           <Link
             to={backTo}
             state={backState}
-            className="inline-flex items-center gap-1.5 text-sm text-mist-500 transition hover:text-violet-glow"
+            className="inline-flex items-center gap-1.5 text-sm text-mist-500 transition hover:text-violet-600"
           >
             <ArrowLeftOutlined className="text-xs" />
             {backLabel}

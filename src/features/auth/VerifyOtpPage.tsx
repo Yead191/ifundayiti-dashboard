@@ -105,7 +105,7 @@ export default function VerifyOtpPage() {
             icon={<ReloadOutlined />}
             loading={isResending}
             onClick={handleResend}
-            className="text-violet-glow! hover:bg-violet-600/10!"
+            className="text-violet-600! hover:bg-violet-600/10!"
           >
             Resend code
           </Button>
@@ -113,7 +113,7 @@ export default function VerifyOtpPage() {
       </div>
 
       <p className="mt-5 text-center text-xs text-mist-600">
-        <Link to="/login" className="text-violet-glow hover:underline">
+        <Link to="/login" className="text-violet-600 hover:underline">
           Back to sign in
         </Link>
       </p>

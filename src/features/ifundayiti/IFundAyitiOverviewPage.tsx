@@ -50,10 +50,10 @@ export default function IFundAyitiOverviewPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button className="btn-gradient !border-0" onClick={() => navigate("/ifundayiti/applications")}>
+          <Button className="btn-gradient !border-0" onClick={() => navigate("/applications")}>
             Manage applications
           </Button>
-          <Button onClick={() => navigate("/ifundayiti/periods")}>Application periods</Button>
+          <Button onClick={() => navigate("/periods")}>Application periods</Button>
         </div>
       </div>
 
@@ -133,7 +133,7 @@ export default function IFundAyitiOverviewPage() {
             size="small"
             icon={<ArrowRightOutlined />}
             iconPosition="end"
-            onClick={() => navigate("/ifundayiti/donations")}
+            onClick={() => navigate("/donations")}
           >
             View donations
           </Button>

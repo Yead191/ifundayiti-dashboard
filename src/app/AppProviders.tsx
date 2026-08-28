@@ -6,19 +6,19 @@ import { IFundAyitiProvider } from "@/features/ifundayiti/IFundAyitiContext";
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
-    <ConfigProvider theme={{ algorithm: antdTheme.darkAlgorithm, ...hubologyTheme }}>
+    <ConfigProvider theme={{ algorithm: antdTheme.defaultAlgorithm, ...hubologyTheme }}>
       <AntdApp>
         <IFundAyitiProvider>
           {children}
           <Toaster
-            theme="dark"
+            theme="light"
             position="top-right"
             richColors
             toastOptions={{
               style: {
-                background: "#141737",
-                border: "1px solid #23274f",
-                color: "#eef0fb",
+                background: "#ffffff",
+                border: "1px solid #e2eae6",
+                color: "#142921",
               },
             }}
           />

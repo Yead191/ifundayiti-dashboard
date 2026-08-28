@@ -383,7 +383,7 @@ export default function OrdersPage() {
       <ConfirmDeleteModal
         open={deleteFlow.isOpen}
         title={`Delete ${deleteFlow.target?.order_id}?`}
-        description="This permanently removes the order and its line items from Hubology. This can't be undone."
+        description="This permanently removes the order and its line items from IFundAyiti. This can't be undone."
         confirmLabel="Delete order"
         loading={deleteFlow.loading}
         onConfirm={deleteFlow.confirm}

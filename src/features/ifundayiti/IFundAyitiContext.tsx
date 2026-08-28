@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState, useCallback, type ReactNode } from "react";
 import { genId } from "@/lib/utils";
-import { INITIAL_APPLICATIONS, INITIAL_PERIODS, INITIAL_DONATIONS } from "./mockData";
+import { INITIAL_APPLICATIONS, INITIAL_PERIODS, INITIAL_DONATIONS, INITIAL_TEAM } from "./mockData";
 import { MAX_FINALISTS } from "./types";
 import type {
   Application,
@@ -9,6 +9,8 @@ import type {
   ApplicationStatus,
   Donation,
   WinnerAward,
+  TeamMember,
+  TeamMemberStatus,
 } from "./types";
 
 /** Result of a guarded transition — lets pages surface a friendly error toast. */
@@ -32,6 +34,11 @@ interface IFundAyitiContextValue {
   addPeriod: (input: ApplicationPeriodInput) => void;
   updatePeriod: (id: string, input: ApplicationPeriodInput) => void;
   removePeriod: (id: string) => void;
+  team: TeamMember[];
+  addTeamMember: (input: Omit<TeamMember, "id" | "createdAt" | "status">) => void;
+  updateTeamMember: (id: string, input: Partial<TeamMember>) => void;
+  deleteTeamMember: (id: string) => void;
+  changeTeamStatus: (id: string, status: TeamMemberStatus, reason?: string) => void;
 }
 
 const IFundAyitiContext = createContext<IFundAyitiContextValue | undefined>(undefined);
@@ -40,6 +47,7 @@ export function IFundAyitiProvider({ children }: { children: ReactNode }) {
   const [applications, setApplications] = useState<Application[]>(INITIAL_APPLICATIONS);
   const [periods, setPeriods] = useState<ApplicationPeriod[]>(INITIAL_PERIODS);
   const [donations] = useState<Donation[]>(INITIAL_DONATIONS);
+  const [team, setTeam] = useState<TeamMember[]>(INITIAL_TEAM);
 
   /** Patch a single application, always bumping `updatedAt`. */
   const patchApplication = useCallback((id: string, patch: Partial<Application>) => {
@@ -133,6 +141,36 @@ export function IFundAyitiProvider({ children }: { children: ReactNode }) {
     setPeriods((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
+  const addTeamMember = useCallback((input: Omit<TeamMember, "id" | "createdAt" | "status">) => {
+    setTeam((prev) => [
+      {
+        ...input,
+        id: genId("tm"),
+        status: input.category === "volunteer" ? "pending" : "active",
+        createdAt: new Date().toISOString(),
+      },
+      ...prev,
+    ]);
+  }, []);
+
+  const updateTeamMember = useCallback((id: string, input: Partial<TeamMember>) => {
+    setTeam((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, ...input } : t))
+    );
+  }, []);
+
+  const deleteTeamMember = useCallback((id: string) => {
+    setTeam((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  const changeTeamStatus = useCallback((id: string, status: TeamMemberStatus, reason?: string) => {
+    setTeam((prev) =>
+      prev.map((t) =>
+        t.id === id ? { ...t, status, rejectionReason: reason || null } : t
+      )
+    );
+  }, []);
+
   const value = useMemo(
     () => ({
       applications,
@@ -149,6 +187,11 @@ export function IFundAyitiProvider({ children }: { children: ReactNode }) {
       addPeriod,
       updatePeriod,
       removePeriod,
+      team,
+      addTeamMember,
+      updateTeamMember,
+      deleteTeamMember,
+      changeTeamStatus,
     }),
     [
       applications,
@@ -165,6 +208,11 @@ export function IFundAyitiProvider({ children }: { children: ReactNode }) {
       addPeriod,
       updatePeriod,
       removePeriod,
+      team,
+      addTeamMember,
+      updateTeamMember,
+      deleteTeamMember,
+      changeTeamStatus,
     ]
   );
 

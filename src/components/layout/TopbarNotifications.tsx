@@ -160,7 +160,7 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
         className={cn(
           "relative flex h-9 w-9 items-center justify-center rounded-full text-mist-400 transition",
           "hover:bg-white/5 hover:text-cloud-100",
-          open && "bg-violet-600/15 text-violet-glow"
+          open && "bg-violet-600/10 text-violet-600"
         )}
       >
         <Badge
@@ -169,8 +169,8 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
           overflowCount={99}
           offset={[-2, 2]}
           style={{
-            backgroundColor: "#8131F0",
-            boxShadow: "0 0 0 2px #090b1b",
+            backgroundColor: "#0B3D2E",
+            boxShadow: "0 0 0 2px #ffffff",
           }}
         >
           <BellOutlined className="text-[16px]" />
@@ -178,9 +178,9 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-12 z-50 flex w-88 flex-col overflow-hidden rounded-2xl border border-navy-700/70 bg-linear-to-b from-[#171b3a] to-[#10132c] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.75)] sm:w-96">
-          <div className="pointer-events-none absolute -right-10 -top-14 h-36 w-36 rounded-full bg-violet-600/25 blur-[50px]" />
-          <div className="pointer-events-none absolute -left-8 top-20 h-28 w-28 rounded-full bg-warning/8 blur-2xl" />
+        <div className="absolute right-0 top-12 z-50 flex w-88 flex-col overflow-hidden rounded-2xl border border-navy-700/70 bg-white shadow-xl shadow-green-950/5 sm:w-96">
+          <div className="pointer-events-none absolute -right-10 -top-14 h-36 w-36 rounded-full bg-violet-600/10 blur-[50px]" />
+          <div className="pointer-events-none absolute -left-8 top-20 h-28 w-28 rounded-full bg-warning/3 blur-2xl" />
 
           <div className="relative flex items-start justify-between gap-3 border-b border-navy-700/60 px-4 py-3.5">
             <div>
@@ -198,7 +198,7 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
               icon={<CheckOutlined />}
               onClick={handleReadAll}
               disabled={!unreadCount || isFetching}
-              className="text-mist-400! hover:bg-violet-600/15! hover:text-violet-glow! disabled:text-mist-600!"
+              className="text-mist-400! hover:bg-violet-600/10! hover:text-violet-600! disabled:text-mist-600!"
             >
               Read all
             </Button>
@@ -207,7 +207,7 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
           <div ref={listRef} className="relative max-h-112 overflow-y-auto">
             {isLoading && notifications.length === 0 ? (
               <div className="flex items-center justify-center py-12">
-                <Spin indicator={<LoadingOutlined className="text-violet-glow" spin />} />
+                <Spin indicator={<LoadingOutlined className="text-violet-600" spin />} />
               </div>
             ) : notifications.length === 0 ? (
               <div className="flex flex-col items-center px-4 py-10 text-center">
@@ -228,7 +228,7 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
                       onClick={() => handleNotificationClick(notification)}
                       className={cn(
                         "block w-full border-b border-navy-700/50 px-4 py-3.5 text-left transition last:border-b-0",
-                        unread ? "bg-violet-600/8 hover:bg-violet-600/14" : "hover:bg-white/3"
+                        unread ? "bg-violet-600/5 hover:bg-violet-600/10" : "hover:bg-black/2"
                       )}
                     >
                       <div className="flex items-start gap-3">
@@ -236,7 +236,7 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
                           className={cn(
                             "mt-1.5 h-2 w-2 shrink-0 rounded-full",
                             unread
-                              ? "bg-violet-glow shadow-[0_0_8px_rgba(157,92,245,0.65)]"
+                              ? "bg-violet-600 shadow-[0_0_8px_rgba(11,61,46,0.35)]"
                               : "bg-navy-600"
                           )}
                         />
@@ -269,7 +269,7 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
 
                 <div ref={sentinelRef} className="flex h-10 items-center justify-center">
                   {isFetching && hasMore && (
-                    <Spin size="small" indicator={<LoadingOutlined className="text-violet-glow" spin />} />
+                    <Spin size="small" indicator={<LoadingOutlined className="text-violet-600" spin />} />
                   )}
                   {!hasMore && notifications.length > 0 && (
                     <span className="text-[11px] text-mist-600">End of notifications</span>

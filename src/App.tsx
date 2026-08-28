@@ -16,30 +16,14 @@ const ResetPasswordPage = lazy(
   () => import("@/features/auth/ResetPasswordPage"),
 );
 const ProfilePage = lazy(() => import("@/features/profile/ProfilePage"));
-const DashboardOverviewPage = lazy(
-  () => import("@/features/dashboard/DashboardOverviewPage"),
-);
-const UsersPage = lazy(() => import("@/features/users/UsersPage"));
 const StorePage = lazy(() => import("@/features/store/StorePage"));
 const CouponsPage = lazy(() => import("@/features/coupons/CouponsPage"));
 const RefundsPage = lazy(() => import("@/features/refunds/RefundsPage"));
 const RefundDetailPage = lazy(
   () => import("@/features/refunds/RefundDetailPage"),
 );
-
-const TransactionsPage = lazy(
-  () => import("@/features/transactions/TransactionsPage"),
-);
-
-const TestimonialsPage = lazy(
-  () => import("@/features/testimonials/TestimonialsPage"),
-);
 const EventsPage = lazy(() => import("@/features/events/EventsPage"));
 const EventDetailPage = lazy(() => import("@/features/events/EventDetailPage"));
-const InquiriesPage = lazy(() => import("@/features/inquiries/InquiriesPage"));
-const DisclaimerEditorPage = lazy(
-  () => import("@/features/disclaimer/DisclaimerEditorPage"),
-);
 const IFundAyitiOverviewPage = lazy(
   () => import("@/features/ifundayiti/IFundAyitiOverviewPage"),
 );
@@ -52,6 +36,7 @@ const IFundAyitiPeriodsPage = lazy(
 const IFundAyitiDonationsPage = lazy(
   () => import("@/features/ifundayiti/DonationsPage"),
 );
+const TeamPage = lazy(() => import("@/features/ifundayiti/TeamPage"));
 
 export default function App() {
   return (
@@ -64,9 +49,8 @@ export default function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
-            <Route index element={<DashboardOverviewPage />} />
+            <Route index element={<IFundAyitiOverviewPage />} />
 
-            <Route path="users" element={<UsersPage />} />
             <Route path="store" element={<StorePage />} />
             <Route path="store/orders" element={<OrdersPage />} />
             <Route path="store/coupons" element={<CouponsPage />} />
@@ -75,26 +59,22 @@ export default function App() {
               path="store/refunds/:refundId"
               element={<RefundDetailPage />}
             />
-            <Route path="transactions" element={<TransactionsPage />} />
-            <Route path="testimonials" element={<TestimonialsPage />} />
             <Route path="events" element={<EventsPage />} />
             <Route path="events/:eventSlug" element={<EventDetailPage />} />
-            <Route path="inquiries" element={<InquiriesPage />} />
             <Route path="profile" element={<ProfilePage />} />
-            <Route path="disclaimer/:type" element={<DisclaimerEditorPage />} />
-            <Route path="ifundayiti" element={<IFundAyitiOverviewPage />} />
             <Route
-              path="ifundayiti/applications"
+              path="applications"
               element={<IFundAyitiApplicationsPage />}
             />
             <Route
-              path="ifundayiti/periods"
+              path="periods"
               element={<IFundAyitiPeriodsPage />}
             />
             <Route
-              path="ifundayiti/donations"
+              path="donations"
               element={<IFundAyitiDonationsPage />}
             />
+            <Route path="team" element={<TeamPage />} />
           </Route>
         </Route>
 

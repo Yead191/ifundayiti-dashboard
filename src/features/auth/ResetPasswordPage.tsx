@@ -53,7 +53,7 @@ export default function ResetPasswordPage() {
     <AuthShell
       step={3}
       title="Create new password"
-      subtitle="Choose a strong password you'll use to sign in to Hubology admin."
+      subtitle="Choose a strong password you'll use to sign in to IFundAyiti admin."
       backTo="/verify-otp"
       backState={{ email }}
       backLabel="Back to verification"
@@ -121,7 +121,7 @@ export default function ResetPasswordPage() {
       </Form>
 
       <p className="mt-5 text-center text-xs text-mist-600">
-        <Link to="/login" className="text-violet-glow hover:underline">
+        <Link to="/login" className="text-violet-600 hover:underline">
           Back to sign in
         </Link>
       </p>

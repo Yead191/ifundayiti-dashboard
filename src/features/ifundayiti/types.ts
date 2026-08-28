@@ -106,6 +106,27 @@ export interface Donation {
   date: string;
 }
 
+export type TeamMemberCategory = "director" | "member" | "volunteer";
+export type TeamMemberStatus = "pending" | "active" | "rejected" | "blocked";
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  category: TeamMemberCategory;
+  location: string;
+  bio: string;
+  image: string;
+  focusAreas: string[];
+  status: TeamMemberStatus;
+  email: string;
+  phone: string;
+  linkedin?: string;
+  twitter?: string;
+  featured?: boolean;
+  rejectionReason?: string | null;
+  createdAt: string;
+}
+
 /** Hard business limits enforced across the application lifecycle. */
 export const MAX_FINALISTS = 5;
 export const MAX_GRANT_AMOUNT = 1000;

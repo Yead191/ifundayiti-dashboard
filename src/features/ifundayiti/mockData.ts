@@ -1,4 +1,4 @@
-import type { Application, ApplicationPeriod, Donation } from "./types";
+import type { Application, ApplicationPeriod, Donation, TeamMember } from "./types";
 
 export const INITIAL_PERIODS: ApplicationPeriod[] = [
   {
@@ -433,4 +433,63 @@ export const INITIAL_DONATIONS: Donation[] = [
     transactionId: "TXN-6E31F208",
     date: "2026-08-02T11:30:00.000Z",
   },
+];
+
+export const INITIAL_TEAM: TeamMember[] = [
+  {
+    id: "tm-1",
+    name: "Edline Jean",
+    category: "director",
+    location: "Port-au-Prince, Haiti",
+    bio: "Co-founder & Executive Director. 10+ years managing micro-finance and community development projects in Haiti.",
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400",
+    focusAreas: ["Operations", "Partnerships", "Grant Strategy"],
+    status: "active",
+    email: "e.jean@ifundayiti.org",
+    phone: "+509 3711 2233",
+    linkedin: "linkedin.com/in/edline-jean",
+    twitter: "twitter.com/edlinej",
+    featured: true,
+    createdAt: "2026-01-10T00:00:00.000Z",
+  },
+  {
+    id: "tm-2",
+    name: "Marc-Arthur Pierre",
+    category: "member",
+    location: "Cap-Haïtien, Haiti",
+    bio: "Treasurer and Financial Auditor. Background in cooperative banking and auditing nonprofit programs.",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+    focusAreas: ["Finances", "Compliance", "Risk Assessment"],
+    status: "active",
+    email: "ma.pierre@ifundayiti.org",
+    phone: "+509 3822 3344",
+    createdAt: "2026-02-15T00:00:00.000Z",
+  },
+  {
+    id: "tm-3",
+    name: "Roseline Dubois",
+    category: "volunteer",
+    location: "Jacmel, Haiti",
+    bio: "Graduate student in Social Work. Passionate about empowering rural women-led agricultural startups.",
+    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
+    focusAreas: ["Agriculture", "Education", "Field Reviews"],
+    status: "pending",
+    email: "r.dubois@example.com",
+    phone: "+509 3633 4455",
+    linkedin: "linkedin.com/in/roseline-dubois",
+    createdAt: "2026-08-25T10:00:00.000Z",
+  },
+  {
+    id: "tm-4",
+    name: "Samuel Lamothe",
+    category: "volunteer",
+    location: "Les Cayes, Haiti",
+    bio: "Solar installation engineer offering technical vetting for clean energy grant applicants.",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400",
+    focusAreas: ["Clean Energy", "Technology Vetting"],
+    status: "pending",
+    email: "sam.lamothe@example.com",
+    phone: "+509 3444 5566",
+    createdAt: "2026-08-26T14:30:00.000Z",
+  }
 ];
