@@ -1,37 +1,31 @@
 import type { useApplicationWorkflow } from "../useApplicationWorkflow";
-import { ApplicationDetailDrawer } from "./ApplicationDetailDrawer";
 import { RejectReasonModal } from "./RejectReasonModal";
 import { SelectWinnerModal } from "./SelectWinnerModal";
 import { WinnerStoryModal } from "./WinnerStoryModal";
+import type { Application } from "@/features/core/types";
 
 type Workflow = ReturnType<typeof useApplicationWorkflow>;
 
-/** Renders the drawer + reject / winner / story modals for a workflow instance. */
+/** Renders the reject / winner / story modals for a workflow instance. */
 export function ApplicationWorkflowModals({ wf }: { wf: Workflow }) {
   return (
     <>
-      <ApplicationDetailDrawer
-        application={wf.viewing}
-        period={wf.viewingPeriod}
-        open={!!wf.viewing}
-        onClose={wf.closeViewing}
-        onAction={wf.onAction}
-      />
       <RejectReasonModal
         open={!!wf.rejecting}
-        applicantName={wf.rejecting?.personal.name}
+        applicantName={wf.rejecting?.personal?.name}
         onCancel={wf.closeRejecting}
         onConfirm={wf.confirmReject}
       />
       <SelectWinnerModal
+        // Cast or map if types mismatch slightly
         application={wf.winnering}
-        maxAmount={wf.winnerMaxAmount}
+        maxAmount={1000} // Canonical max amount
         open={!!wf.winnering}
         onCancel={wf.closeWinnering}
         onConfirm={wf.confirmWinner}
       />
       <WinnerStoryModal
-        application={wf.storying}
+        application={wf.storying as unknown as Application}
         open={!!wf.storying}
         onCancel={wf.closeStorying}
         onConfirm={wf.confirmStory}

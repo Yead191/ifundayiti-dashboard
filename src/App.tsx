@@ -31,6 +31,9 @@ const IFundAyitiOverviewPage = lazy(
 const IFundAyitiApplicationsPage = lazy(
   () => import("@/features/applications/ApplicationsPage"),
 );
+const IFundAyitiApplicationDetailPage = lazy(
+  () => import("@/features/applications/ApplicationDetailPage"),
+);
 const IFundAyitiPeriodsPage = lazy(
   () => import("@/features/periods/ApplicationPeriodsPage"),
 );
@@ -66,6 +69,10 @@ export default function App() {
             <Route
               path="applications"
               element={<IFundAyitiApplicationsPage />}
+            />
+            <Route
+              path="applications/:applicationId"
+              element={<IFundAyitiApplicationDetailPage />}
             />
             <Route path="periods" element={<IFundAyitiPeriodsPage />} />
             <Route path="donations" element={<IFundAyitiDonationsPage />} />

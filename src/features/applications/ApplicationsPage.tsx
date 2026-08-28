@@ -1,114 +1,213 @@
-import { useMemo, useState } from "react";
-import { Tabs, Badge } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import { Tabs, Badge, Input, Select, Button, Space } from "antd";
+import { InboxOutlined, SearchOutlined, ReloadOutlined } from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { useIFundAyiti } from "@/features/core/IFundAyitiContext";
+import { useGetApplicationsQuery } from "@/redux/features/applications/applicationsApi";
+import { useGetPeriodsQuery } from "@/redux/features/periods/periodsApi";
 import { useApplicationWorkflow } from "./useApplicationWorkflow";
+import { useGetDashboardOverviewQuery } from "@/redux/features/dashboard/dashboardApi";
 import { STATUS_ORDER, statusLabelMap } from "@/features/core/statusMaps";
 import { ApplicationsTable } from "./components/ApplicationsTable";
-import {
-  ApplicationFilters,
-  AMOUNT_RANGES,
-  DEFAULT_FILTERS,
-  type ApplicationFilterValues,
-} from "./components/ApplicationFilters";
 import { ApplicationWorkflowModals } from "./components/ApplicationWorkflowModals";
-import type { ApplicationStatus } from "@/features/core/types";
 
-type TabKey = ApplicationStatus | "all";
+type TabKey = string;
 
 export default function ApplicationsPage() {
-  const { applications, periods } = useIFundAyiti();
-  const workflow = useApplicationWorkflow();
   const [tab, setTab] = useState<TabKey>("all");
-  const [filters, setFilters] = useState<ApplicationFilterValues>(DEFAULT_FILTERS);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [periodId, setPeriodId] = useState("all");
 
-  const counts = useMemo(() => {
-    const map = { all: applications.length } as Record<TabKey, number>;
-    for (const status of STATUS_ORDER) map[status] = 0;
-    for (const app of applications) map[app.status] += 1;
-    return map;
-  }, [applications]);
+  // Fetch applications from the backend
+  const {
+    data: applicationsData,
+    isLoading: isLoadingApplications,
+    isFetching: isFetchingApplications,
+    refetch,
+  } = useGetApplicationsQuery({
+    page,
+    limit,
+    searchTerm,
+    status: tab,
+    applicationPeriod: periodId,
+  });
 
-  const filtered = useMemo(() => {
-    const amountRange = AMOUNT_RANGES.find((r) => r.key === filters.amountKey)?.range ?? null;
-    const search = filters.search.trim().toLowerCase();
+  // Fetch periods for the filter select dropdown
+  const { data: periodsData, isLoading: isLoadingPeriods } = useGetPeriodsQuery({
+    limit: 100,
+  });
 
-    return applications
-      .filter((app) => (tab === "all" ? true : app.status === tab))
-      .filter((app) => (filters.periodId === "all" ? true : app.periodId === filters.periodId))
-      .filter((app) => {
-        if (!amountRange) return true;
-        return app.grant.requestedAmount >= amountRange.min && app.grant.requestedAmount <= amountRange.max;
-      })
-      .filter((app) => {
-        if (!filters.dateRange) return true;
-        const [from, to] = filters.dateRange;
-        const created = new Date(app.createdAt).getTime();
-        return created >= from.startOf("day").valueOf() && created <= to.endOf("day").valueOf();
-      })
-      .filter((app) => {
-        if (!search) return true;
-        return (
-          app.personal.name.toLowerCase().includes(search) ||
-          app.grant.projectName.toLowerCase().includes(search) ||
-          app.trackingId.toLowerCase().includes(search)
-        );
-      })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [applications, tab, filters]);
+  // Fetch dashboard overview counts for tab badges
+  const { data: overviewRes } = useGetDashboardOverviewQuery();
+  const overview = overviewRes?.data;
+
+  const workflow = useApplicationWorkflow(() => {
+    refetch();
+  });
+
+  const periods = periodsData?.data || [];
+  const applications = applicationsData?.data || [];
+  const total = applicationsData?.pagination?.total || 0;
 
   const tabItems = [
-    { key: "all", label: <TabLabel label="All" count={counts.all} active={tab === "all"} /> },
+    {
+      key: "all",
+      label: (
+        <TabLabel
+          label="All"
+          active={tab === "all"}
+          count={overview?.totalApplication}
+        />
+      ),
+    },
     ...STATUS_ORDER.map((status) => ({
       key: status,
-      label: <TabLabel label={statusLabelMap[status]} count={counts[status]} active={tab === status} />,
+      label: (
+        <TabLabel
+          label={statusLabelMap[status]}
+          active={tab === status}
+          count={overview?.[status as keyof typeof overview] as number | undefined}
+        />
+      ),
     })),
   ];
 
+  const handleTabChange = (key: TabKey) => {
+    setTab(key);
+    setPage(1); // Reset page on tab switch
+  };
+
+  const handlePageChange = (p: number, l: number) => {
+    setPage(p);
+    setLimit(l);
+  };
+
   return (
-    <div>
-      <GlassCard flat className="mb-4" padded={false}>
-        <div className="px-4 pt-2 md:px-5">
-          <Tabs activeKey={tab} onChange={(k) => setTab(k as TabKey)} items={tabItems} />
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+        <div>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0B3D2E]">
+            Applications
+          </h1>
+          <p className="text-sm text-mist-600 mt-1">
+            Review submissions, evaluate projects, and manage the full micro-grant lifecycle.
+          </p>
         </div>
-        <div className="border-t border-navy-700/60 p-4 md:p-5">
-          <ApplicationFilters value={filters} periods={periods} onChange={setFilters} />
+        <Button
+          icon={<ReloadOutlined spin={isFetchingApplications} />}
+          onClick={refetch}
+          className="self-start md:self-auto border-navy-700/60 hover:text-[#0b3d2e] hover:border-[#0b3d2e] rounded-xl"
+        >
+          Refresh Board
+        </Button>
+      </div>
+
+      {/* Tabs and Filters */}
+      <GlassCard flat className="mb-4 overflow-hidden" padded={false}>
+        <div className="px-4 pt-2 md:px-5 border-b border-navy-700/40 bg-linear-to-b from-navy-800/10 to-transparent">
+          <Tabs
+            activeKey={tab}
+            onChange={handleTabChange}
+            items={tabItems}
+            className="applications-tabs"
+          />
+        </div>
+        <div className="p-4 md:p-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-mist-500 mb-1.5">
+              Search Applicants
+            </div>
+            <Input
+              allowClear
+              prefix={<SearchOutlined className="text-mist-500" />}
+              placeholder="Search name, project title, etc."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+              className="rounded-xl border-navy-700/60 hover:border-[#0b3d2e] focus:border-[#0b3d2e]"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-mist-500 mb-1.5">
+              Grant Cycle / Period
+            </div>
+            <Select
+              className="w-full rounded-xl"
+              value={periodId}
+              onChange={(val) => {
+                setPeriodId(val);
+                setPage(1);
+              }}
+              loading={isLoadingPeriods}
+              options={[
+                { label: "All Grant Cycles", value: "all" },
+                ...periods.map((p) => ({ label: p.title, value: p._id })),
+              ]}
+            />
+          </div>
         </div>
       </GlassCard>
 
-      <GlassCard flat padded={false}>
-        {filtered.length === 0 ? (
+      {/* Table Data */}
+      <GlassCard flat padded={false} className="overflow-hidden border border-navy-700/60 shadow-md">
+        {applications.length === 0 && !isLoadingApplications ? (
           <EmptyState
-            icon={<InboxOutlined />}
+            icon={<InboxOutlined className="text-mist-500 text-5xl" />}
             title="No applications found"
-            description="Try adjusting the status tab or filters to see more applications."
+            description="There are no applications matching your current filter criteria."
           />
         ) : (
-          <ApplicationsTable data={filtered} periods={periods} onAction={workflow.onAction} />
+          <ApplicationsTable
+            data={applications}
+            loading={isLoadingApplications}
+            page={page}
+            pageSize={limit}
+            total={total}
+            onPageChange={handlePageChange}
+            onAction={workflow.onAction}
+          />
         )}
       </GlassCard>
 
+      {/* Action Modals */}
       <ApplicationWorkflowModals wf={workflow} />
     </div>
   );
 }
 
-function TabLabel({ label, count, active }: { label: string; count: number; active: boolean }) {
+function TabLabel({
+  label,
+  active,
+  count,
+}: {
+  label: string;
+  active: boolean;
+  count?: number;
+}) {
   return (
-    <span className="flex items-center gap-2">
-      {label}
-      <Badge
-        count={count}
-        showZero
-        overflowCount={999}
-        style={{
-          backgroundColor: active ? "#8131F0" : "#23274f",
-          color: active ? "#fff" : "#9ca3c9",
-          boxShadow: "none",
-        }}
-      />
+    <span className="flex items-center gap-2.5 py-1 px-1 font-semibold transition-colors duration-200">
+      <span>{label}</span>
+      {count !== undefined && (
+        <Badge
+          count={count}
+          showZero
+          style={{
+            backgroundColor: active ? "#0b3d2e" : "rgba(11, 61, 46, 0.08)",
+            color: active ? "#fff" : "#0b3d2e",
+            boxShadow: "none",
+            fontSize: "10px",
+            height: "18px",
+            lineHeight: "18px",
+            minWidth: "18px",
+            padding: "0 5px",
+          }}
+        />
+      )}
     </span>
   );
 }
