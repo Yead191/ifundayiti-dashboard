@@ -1,0 +1,876 @@
+Page Name:
+IFundAyiti - Application Management Dashboard
+
+Page Goal:
+Build a centralized application management dashboard where administrators can manage the complete lifecycle of every micro grant application. Instead of creating separate modules for Approved Applicants, Finalists, Winners, and Archived Applicants, the dashboard manages everything from a single Applications page using status-based tabs. Every application moves through different statuses until the application period is completed.
+
+====================================================
+OVERALL APPLICATION FLOW
+====================================================
+
+Application Period Created
+
+↓
+
+Applicants Submit Applications
+
+↓
+
+Status = submitted
+
+↓
+
+Admin Reviews Application
+
+↓
+
+Status = underReview
+
+↓
+
+approve
+
+OR
+
+reject
+
+↓
+
+Approved Applicants Become Public
+
+↓
+
+Admin Selects Top 5 Finalists
+
+↓
+
+Status = finalist
+
+↓
+
+Admin Selects One Winner
+
+↓
+
+Status = winner
+
+↓
+
+Application Period Ends
+
+↓
+
+Winner and Remaining Applications
+
+↓
+
+Status = Archived
+
+====================================================
+SIDEBAR (children of IFundAyiti)
+====================================================
+
+Overview
+
+Applications
+
+Application Periods
+
+Donations (transactions)
+
+
+====================================================
+DASHBOARD OVERVIEW
+====================================================
+
+Purpose
+
+Quick summary of the current grant program.
+
+Statistics( overall + current period)
+
+- Total Applications
+- Submitted
+- Under Review
+- Approved
+- Rejected
+- Finalists
+- Winner
+- Archived
+- Total Donations
+- Current Program Fund
+
+Optional Charts
+
+- Applications by year(
+     "message": "Monthly application chart fetched successfully",
+    "data": [
+        {
+            "month": "Jan",
+            "count": 0
+        },
+        {
+            "month": "Feb",
+            "count": 0
+        },
+        {
+            "month": "Mar",
+            "count": 0
+        },
+        {
+            "month": "Apr",
+            "count": 0
+        },
+        {
+            "month": "May",
+            "count": 0
+        },
+        {
+            "month": "Jun",
+            "count": 0
+        },
+        {
+            "month": "Jul",
+            "count": 8
+        },
+        {
+            "month": "Aug",
+            "count": 0
+        },
+        {
+            "month": "Sep",
+            "count": 0
+        },
+        {
+            "month": "Oct",
+            "count": 0
+        },
+        {
+            "month": "Nov",
+            "count": 0
+        },
+        {
+            "month": "Dec",
+            "count": 0
+        }
+    ]
+)
+- Monthly Donations by year(
+      "message": "Donation amount chart fetched successfully",
+    "data": [
+        {
+            "month": "Jan",
+            "amount": 0
+        },
+        {
+            "month": "Feb",
+            "amount": 0
+        },
+        {
+            "month": "Mar",
+            "amount": 0
+        },
+        {
+            "month": "Apr",
+            "amount": 0
+        },
+        {
+            "month": "May",
+            "amount": 0
+        },
+        {
+            "month": "Jun",
+            "amount": 0
+        },
+        {
+            "month": "Jul",
+            "amount": 1150
+        },
+        {
+            "month": "Aug",
+            "amount": 0
+        },
+        {
+            "month": "Sep",
+            "amount": 0
+        },
+        {
+            "month": "Oct",
+            "amount": 0
+        },
+        {
+            "month": "Nov",
+            "amount": 0
+        },
+        {
+            "month": "Dec",
+            "amount": 0
+        }
+    ]
+)
+- Status Chart(
+     "data": [
+        {
+            "status": "Finalist",
+            "count": 1
+        },
+        {
+            "status": "Submitted",
+            "count": 4
+        },
+        {
+            "status": "Rejected",
+            "count": 1
+        },
+        {
+            "status": "Winner",
+            "count": 2
+        }
+        ... rest of the statu
+    ]
+)
+
+====================================================
+APPLICATIONS
+====================================================
+
+Purpose
+
+Manage every application from one page.
+
+Tabs
+
+[ All ]
+
+[ Submitted ]
+
+[ Under Review ]
+
+[ Approved ]
+
+[ Rejected ]
+
+[ Finalists ]
+
+[ Winner ]
+
+[ Archived ]
+
+Each tab simply filters applications by status.
+
+====================================================
+APPLICATION TABLE
+====================================================
+
+Columns
+
+Applicant Name
+
+Project Name
+
+Requested Amount
+
+Application Period
+
+Status
+
+Submitted Date
+
+Actions
+
+Filters
+
+- Search
+- Application Period
+- Requested Amount
+- Submission Date
+
+====================================================
+APPLICATION DETAILS
+====================================================
+
+Clicking View opens the full application.
+
+====================================================
+
+PERSONAL DETAILS
+
+Full Name
+
+Date of Birth
+
+Nationality
+
+Location
+
+Occupation
+
+Financial Background
+
+====================================================
+
+CONTACT INFORMATION
+
+Email
+
+Phone Number
+
+====================================================
+
+IDENTIFICATION
+
+National ID
+
+Passport Number
+
+====================================================
+
+PROJECT INFORMATION
+
+Project Name
+
+Project Description
+
+Requested Amount
+
+Fund Usage
+
+Expected Impact
+
+====================================================
+
+DOCUMENTS
+
+Every uploaded document is stored in one array.
+
+Example
+
+Government ID
+
+Preview
+
+Download
+
+----------------------------
+
+Proof of Address
+
+Preview
+
+Download
+
+----------------------------
+
+Business Plan
+
+Preview
+
+Download
+
+Supported Files
+
+- jpg
+- jpeg
+- png
+- webp
+- pdf
+
+Images should open in an image viewer.
+
+PDFs should open in a PDF viewer.
+
+
+====================================================
+STATUS ACTIONS
+====================================================
+
+Submitted
+
+Actions
+
+- View
+- Move to Under Review
+
+----------------------------------------------------
+
+Under Review
+
+Actions
+
+- View
+- Approve
+- Reject
+
+----------------------------------------------------
+
+Approved
+
+Actions
+
+- View
+- Move to Finalist
+- Reject
+
+Business Rule
+
+Approved applicants automatically become visible on the public website.
+
+----------------------------------------------------
+
+Rejected
+
+Actions
+
+- View
+- Archive
+- Rejection reason input
+
+Rejected applicants never appear publicly.
+
+----------------------------------------------------
+
+Finalist
+
+Actions
+
+- View
+- Remove from Finalists
+- Select Winner
+
+Business Rule
+
+Maximum of five finalists.
+
+----------------------------------------------------
+
+Winner
+
+Actions
+
+- View
+- Edit Winner Story
+- Archive
+
+Business Rule
+
+Only one winner can exist for an application period.
+
+----------------------------------------------------
+
+Archived
+
+Actions
+
+- View
+
+Read-only.
+
+====================================================
+APPLICATION PERIODS
+====================================================
+
+Purpose
+
+Manage grant cycles.
+
+Fields
+
+- Period Name
+- Description
+- Start Date
+- End Date
+- Maximum Grant Amount
+- Status
+
+Statuses
+
+Upcoming
+
+Open
+
+Review
+
+Winner Selection
+
+Closed
+
+Business Rules
+
+Only one application period can be Open at a time.
+
+When End Date arrives
+
+↓
+
+Application closes
+
+↓
+
+Applications move into review
+
+(
+    backend model schema for better understandning
+    const applicationperiodSchema = new Schema<IApplicationperiod, ApplicationperiodModel>({
+
+  title: {
+    type: String,
+    required: true,
+    trim: true,
+    unique: true,
+  },
+
+  startDate: {
+    type: Date,
+    required: true,
+  },
+
+  endDate: {
+    type: Date,
+    required: true,
+  },
+
+  maximumGrantAmount: {
+    type: Number,
+    required: true,
+    min: 1, max: 1000
+  },
+
+  status: {
+    type: String,
+    enum: [
+      'Upcoming',
+      'Open',
+      'Review',
+      'WinnerSelection',
+      'Closed',
+    ],
+    default: 'Upcoming',
+  },
+},
+  {
+    timestamps: true,
+  }
+);)
+
+====================================================
+TOP 5 FINALIST PROCESS
+====================================================
+
+Workflow
+
+Application
+
+↓
+
+Submitted
+
+↓
+
+Under Review
+
+↓
+
+Approved
+
+↓
+
+Admin manually selects Top 5
+
+↓
+
+Status becomes
+
+Finalist
+
+Business Rules
+
+- Maximum five finalists.
+- No automatic scoring.
+- No voting.
+- Team selects finalists manually.
+
+====================================================
+WINNER PROCESS
+====================================================
+
+Workflow
+
+Finalist
+
+↓
+
+Admin clicks
+
+Select Winner
+
+Popup
+
+Award Amount
+
+Transfer Date
+
+Admin Notes
+
+Confirm
+
+System
+
+↓
+
+Status becomes
+
+Winner
+
+Business Rules
+
+- Only one winner per application period.
+- Winner must come from Finalists.
+- Winner automatically appears on the public Winners page.
+
+====================================================
+DONATIONS (transaction with )
+====================================================
+
+Purpose
+
+Monitor donations.
+
+STATS: 
+Total Donations
+Awarded Grants
+Current Program Fund(Balance)
+
+
+Columns
+
+Donor
+
+Email
+
+Amount
+
+Transaction ID
+
+Date
+
+
+====================================================
+APPLICATION DATA 
+====================================================
+
+Example Payload
+
+ {
+            "_id": "6a5f186ab3e22f3f08e59753",
+            "applicationPeriod": {
+                "_id": "6a5f1646f0bf1afd49f1edcd",
+                "title": "Summer 2027 Grant Cycle",
+                "startDate": "2026-07-21T00:00:00.000Z",
+                "endDate": "2026-08-30T23:59:59.999Z"
+            },
+            "personal": {
+                "name": "Asadur Rahaman Yead",
+                "dob": "2000-12-30T00:00:00.000Z",
+                "nationality": "Bangladeshi",
+                "location": "Dhaka, Bangladesh",
+                "image": "/image/736740083_122096196879388320_3226666689297866208_n-1784617066879.jpg"
+            },
+            "contact": {
+                "email": "yead19@gmail.com",
+                "phone": "+8801712345678"
+            },
+            "identification": {
+                "nationalId": "1998123456789",
+                "passport": "A12345678"
+            },
+            "grant": {
+                "projectName": "Smart Farming Initiative",
+                "projectDescription": "Developing a smart farming solution using IoT sensors and AI analytics for small-scale farmers.",
+                "requestedAmount": 500,
+                "fundUsage": "The grant will be used to purchase sensors, microcontrollers, and cloud hosting for the pilot implementation.",
+                "expectedImpact": "The project aims to improve crop yield, reduce water consumption, and increase farmers' income."
+            },
+            "background": {
+                "occupation": "Software Engineer",
+                "financialBackground": "I am a self-employed software engineer with limited funding available for research and product development."
+            },
+            "documents": [
+                {
+                    "type": "nid_card",
+                    "url": "/nid_card/388-1-zoom_grande-1784617066842.webp"
+                },
+                {
+                    "type": "proof_of_address",
+                    "url": "/proof_of_address/736740083_122096196879388320_3226666689297866208_n-1784617066842.jpg"
+                },
+                {
+                    "type": "business_plan",
+                    "url": "/business_plan/the-bussiness-plan-(8.5-x-11-in)-(1)-1784617066845.pdf"
+                }
+            ],
+            "status": "winner",
+            "fundedAmount": 800,
+            "createdAt": "2026-07-21T06:57:46.893Z",
+            "updatedAt": "2026-07-21T08:13:46.453Z",
+            "__v": 0,
+            "reviewedAt": "2026-07-21T08:13:46.430Z",
+            "reviewedBy": "6a4e27433c8dccc51692e6af",
+            "successStory": "This person is amazing, also amazing his project idea! Congrats" //for success, successStory. if rejected, then rejectionReason , else null
+        },
+
+====================================================
+DOCUMENT STORAGE
+====================================================
+
+Store every uploaded file in one documents array.
+
+Example
+
+documents: [
+
+{
+
+id,
+
+type,
+
+fileUrl,
+
+fileName,
+
+mimeType,
+
+size
+
+}
+
+]
+
+Document Types
+
+- Government ID
+- Proof of Address
+- Business Plan
+- Supporting Images
+- Supporting Documents
+
+====================================================
+PUBLIC WEBSITE SYNCHRONIZATION
+====================================================
+
+Status = Approved
+
+↓
+
+Applicant appears on
+
+Approved Applicants
+
+--------------------------------------------
+
+Status = Finalist
+
+↓
+
+Applicant appears on
+
+Top 5 Finalists
+
+--------------------------------------------
+
+Status = Winner
+
+↓
+
+Applicant appears on
+
+Winners Page
+
+--------------------------------------------
+
+Status = Archived
+
+↓
+
+Applicant appears on
+
+Past Applicants
+
+====================================================
+APPLICATION STATUS ENUM
+====================================================
+
+submitted
+
+↓
+
+underReview
+
+↓
+
+approved
+
+↓
+
+finalist
+
+↓
+
+winner
+
+↓
+
+archived
+
+OR
+
+submitted
+
+↓
+
+underReview
+
+↓
+
+rejected
+
+↓
+
+archived
+
+====================================================
+BACKEND STATUS ENUM
+====================================================
+
+status:
+
+    enum: [
+      'submitted',
+      'underReview',
+      'approved',
+      'rejected',
+      'finalist',
+      'winner',
+      'archived',
+    ],
+
+====================================================
+IMPORTANT BUSINESS RULES
+====================================================
+
+- Applicants do not have user accounts.
+- Every application receives a unique Tracking ID after submission.
+- Applicants check their application using the Tracking ID (and optionally Date of Birth for verification).
+- Every application belongs to exactly one Application Period.
+- Maximum requested grant amount is $1000.
+- Only admins can modify application data after submission.
+- Only admins can change an application's status.
+- Approved applications become publicly visible.
+- Rejected applications remain private.
+- A maximum of five applications can have the Finalist status within a single application period.
+- Exactly one application can have the Winner status within a single application period.
+- The Winner must be selected from the Finalists.
+- When a Winner is selected, the organization transfers funds manually outside the platform.
+- Donations always go to the IFundAyiti Program Fund and are never linked to individual applicants.
+- All uploaded documents are stored in a single documents array and support image and PDF preview.
+- All frontend validation should use Zod, and all data must be validated again on the backend before processing.

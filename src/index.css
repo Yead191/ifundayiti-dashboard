@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+@theme {
+  /* ---- Brand palette (from Hubology frontend design system) ---- */
+  --color-navy-950: #060712;
+  --color-navy-900: #090b1b;
+  --color-navy-850: #0d1026;
+  --color-navy-800: #121531;
+  --color-navy-700: #191d3f;
+  --color-navy-600: #23274f;
+  --color-navy-500: #313564;
+
+  --color-violet-600: #8131f0;
+  --color-violet-700: #6b26cc;
+  --color-violet-900: #4a1c8a;
+  --color-violet-glow: #9d5cf5;
+
+  --color-cloud-100: #eef0fb;
+  --color-mist-400: #9ca3c9;
+  --color-mist-600: #6b7299;
+
+  --color-success: #34d399;
+  --color-warning: #f5b544;
+  --color-danger: #f2617a;
+  --color-info: #5cc8f5;
+
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-glow-violet: 0 0 0 1px rgba(129, 49, 240, 0.15), 0 8px 30px -8px rgba(129, 49, 240, 0.45);
+  --shadow-panel: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset, 0 20px 60px -20px rgba(0, 0, 0, 0.6);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-navy-900);
+    color: var(--color-cloud-100);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: rgba(129, 49, 240, 0.35);
+    color: #fff;
+  }
+
+  /* Slim, quiet scrollbars that suit a dark UI */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-navy-600);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-navy-500);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-violet-glow);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* Radial aurora glows used sparingly on hero / overview surfaces */
+  .aurora-field {
+    position: relative;
+    isolation: isolate;
+  }
+  .aurora-field::before,
+  .aurora-field::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    border-radius: 999px;
+    filter: blur(90px);
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .aurora-field::before {
+    width: 420px;
+    height: 420px;
+    top: -160px;
+    left: -80px;
+    background: radial-gradient(circle, var(--color-violet-600), transparent 70%);
+  }
+  .aurora-field::after {
+    width: 360px;
+    height: 360px;
+    bottom: -140px;
+    right: -60px;
+    background: radial-gradient(circle, var(--color-violet-900), transparent 70%);
+  }
+
+  /* Glassmorphic panel with 1px gradient hairline border */
+  .glass-panel {
+    position: relative;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: var(--shadow-panel);
+  }
+  .glass-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(129, 49, 240, 0.55), rgba(255, 255, 255, 0.06) 40%, rgba(74, 28, 138, 0.4));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .glass-panel-flat {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+  }
+
+  .gradient-text {
+    background: linear-gradient(120deg, #c9a4fb, var(--color-violet-glow) 45%, var(--color-violet-600));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .gradient-ring {
+    box-shadow: 0 0 0 1px rgba(129, 49, 240, 0.4);
+  }
+
+  .btn-gradient {
+    background: linear-gradient(135deg, var(--color-violet-600), var(--color-violet-900));
+    box-shadow: var(--shadow-glow-violet);
+  }
+
+  .surface-hover {
+    transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
