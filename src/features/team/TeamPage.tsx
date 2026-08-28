@@ -27,9 +27,9 @@ import {
   EnvironmentOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { useIFundAyiti } from "./IFundAyitiContext";
+import { useIFundAyiti } from "@/features/core/IFundAyitiContext";
 import { GlassCard } from "@/components/ui/GlassCard";
-import type { TeamMember, TeamMemberStatus } from "./types";
+import type { TeamMember, TeamMemberStatus } from "@/features/core/types";
 import { toast } from "sonner";
 
 export default function TeamPage() {

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { useIFundAyiti } from "./IFundAyitiContext";
-import { MAX_GRANT_AMOUNT, type Application, type WinnerAward } from "./types";
+import { useIFundAyiti } from "@/features/core/IFundAyitiContext";
+import { MAX_GRANT_AMOUNT, type Application, type WinnerAward } from "@/features/core/types";
 import type { AppActionKey } from "./applicationActions";
 
 /**

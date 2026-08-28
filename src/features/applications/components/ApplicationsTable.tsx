@@ -2,8 +2,8 @@ import { Avatar, Table, type TableProps } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { statusToneMap, statusLabelMap } from "../statusMaps";
-import type { Application, ApplicationPeriod, ApplicationStatus } from "../types";
+import { statusToneMap, statusLabelMap } from "@/features/core/statusMaps";
+import type { Application, ApplicationPeriod, ApplicationStatus } from "@/features/core/types";
 import { ApplicationActionsCell } from "./ApplicationActions";
 import type { AppActionKey } from "../applicationActions";
 

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Modal, Input, Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
-import { winnerStorySchema } from "../schemas";
-import type { Application } from "../types";
+import { winnerStorySchema } from "@/features/core/schemas";
+import type { Application } from "@/features/core/types";
 
 /** Create or edit the public success story shown on the Winners page. */
 export function WinnerStoryModal({

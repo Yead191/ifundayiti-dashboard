@@ -1,7 +1,7 @@
 import { Input, Select, DatePicker } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import type { Dayjs } from "dayjs";
-import type { ApplicationPeriod } from "../types";
+import type { ApplicationPeriod } from "@/features/core/types";
 
 const { RangePicker } = DatePicker;
 

@@ -10,7 +10,7 @@ import {
   EditOutlined,
   InboxOutlined,
 } from "@ant-design/icons";
-import type { ApplicationStatus } from "./types";
+import type { ApplicationStatus } from "@/features/core/types";
 
 export type AppActionKey =
   | "view"

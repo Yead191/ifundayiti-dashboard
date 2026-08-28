@@ -41,9 +41,17 @@ export function AuthShell({
 
       <div className="relative z-10 w-full max-w-105">
         <div className="mb-8 flex flex-col items-center text-center">
-          <img src="/logo-ifundayiti.png" alt="IFundAyiti" className="mb-4 h-14 w-auto" />
-          <h1 className="font-display text-xl font-semibold tracking-tight text-cloud-100">{title}</h1>
-          {subtitle && <p className="mt-1.5 max-w-sm text-sm text-mist-400">{subtitle}</p>}
+          <img
+            src="/logo-ifundayiti.png"
+            alt="IFundAyiti"
+            className="mb-4 h-32 w-fit"
+          />
+          <h1 className="font-display text-xl font-semibold tracking-tight text-cloud-100">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="mt-1.5 max-w-sm text-sm text-mist-400">{subtitle}</p>
+          )}
 
           {step !== undefined && (
             <div className="mt-6 flex items-center gap-2">
@@ -56,9 +64,13 @@ export function AuthShell({
                     <div
                       className={cn(
                         "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition",
-                        done && "border-violet-600/40 bg-violet-600/10 text-violet-600",
-                        active && "border-violet-600 bg-linear-to-br from-[#0B3D2E] to-[#051C15] text-white shadow-[0_8px_20px_-8px_rgba(11,61,46,0.35)]",
-                        !done && !active && "border-navy-650 bg-navy-900/10 text-mist-500"
+                        done &&
+                          "border-violet-600/40 bg-violet-600/10 text-violet-600",
+                        active &&
+                          "border-violet-600 bg-linear-to-br from-[#0B3D2E] to-[#051C15] text-white shadow-[0_8px_20px_-8px_rgba(11,61,46,0.35)]",
+                        !done &&
+                          !active &&
+                          "border-navy-650 bg-navy-900/10 text-mist-500",
                       )}
                     >
                       {stepNumber}
@@ -67,7 +79,7 @@ export function AuthShell({
                       <div
                         className={cn(
                           "h-px w-8 transition",
-                          done ? "bg-violet-600/50" : "bg-navy-600/80"
+                          done ? "bg-violet-600/50" : "bg-navy-600/80",
                         )}
                       />
                     )}

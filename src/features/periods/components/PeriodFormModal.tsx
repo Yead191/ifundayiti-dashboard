@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 import { Modal, Form, Input, InputNumber, DatePicker, Select, Button } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
-import { applicationPeriodSchema, zodToFormErrors } from "../schemas";
-import { periodStatusLabelMap } from "../statusMaps";
+import { applicationPeriodSchema, zodToFormErrors } from "@/features/core/schemas";
+import { periodStatusLabelMap } from "@/features/core/statusMaps";
 import {
   MAX_GRANT_AMOUNT,
   PERIOD_STATUS_OPTIONS,
   type ApplicationPeriod,
   type ApplicationPeriodInput,
-} from "../types";
+} from "@/features/core/types";
 
 const { RangePicker } = DatePicker;
 

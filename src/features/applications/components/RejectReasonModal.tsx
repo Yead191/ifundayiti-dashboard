@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal, Input, Button } from "antd";
 import { CloseCircleFilled } from "@ant-design/icons";
-import { rejectionReasonSchema } from "../schemas";
+import { rejectionReasonSchema } from "@/features/core/schemas";
 
 /** Captures a required rejection reason before rejecting an application. */
 export function RejectReasonModal({

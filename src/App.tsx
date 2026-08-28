@@ -4,6 +4,7 @@ import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { PageLoader } from "@/components/ui/PageLoader";
 import OrdersPage from "./features/orders/OrdersPage";
+// import TeamPage from "./features/ifundayiti/TeamPage";
 
 // Route-level code splitting keeps the initial bundle lean — each page's
 // chunk is only fetched when the admin actually navigates there.
@@ -25,18 +26,18 @@ const RefundDetailPage = lazy(
 const EventsPage = lazy(() => import("@/features/events/EventsPage"));
 const EventDetailPage = lazy(() => import("@/features/events/EventDetailPage"));
 const IFundAyitiOverviewPage = lazy(
-  () => import("@/features/ifundayiti/IFundAyitiOverviewPage"),
+  () => import("@/features/overview/OverviewPage"),
 );
 const IFundAyitiApplicationsPage = lazy(
-  () => import("@/features/ifundayiti/ApplicationsPage"),
+  () => import("@/features/applications/ApplicationsPage"),
 );
 const IFundAyitiPeriodsPage = lazy(
-  () => import("@/features/ifundayiti/ApplicationPeriodsPage"),
+  () => import("@/features/periods/ApplicationPeriodsPage"),
 );
 const IFundAyitiDonationsPage = lazy(
-  () => import("@/features/ifundayiti/DonationsPage"),
+  () => import("@/features/donations/DonationsPage"),
 );
-const TeamPage = lazy(() => import("@/features/ifundayiti/TeamPage"));
+const TeamPage = lazy(() => import("@/features/team/TeamPage"));
 
 export default function App() {
   return (
@@ -66,14 +67,8 @@ export default function App() {
               path="applications"
               element={<IFundAyitiApplicationsPage />}
             />
-            <Route
-              path="periods"
-              element={<IFundAyitiPeriodsPage />}
-            />
-            <Route
-              path="donations"
-              element={<IFundAyitiDonationsPage />}
-            />
+            <Route path="periods" element={<IFundAyitiPeriodsPage />} />
+            <Route path="donations" element={<IFundAyitiDonationsPage />} />
             <Route path="team" element={<TeamPage />} />
           </Route>
         </Route>

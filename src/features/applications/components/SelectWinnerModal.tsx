@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { Modal, Form, InputNumber, DatePicker, Input, Button } from "antd";
 import { TrophyFilled } from "@ant-design/icons";
 import dayjs, { type Dayjs } from "dayjs";
-import { winnerAwardSchema, zodToFormErrors } from "../schemas";
-import type { Application, WinnerAward } from "../types";
+import { winnerAwardSchema, zodToFormErrors } from "@/features/core/schemas";
+import type { Application, WinnerAward } from "@/features/core/types";
 
 interface WinnerFormValues {
   awardAmount: number;

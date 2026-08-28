@@ -18,7 +18,10 @@ interface LoginFormValues {
 
 /** Pull a human-readable message out of an RTK Query error. */
 function getErrorMessage(error: unknown): string {
-  return getAuthErrorMessage(error, "Those credentials don't match our records.");
+  return getAuthErrorMessage(
+    error,
+    "Those credentials don't match our records.",
+  );
 }
 
 export default function LoginPage() {
@@ -74,7 +77,7 @@ export default function LoginPage() {
           <img
             src="/logo-ifundayiti.png"
             alt="IFundAyiti"
-            className="mb-4 h-14 w-auto"
+            className="mb-4 h-32 w-fit"
           />
           <p className="mt-1 text-sm text-mist-400">
             Sign in to manage your workspace

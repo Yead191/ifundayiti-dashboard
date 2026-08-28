@@ -15,8 +15,8 @@ import {
 } from "@ant-design/icons";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { formatCurrency, formatDate, formatFileSize } from "@/lib/utils";
-import { statusToneMap, statusLabelMap } from "../statusMaps";
-import { DOCUMENT_LABELS, type Application, type ApplicationDocument, type ApplicationPeriod } from "../types";
+import { statusToneMap, statusLabelMap } from "@/features/core/statusMaps";
+import { DOCUMENT_LABELS, type Application, type ApplicationDocument, type ApplicationPeriod } from "@/features/core/types";
 import { StatusActionBar } from "./ApplicationActions";
 import { DocumentPreviewModal } from "./DocumentPreviewModal";
 import type { AppActionKey } from "../applicationActions";

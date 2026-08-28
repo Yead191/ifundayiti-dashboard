@@ -3,9 +3,9 @@ import { Tabs, Badge } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { useIFundAyiti } from "./IFundAyitiContext";
+import { useIFundAyiti } from "@/features/core/IFundAyitiContext";
 import { useApplicationWorkflow } from "./useApplicationWorkflow";
-import { STATUS_ORDER, statusLabelMap } from "./statusMaps";
+import { STATUS_ORDER, statusLabelMap } from "@/features/core/statusMaps";
 import { ApplicationsTable } from "./components/ApplicationsTable";
 import {
   ApplicationFilters,
@@ -14,7 +14,7 @@ import {
   type ApplicationFilterValues,
 } from "./components/ApplicationFilters";
 import { ApplicationWorkflowModals } from "./components/ApplicationWorkflowModals";
-import type { ApplicationStatus } from "./types";
+import type { ApplicationStatus } from "@/features/core/types";
 
 type TabKey = ApplicationStatus | "all";
 

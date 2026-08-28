@@ -9,10 +9,10 @@ import { StatusTag } from "@/components/ui/StatusTag";
 import { ConfirmDeleteModal } from "@/components/ui/ConfirmDeleteModal";
 import { useConfirmDelete } from "@/hooks/useConfirmDelete";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { useIFundAyiti } from "./IFundAyitiContext";
-import { periodStatusToneMap, periodStatusLabelMap } from "./statusMaps";
+import { useIFundAyiti } from "@/features/core/IFundAyitiContext";
+import { periodStatusToneMap, periodStatusLabelMap } from "@/features/core/statusMaps";
 import { PeriodFormModal } from "./components/PeriodFormModal";
-import type { ApplicationPeriod, ApplicationPeriodInput } from "./types";
+import type { ApplicationPeriod, ApplicationPeriodInput } from "@/features/core/types";
 
 export default function ApplicationPeriodsPage() {
   const { periods, applications, addPeriod, updatePeriod, removePeriod } = useIFundAyiti();

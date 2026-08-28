@@ -1,8 +1,12 @@
 import { Button, Dropdown, type MenuProps } from "antd";
 import { EyeOutlined, MoreOutlined } from "@ant-design/icons";
 import { cn } from "@/lib/utils";
-import { ACTION_META, STATUS_ACTIONS, type AppActionKey } from "../applicationActions";
-import type { Application } from "../types";
+import {
+  ACTION_META,
+  STATUS_ACTIONS,
+  type AppActionKey,
+} from "../applicationActions";
+import type { Application } from "@/features/core/types";
 
 type OnAction = (key: AppActionKey, application: Application) => void;
 
@@ -29,12 +33,24 @@ export function ApplicationActionsCell({
 
   return (
     <div className="flex items-center justify-end gap-1.5">
-      <Button size="small" icon={<EyeOutlined />} onClick={() => onAction("view", application)}>
+      <Button
+        size="small"
+        icon={<EyeOutlined />}
+        onClick={() => onAction("view", application)}
+      >
         View
       </Button>
       {actions.length > 0 && (
-        <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
-          <Button size="small" icon={<MoreOutlined />} aria-label="More actions" />
+        <Dropdown
+          menu={{ items: menuItems }}
+          trigger={["click"]}
+          placement="bottomRight"
+        >
+          <Button
+            size="small"
+            icon={<MoreOutlined />}
+            aria-label="More actions"
+          />
         </Dropdown>
       )}
     </div>
@@ -73,7 +89,10 @@ export function StatusActionBar({
             danger={meta.danger}
             type={meta.primary ? "primary" : "default"}
             icon={meta.icon}
-            className={cn("flex-1", meta.primary && !meta.danger && "btn-gradient !border-0")}
+            className={cn(
+              "flex-1",
+              meta.primary && !meta.danger && "btn-gradient border-0!",
+            )}
             onClick={() => onAction(key, application)}
           >
             {meta.label}

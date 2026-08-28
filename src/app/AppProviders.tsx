@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { ConfigProvider, App as AntdApp, theme as antdTheme } from "antd";
 import { Toaster } from "sonner";
 import { hubologyTheme } from "@/lib/theme";
-import { IFundAyitiProvider } from "@/features/ifundayiti/IFundAyitiContext";
+import { IFundAyitiProvider } from "@/features/core/IFundAyitiContext";
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (

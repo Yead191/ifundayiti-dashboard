@@ -5,9 +5,9 @@ import { StatCard } from "@/components/ui/StatCard";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
-import { useIFundAyiti } from "./IFundAyitiContext";
-import { computeStats } from "./selectors";
-import type { Donation } from "./types";
+import { useIFundAyiti } from "@/features/core/IFundAyitiContext";
+import { computeStats } from "@/features/core/selectors";
+import type { Donation } from "@/features/core/types";
 
 export default function DonationsPage() {
   const { donations, applications } = useIFundAyiti();

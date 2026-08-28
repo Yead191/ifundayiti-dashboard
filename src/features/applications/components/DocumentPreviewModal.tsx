@@ -1,6 +1,6 @@
 import { Modal, Button } from "antd";
 import { DownloadOutlined, FilePdfOutlined, FileImageOutlined } from "@ant-design/icons";
-import { DOCUMENT_LABELS, type ApplicationDocument } from "../types";
+import { DOCUMENT_LABELS, type ApplicationDocument } from "@/features/core/types";
 import { formatFileSize } from "@/lib/utils";
 
 /** Renders images in an inline viewer and PDFs in an embedded PDF frame. */
