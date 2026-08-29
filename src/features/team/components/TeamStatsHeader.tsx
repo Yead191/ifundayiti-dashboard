@@ -67,7 +67,7 @@ export function TeamStatsHeader({
       {statCards.map((card) => (
         <GlassCard
           key={card.id}
-          className={`relative cursor-pointer overflow-hidden border p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${card.borderColor} bg-gradient-to-br ${card.bgGradient}`}
+          className={`relative cursor-pointer overflow-hidden border p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${card.borderColor} bg-linear-to-br ${card.bgGradient}`}
           onClick={() => onSelectTab?.(card.id)}
         >
           {card.hasAlertBadge && (
@@ -81,7 +81,9 @@ export function TeamStatsHeader({
             <div className="rounded-xl border border-navy-700/40 bg-white/70 p-2.5 shadow-xs">
               {card.icon}
             </div>
-            <div className={`font-display text-2xl font-bold ${card.textColor}`}>
+            <div
+              className={`font-display text-2xl font-bold ${card.textColor}`}
+            >
               {loading ? "..." : card.count}
             </div>
           </div>
