@@ -30,7 +30,7 @@ export function Sidebar({
     limit: 1,
   });
 
-  const pendingVendors = dashboardRes?.data?.pendingVendors ?? 0;
+  const pendingVendors = (dashboardRes as any)?.data?.pendingVendors ?? 0;
   const reportedPosts = reportedRes?.pagination?.total ?? 0;
   const pendingPartners = pendingPartnersRes?.pagination?.total ?? 0;
 
