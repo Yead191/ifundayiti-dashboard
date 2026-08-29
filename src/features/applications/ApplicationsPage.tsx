@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Tabs, Badge, Input, Select, Button, Space } from "antd";
-import { InboxOutlined, SearchOutlined, ReloadOutlined } from "@ant-design/icons";
+import {
+  InboxOutlined,
+  SearchOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useGetApplicationsQuery } from "@/redux/features/applications/applicationsApi";
@@ -35,9 +39,11 @@ export default function ApplicationsPage() {
   });
 
   // Fetch periods for the filter select dropdown
-  const { data: periodsData, isLoading: isLoadingPeriods } = useGetPeriodsQuery({
-    limit: 100,
-  });
+  const { data: periodsData, isLoading: isLoadingPeriods } = useGetPeriodsQuery(
+    {
+      limit: 100,
+    },
+  );
 
   // Fetch dashboard overview counts for tab badges
   const { data: overviewRes } = useGetDashboardOverviewQuery();
@@ -68,7 +74,9 @@ export default function ApplicationsPage() {
         <TabLabel
           label={statusLabelMap[status]}
           active={tab === status}
-          count={overview?.[status as keyof typeof overview] as number | undefined}
+          count={
+            overview?.[status as keyof typeof overview] as number | undefined
+          }
         />
       ),
     })),
@@ -93,13 +101,14 @@ export default function ApplicationsPage() {
             Applications
           </h1>
           <p className="text-sm text-mist-600 mt-1">
-            Review submissions, evaluate projects, and manage the full micro-grant lifecycle.
+            Review submissions, evaluate projects, and manage the full
+            micro-grant lifecycle.
           </p>
         </div>
         <Button
           icon={<ReloadOutlined spin={isFetchingApplications} />}
           onClick={refetch}
-          className="self-start md:self-auto border-navy-700/60 hover:text-[#0b3d2e] hover:border-[#0b3d2e] rounded-xl"
+          className="self-start md:self-auto border-navy-700/60 hover:text-violet-600 hover:border-violet-600 rounded-xl"
         >
           Refresh Board
         </Button>
@@ -129,7 +138,7 @@ export default function ApplicationsPage() {
                 setSearchTerm(e.target.value);
                 setPage(1);
               }}
-              className="rounded-xl border-navy-700/60 hover:border-[#0b3d2e] focus:border-[#0b3d2e]"
+              className="rounded-xl border-navy-700/60 hover:border-violet-600 focus:border-violet-600"
             />
           </div>
           <div>
@@ -154,7 +163,11 @@ export default function ApplicationsPage() {
       </GlassCard>
 
       {/* Table Data */}
-      <GlassCard flat padded={false} className="overflow-hidden border border-navy-700/60 shadow-md">
+      <GlassCard
+        flat
+        padded={false}
+        className="overflow-hidden border border-navy-700/60 shadow-md"
+      >
         {applications.length === 0 && !isLoadingApplications ? (
           <EmptyState
             icon={<InboxOutlined className="text-mist-500 text-5xl" />}

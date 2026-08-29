@@ -136,11 +136,11 @@ export default function ApplicationDetailPage() {
             shape="circle"
             icon={<ArrowLeftOutlined />}
             onClick={() => navigate("/applications")}
-            className="border-navy-700/60 hover:text-[#0b3d2e] hover:border-[#0b3d2e]"
+            className="border-navy-700/60 hover:text-violet-600 hover:border-violet-600"
           />
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-display text-xl font-bold tracking-tight text-[#0B3D2E]">
+              <h1 className="font-display text-xl font-bold tracking-tight text-violet-600">
                 {personal?.name || "Applicant Details"}
               </h1>
               <StatusTag
@@ -175,7 +175,7 @@ export default function ApplicationDetailPage() {
         <div className="space-y-6 lg:col-span-4">
           {/* Winner Showcase Block */}
           {application.status === "winner" && (
-            <div className="relative overflow-hidden rounded-2xl border border-[#f5b544]/30 bg-gradient-to-r from-[#ffd166]/10 via-[#f5b544]/5 to-transparent p-5">
+            <div className="relative overflow-hidden rounded-2xl border border-[#f5b544]/30 bg-linear-to-r from-[#ffd166]/10 via-[#f5b544]/5 to-transparent p-5">
               <div className="absolute right-3 top-3 text-[#f5b544] text-3xl opacity-20">
                 <TrophyFilled />
               </div>
@@ -243,7 +243,7 @@ export default function ApplicationDetailPage() {
 
           {/* Profile Card */}
           <GlassCard className="border border-navy-700/60 shadow-xs">
-            <h3 className="font-display text-sm font-bold text-[#0B3D2E] border-b border-navy-700/40 pb-2 mb-4">
+            <h3 className="font-display text-sm font-bold text-violet-600 border-b border-navy-700/40 pb-2 mb-4">
               Applicant Profile
             </h3>
             <div className="flex items-center gap-4 mb-5">
@@ -251,7 +251,7 @@ export default function ApplicationDetailPage() {
                 src={toFileUrl(personal?.image)}
                 icon={<UserOutlined />}
                 size={68}
-                className="border-2 border-[#0b3d2e]/20"
+                className="border-2 border-violet-600/20"
               />
               <div>
                 <h4 className="font-bold text-cloud-100 text-base">
@@ -295,7 +295,7 @@ export default function ApplicationDetailPage() {
                 <span className="text-mist-500 flex items-center gap-2">
                   <EnvironmentOutlined className="text-mist-400" /> Location
                 </span>
-                <span className="text-cloud-100 font-medium text-right max-w-[200px] truncate">
+                <span className="text-cloud-100 font-medium text-right max-w-50 truncate">
                   {personal?.location}
                 </span>
               </div>
@@ -332,7 +332,7 @@ export default function ApplicationDetailPage() {
 
           {/* Workflow Action Bar */}
           <GlassCard className="border border-navy-700/60 shadow-xs">
-            <h3 className="font-display text-sm font-bold text-[#0B3D2E] border-b border-navy-700/40 pb-2 mb-4">
+            <h3 className="font-display text-sm font-bold text-violet-600 border-b border-navy-700/40 pb-2 mb-4">
               Workflow Actions
             </h3>
             <div className="space-y-3">
@@ -345,7 +345,7 @@ export default function ApplicationDetailPage() {
                     onClick={() =>
                       workflow.onAction("underReview", application)
                     }
-                    className="w-full btn-gradient border-0 rounded-xl"
+                    className="w-full btn-linear border-0 rounded-xl"
                   >
                     Start Technical Review
                   </Button>
@@ -367,7 +367,7 @@ export default function ApplicationDetailPage() {
                     icon={<CheckCircleOutlined />}
                     loading={workflow.isUpdatingStatus}
                     onClick={() => workflow.onAction("approve", application)}
-                    className="w-full btn-gradient border-0 rounded-xl"
+                    className="w-full btn-linear border-0 rounded-xl"
                   >
                     Approve to Shortlist
                   </Button>
@@ -412,7 +412,7 @@ export default function ApplicationDetailPage() {
                     onClick={() =>
                       workflow.onAction("selectWinner", application)
                     }
-                    className="w-full !bg-gradient-to-r !from-[#f5b544] !to-[#c9800f] !text-white !border-0 rounded-xl shadow-xs"
+                    className="w-full bg-linear-to-r! from-[#f5b544]! to-[#c9800f]! text-white! border-0! rounded-xl shadow-xs"
                   >
                     Select as Cycle Winner
                   </Button>
@@ -435,7 +435,7 @@ export default function ApplicationDetailPage() {
                     type="primary"
                     icon={<TrophyFilled />}
                     onClick={() => workflow.onAction("editStory", application)}
-                    className="w-full btn-gradient border-0 rounded-xl"
+                    className="w-full btn-linear border-0 rounded-xl"
                   >
                     Edit Winner Success Story
                   </Button>
@@ -497,7 +497,7 @@ export default function ApplicationDetailPage() {
         <div className="lg:col-span-8 space-y-6">
           {/* Project Card */}
           <GlassCard className="border border-navy-700/60 shadow-xs">
-            <h3 className="font-display text-sm font-bold text-[#0B3D2E] border-b border-navy-700/40 pb-2 mb-4">
+            <h3 className="font-display text-sm font-bold text-violet-600 border-b border-navy-700/40 pb-2 mb-4">
               Project Information
             </h3>
             <div className="space-y-4">
@@ -514,7 +514,7 @@ export default function ApplicationDetailPage() {
                   <div className="text-xs text-mist-500 font-semibold uppercase tracking-wider">
                     Requested Funds
                   </div>
-                  <div className="font-bold text-[#0b3d2e] text-lg mt-0.5">
+                  <div className="font-bold text-violet-600 text-lg mt-0.5">
                     {formatCurrency(grant?.requestedAmount)}
                   </div>
                 </div>
@@ -566,7 +566,7 @@ export default function ApplicationDetailPage() {
 
           {/* Attachments Card */}
           <GlassCard className="border border-navy-700/60 shadow-xs">
-            <h3 className="font-display text-sm font-bold text-[#0B3D2E] border-b border-navy-700/40 pb-2 mb-4 flex items-center justify-between">
+            <h3 className="font-display text-sm font-bold text-violet-600 border-b border-navy-700/40 pb-2 mb-4 flex items-center justify-between">
               <span>Application Materials & Attachments</span>
               <span className="text-xs font-normal text-mist-500">
                 {(application.documents?.length || 0) +
@@ -605,20 +605,18 @@ export default function ApplicationDetailPage() {
                               label,
                             })
                           }
-                          className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 border border-navy-700/40 hover:bg-[#0b3d2e]/5 hover:border-[#0b3d2e] bg-white/40 shadow-xs group"
+                          className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 border border-navy-700/40 hover:bg-violet-600/5 hover:border-violet-600 bg-white/40 shadow-xs group"
                         >
-                          <span className="text-base flex-shrink-0">
-                            {icon}
-                          </span>
+                          <span className="text-base shrink-0">{icon}</span>
                           <div className="min-w-0 flex-1">
-                            <div className="text-xs font-semibold text-cloud-100 truncate group-hover:text-[#0b3d2e] transition-colors">
+                            <div className="text-xs font-semibold text-cloud-100 truncate group-hover:text-violet-600 transition-colors">
                               {label}
                             </div>
                             <div className="text-[9px] text-mist-500 font-mono truncate">
                               {doc.url.split("/").pop()}
                             </div>
                           </div>
-                          <EyeOutlined className="text-mist-400 group-hover:text-[#0b3d2e] transition-colors flex-shrink-0" />
+                          <EyeOutlined className="text-mist-400 group-hover:text-violet-600 transition-colors shrink-0" />
                         </div>
                       );
                     })}
@@ -649,20 +647,20 @@ export default function ApplicationDetailPage() {
                               label,
                             })
                           }
-                          className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 border border-navy-700/40 hover:bg-[#0b3d2e]/5 hover:border-[#0b3d2e] bg-white/40 shadow-xs group"
+                          className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 border border-navy-700/40 hover:bg-violet-600/5 hover:border-violet-600 bg-white/40 shadow-xs group"
                         >
-                          <span className="text-base flex-shrink-0">
+                          <span className="text-base shrink-0">
                             <FileImageOutlined className="text-amber-500 text-lg" />
                           </span>
                           <div className="min-w-0 flex-1">
-                            <div className="text-xs font-semibold text-cloud-100 truncate group-hover:text-[#0b3d2e] transition-colors">
+                            <div className="text-xs font-semibold text-cloud-100 truncate group-hover:text-violet-600 transition-colors">
                               {label}
                             </div>
                             <div className="text-[9px] text-mist-500 font-mono truncate">
                               {url.split("/").pop()}
                             </div>
                           </div>
-                          <EyeOutlined className="text-mist-400 group-hover:text-[#0b3d2e] transition-colors flex-shrink-0" />
+                          <EyeOutlined className="text-mist-400 group-hover:text-violet-600 transition-colors shrink-0" />
                         </div>
                       );
                     })}
@@ -680,10 +678,10 @@ export default function ApplicationDetailPage() {
         title={
           <div className="flex items-center justify-between pr-8 border-b border-navy-700/20 pb-3">
             <div>
-              <h4 className="font-bold text-base text-[#0B3D2E]">
+              <h4 className="font-bold text-base text-violet-600">
                 {activeFile?.label}
               </h4>
-              <div className="text-[10px] text-mist-500 font-mono truncate max-w-[400px]">
+              <div className="text-[10px] text-mist-500 font-mono truncate max-w-100">
                 {activeFile?.url.split("/").pop()}
               </div>
             </div>
@@ -692,7 +690,7 @@ export default function ApplicationDetailPage() {
                 href={toFileUrl(activeFile.url)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-[#0b3d2e] font-semibold hover:underline mr-4"
+                className="flex items-center gap-1.5 text-xs text-violet-600 font-semibold hover:underline mr-4"
               >
                 <DownloadOutlined /> Download File
               </a>
@@ -706,7 +704,7 @@ export default function ApplicationDetailPage() {
         destroyOnClose
         className="document-preview-modal"
       >
-        <div className="mt-4 flex items-center justify-center bg-white rounded-xl overflow-hidden shadow-inner border border-navy-700/10 p-2 min-h-[500px]">
+        <div className="mt-4 flex items-center justify-center bg-white rounded-xl overflow-hidden shadow-inner border border-navy-700/10 p-2 min-h-125">
           {activeFile && isImage && (
             <img
               src={toFileUrl(activeFile.url)}
@@ -729,7 +727,7 @@ export default function ApplicationDetailPage() {
               <h5 className="font-bold text-sm text-cloud-100">
                 Preview Unsupported
               </h5>
-              <p className="text-xs text-mist-500 mt-1 max-w-[240px] mx-auto">
+              <p className="text-xs text-mist-500 mt-1 max-w-60 mx-auto">
                 This document format is not supported for inline display.
               </p>
               <Button
@@ -737,7 +735,7 @@ export default function ApplicationDetailPage() {
                 icon={<DownloadOutlined />}
                 href={toFileUrl(activeFile.url)}
                 target="_blank"
-                className="mt-4 btn-gradient border-0 rounded-xl"
+                className="mt-4 btn-linear border-0 rounded-xl"
               >
                 Download to View
               </Button>

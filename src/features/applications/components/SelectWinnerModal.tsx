@@ -35,7 +35,11 @@ export function SelectWinnerModal({
   maxAmount: number;
   open: boolean;
   onCancel: () => void;
-  onConfirm: (values: { awardedAmount: number; successStory: string; quote?: string }) => void;
+  onConfirm: (values: {
+    awardedAmount: number;
+    successStory: string;
+    quote?: string;
+  }) => void;
 }) {
   const [form] = Form.useForm<WinnerFormValues>();
 
@@ -58,7 +62,9 @@ export function SelectWinnerModal({
     });
 
     if (!parsed.success) {
-      form.setFields(zodToFormErrors(parsed.error) as Parameters<typeof form.setFields>[0]);
+      form.setFields(
+        zodToFormErrors(parsed.error) as Parameters<typeof form.setFields>[0],
+      );
       return;
     }
 
@@ -88,8 +94,12 @@ export function SelectWinnerModal({
       }
     >
       <div className="mb-4 mt-2 rounded-xl border border-navy-700/60 bg-navy-800/40 p-3.5">
-        <div className="text-sm font-semibold text-cloud-100">{application.personal?.name}</div>
-        <div className="text-xs text-mist-500">{application.grant?.projectName}</div>
+        <div className="text-sm font-semibold text-cloud-100">
+          {application.personal?.name}
+        </div>
+        <div className="text-xs text-mist-500">
+          {application.grant?.projectName}
+        </div>
       </div>
 
       <Form form={form} layout="vertical" requiredMark="optional">
@@ -99,7 +109,7 @@ export function SelectWinnerModal({
           tooltip={`Capped by the cycle's maximum grant amount: $${maxAmount}.`}
         >
           <InputNumber
-            className="!w-full"
+            className="w-full!"
             min={1}
             max={maxAmount}
             prefix="$"
@@ -114,7 +124,11 @@ export function SelectWinnerModal({
           />
         </Form.Item>
 
-        <Form.Item label="Featured Quote" name="quote" tooltip="An inspiring quote to show on the public winners board.">
+        <Form.Item
+          label="Featured Quote"
+          name="quote"
+          tooltip="An inspiring quote to show on the public winners board."
+        >
           <Input.TextArea
             rows={2}
             placeholder="e.g. 'A small grant does not rewrite a whole economy. It can rewrite one week of work...'"
@@ -127,7 +141,7 @@ export function SelectWinnerModal({
         <Button
           type="primary"
           icon={<TrophyFilled />}
-          className="!border-0 !bg-gradient-to-r !from-[#f5b544] !to-[#c9800f] !text-white !shadow-[0_8px_20px_-8px_rgba(245,181,68,0.6)]"
+          className="border-0! bg-linear-to-r! from-[#f5b544]! to-[#c9800f]! text-white! shadow-[0_8px_20px_-8px_rgba(245,181,68,0.6)]!"
           onClick={handleSubmit}
         >
           Confirm Winner

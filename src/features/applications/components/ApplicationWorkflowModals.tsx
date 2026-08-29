@@ -2,7 +2,6 @@ import type { useApplicationWorkflow } from "../useApplicationWorkflow";
 import { RejectReasonModal } from "./RejectReasonModal";
 import { SelectWinnerModal } from "./SelectWinnerModal";
 import { WinnerStoryModal } from "./WinnerStoryModal";
-import type { Application } from "@/features/core/types";
 
 type Workflow = ReturnType<typeof useApplicationWorkflow>;
 
@@ -17,7 +16,6 @@ export function ApplicationWorkflowModals({ wf }: { wf: Workflow }) {
         onConfirm={wf.confirmReject}
       />
       <SelectWinnerModal
-        // Cast or map if types mismatch slightly
         application={wf.winnering}
         maxAmount={1000} // Canonical max amount
         open={!!wf.winnering}
@@ -25,7 +23,8 @@ export function ApplicationWorkflowModals({ wf }: { wf: Workflow }) {
         onConfirm={wf.confirmWinner}
       />
       <WinnerStoryModal
-        application={wf.storying as unknown as Application}
+        application={wf.storying}
+        maxAmount={1000}
         open={!!wf.storying}
         onCancel={wf.closeStorying}
         onConfirm={wf.confirmStory}

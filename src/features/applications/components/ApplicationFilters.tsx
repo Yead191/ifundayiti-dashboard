@@ -17,7 +17,11 @@ export interface ApplicationFilterValues {
   dateRange: [Dayjs, Dayjs] | null;
 }
 
-export const AMOUNT_RANGES: { key: string; label: string; range: AmountRange | null }[] = [
+export const AMOUNT_RANGES: {
+  key: string;
+  label: string;
+  range: AmountRange | null;
+}[] = [
   { key: "all", label: "Any amount", range: null },
   { key: "0-250", label: "$0 – $250", range: { min: 0, max: 250 } },
   { key: "251-500", label: "$251 – $500", range: { min: 251, max: 500 } },
@@ -42,8 +46,10 @@ export function ApplicationFilters({
   periods: ApplicationPeriod[];
   onChange: (next: ApplicationFilterValues) => void;
 }) {
-  const set = <K extends keyof ApplicationFilterValues>(key: K, val: ApplicationFilterValues[K]) =>
-    onChange({ ...value, [key]: val });
+  const set = <K extends keyof ApplicationFilterValues>(
+    key: K,
+    val: ApplicationFilterValues[K],
+  ) => onChange({ ...value, [key]: val });
 
   return (
     <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
@@ -68,9 +74,11 @@ export function ApplicationFilters({
         options={AMOUNT_RANGES.map((r) => ({ label: r.label, value: r.key }))}
       />
       <RangePicker
-        className="!w-full"
+        className="w-full!"
         value={value.dateRange}
-        onChange={(range) => set("dateRange", (range as [Dayjs, Dayjs] | null) ?? null)}
+        onChange={(range) =>
+          set("dateRange", (range as [Dayjs, Dayjs] | null) ?? null)
+        }
         placeholder={["From", "To"]}
       />
     </div>

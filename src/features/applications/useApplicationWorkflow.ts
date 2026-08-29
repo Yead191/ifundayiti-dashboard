@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import {
   useUpdateApplicationStatusMutation,
   useSelectWinnerMutation,
+  useUpdateWinnerInformationMutation,
   useDeleteApplicationMutation,
   type APIApplication
 } from "@/redux/features/applications/applicationsApi";
@@ -12,6 +13,7 @@ import type { WinnerAward } from "@/features/core/types";
 export function useApplicationWorkflow(onSuccess?: () => void) {
   const [updateStatus, { isLoading: isUpdatingStatus }] = useUpdateApplicationStatusMutation();
   const [setWinner, { isLoading: isSettingWinner }] = useSelectWinnerMutation();
+  const [updateWinner, { isLoading: isUpdatingWinner }] = useUpdateWinnerInformationMutation();
   const [deleteApp, { isLoading: isDeleting }] = useDeleteApplicationMutation();
 
   const [rejectingApp, setRejectingApp] = useState<APIApplication | null>(null);
@@ -113,22 +115,22 @@ export function useApplicationWorkflow(onSuccess?: () => void) {
     }
   };
 
-  const confirmStory = async (story: string) => {
+  const confirmStory = async (values: {
+    awardedAmount?: number;
+    successStory?: string;
+    quote?: string;
+  }) => {
     if (!storyingApp) return;
     try {
-      await setWinner({
+      await updateWinner({
         id: storyingApp._id,
-        body: {
-          status: "winner",
-          successStory: story,
-          awardedAmount: storyingApp.awardedAmount || storyingApp.grant.requestedAmount,
-        },
+        body: values,
       }).unwrap();
-      toast.success("Winner story saved");
+      toast.success("Winner information updated successfully");
       setStoryingApp(null);
       onSuccess?.();
     } catch (err: any) {
-      toast.error("Failed to save story", { description: err.data?.message || "An error occurred" });
+      toast.error("Failed to update winner information", { description: err.data?.message || "An error occurred" });
     }
   };
 
@@ -157,5 +159,6 @@ export function useApplicationWorkflow(onSuccess?: () => void) {
     isDeleting,
     isUpdatingStatus,
     isSettingWinner,
+    isUpdatingWinner,
   };
 }

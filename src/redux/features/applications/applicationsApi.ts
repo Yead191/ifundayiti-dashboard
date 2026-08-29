@@ -136,6 +136,24 @@ export const applicationsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Applications"],
     }),
+    updateWinnerInformation: builder.mutation<
+      ApplicationSingleResponse,
+      {
+        id: string;
+        body: {
+          successStory?: string;
+          quote?: string;
+          awardedAmount?: number;
+        };
+      }
+    >({
+      query: ({ id, body }) => ({
+        url: `/application/update-winner/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["Applications"],
+    }),
     deleteApplication: builder.mutation<{ success: boolean; message: string }, string>({
       query: (id) => ({
         url: `/application/${id}`,
@@ -152,5 +170,6 @@ export const {
   useGetApplicationByIdQuery,
   useUpdateApplicationStatusMutation,
   useSelectWinnerMutation,
+  useUpdateWinnerInformationMutation,
   useDeleteApplicationMutation,
 } = applicationsApi;

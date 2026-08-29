@@ -5,7 +5,11 @@ import { StatusTag } from "@/components/ui/StatusTag";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { statusToneMap, statusLabelMap } from "@/features/core/statusMaps";
 import type { APIApplication } from "@/redux/features/applications/applicationsApi";
-import { ACTION_META, STATUS_ACTIONS, type AppActionKey } from "../applicationActions";
+import {
+  ACTION_META,
+  STATUS_ACTIONS,
+  type AppActionKey,
+} from "../applicationActions";
 import { useNavigate } from "react-router-dom";
 import { toFileUrl } from "@/config";
 
@@ -38,15 +42,22 @@ export function ApplicationsTable({
         const imageUrl = toFileUrl(record.personal?.image);
         return (
           <div className="flex items-center gap-3">
-            <Avatar src={imageUrl} icon={<UserOutlined />} size={40} className="border border-navy-700/60" />
+            <Avatar
+              src={imageUrl}
+              icon={<UserOutlined />}
+              size={40}
+              className="border border-navy-700/60"
+            />
             <div className="min-w-0">
-              <div 
-                className="font-semibold text-cloud-100 hover:text-[#0b3d2e] cursor-pointer transition-colors duration-200"
+              <div
+                className="font-semibold text-cloud-100 hover:text-violet-600 cursor-pointer transition-colors duration-200"
                 onClick={() => navigate(`/applications/${record._id}`)}
               >
                 {record.personal?.name || "Anonymous"}
               </div>
-              <div className="font-mono text-[10px] text-mist-600 truncate max-w-[120px]">{record._id}</div>
+              <div className="font-mono text-[10px] text-mist-600 truncate max-w-30">
+                {record._id}
+              </div>
             </div>
           </div>
         );
@@ -57,7 +68,9 @@ export function ApplicationsTable({
       key: "project",
       responsive: ["md"],
       render: (_, record) => (
-        <div className="max-w-[220px] truncate text-mist-400 font-medium">{record.grant?.projectName}</div>
+        <div className="max-w-55 truncate text-mist-400 font-medium">
+          {record.grant?.projectName}
+        </div>
       ),
     },
     {
@@ -65,21 +78,33 @@ export function ApplicationsTable({
       key: "requestedAmount",
       sorter: (a, b) => a.grant.requestedAmount - b.grant.requestedAmount,
       render: (_, record) => (
-        <span className="font-bold text-cloud-100">{formatCurrency(record.grant?.requestedAmount)}</span>
+        <span className="font-bold text-cloud-100">
+          {formatCurrency(record.grant?.requestedAmount)}
+        </span>
       ),
     },
     {
       title: "Period",
       key: "period",
       responsive: ["lg"],
-      render: (_, record) => <span className="text-mist-500 font-medium">{record.applicationPeriod?.title || "—"}</span>,
+      render: (_, record) => (
+        <span className="text-mist-500 font-medium">
+          {record.applicationPeriod?.title || "—"}
+        </span>
+      ),
     },
     {
       title: "Status",
       key: "status",
       render: (_, record) => (
-        <StatusTag tone={statusToneMap[record.status as keyof typeof statusToneMap] || "neutral"}>
-          {statusLabelMap[record.status as keyof typeof statusLabelMap] || record.status}
+        <StatusTag
+          tone={
+            statusToneMap[record.status as keyof typeof statusToneMap] ||
+            "neutral"
+          }
+        >
+          {statusLabelMap[record.status as keyof typeof statusLabelMap] ||
+            record.status}
         </StatusTag>
       ),
     },
@@ -87,8 +112,11 @@ export function ApplicationsTable({
       title: "Submitted",
       key: "createdAt",
       responsive: ["md"],
-      sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      render: (_, record) => <span className="text-mist-500">{formatDate(record.createdAt)}</span>,
+      sorter: (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      render: (_, record) => (
+        <span className="text-mist-500">{formatDate(record.createdAt)}</span>
+      ),
     },
     {
       title: "Actions",
@@ -96,7 +124,8 @@ export function ApplicationsTable({
       width: 140,
       align: "right",
       render: (_, record) => {
-        const actions = STATUS_ACTIONS[record.status as keyof typeof STATUS_ACTIONS] || [];
+        const actions =
+          STATUS_ACTIONS[record.status as keyof typeof STATUS_ACTIONS] || [];
         const menuItems: MenuProps["items"] = actions.map((key) => ({
           key,
           label: ACTION_META[key].label,
@@ -111,7 +140,7 @@ export function ApplicationsTable({
               size="small"
               icon={<EyeOutlined />}
               onClick={() => navigate(`/applications/${record._id}`)}
-              className="hover:text-[#0b3d2e] hover:border-[#0b3d2e]"
+              className="hover:text-violet-600 hover:border-violet-600"
             >
               View
             </Button>
@@ -125,7 +154,7 @@ export function ApplicationsTable({
                   size="small"
                   icon={<MoreOutlined />}
                   aria-label="More actions"
-                  className="hover:text-[#0b3d2e] hover:border-[#0b3d2e]"
+                  className="hover:text-violet-600 hover:border-violet-600"
                 />
               </Dropdown>
             )}

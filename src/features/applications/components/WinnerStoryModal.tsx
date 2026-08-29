@@ -1,64 +1,155 @@
-import { useEffect, useState } from "react";
-import { Modal, Input, Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
-import { winnerStorySchema } from "@/features/core/schemas";
-import type { Application } from "@/features/core/types";
+import { useEffect } from "react";
+import { Modal, Form, InputNumber, Input, Button } from "antd";
+import { EditOutlined, TrophyFilled } from "@ant-design/icons";
+import { z } from "zod";
+import { zodToFormErrors } from "@/features/core/schemas";
+import type { APIApplication } from "@/redux/features/applications/applicationsApi";
 
-/** Create or edit the public success story shown on the Winners page. */
+interface WinnerStoryFormValues {
+  awardedAmount?: number;
+  successStory: string;
+  quote?: string;
+}
+
+const customWinnerStorySchema = (maxAmount: number) =>
+  z.object({
+    awardedAmount: z
+      .number({ error: "Awarded amount must be a valid number" })
+      .positive("Must be greater than 0")
+      .max(maxAmount, `Cannot exceed maximum period grant of $${maxAmount}`)
+      .optional(),
+    successStory: z
+      .string()
+      .trim()
+      .min(10, "Please provide at least 10 characters for the success story"),
+    quote: z.string().trim().optional().or(z.literal("")),
+  });
+
+/** Edit the public success story, quote, and awarded amount shown on the Winners page. */
 export function WinnerStoryModal({
   application,
+  maxAmount = 1000,
   open,
   onCancel,
   onConfirm,
 }: {
-  application: Application | null;
+  application: APIApplication | null;
+  maxAmount?: number;
   open: boolean;
   onCancel: () => void;
-  onConfirm: (story: string) => void;
+  onConfirm: (values: {
+    awardedAmount?: number;
+    successStory: string;
+    quote?: string;
+  }) => void;
 }) {
-  const [story, setStory] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [form] = Form.useForm<WinnerStoryFormValues>();
 
   useEffect(() => {
     if (open && application) {
-      setStory(application.successStory ?? "");
-      setError(null);
+      form.setFieldsValue({
+        awardedAmount:
+          application.awardedAmount ||
+          application.grant?.requestedAmount ||
+          500,
+        successStory: application.successStory ?? "",
+        quote: application.quote ?? "",
+      });
     }
-  }, [open, application]);
+  }, [open, application, form]);
 
-  const handleConfirm = () => {
-    const result = winnerStorySchema.safeParse({ successStory: story });
-    if (!result.success) {
-      setError(result.error.issues[0]?.message ?? "Invalid story");
+  const handleSubmit = () => {
+    const values = form.getFieldsValue();
+    const parsed = customWinnerStorySchema(maxAmount).safeParse({
+      awardedAmount: values.awardedAmount,
+      successStory: values.successStory,
+      quote: values.quote ?? "",
+    });
+
+    if (!parsed.success) {
+      form.setFields(
+        zodToFormErrors(parsed.error) as Parameters<typeof form.setFields>[0],
+      );
       return;
     }
-    onConfirm(result.data.successStory);
+
+    onConfirm({
+      awardedAmount: parsed.data.awardedAmount,
+      successStory: parsed.data.successStory,
+      quote: parsed.data.quote || undefined,
+    });
   };
 
   if (!application) return null;
 
   return (
-    <Modal open={open} onCancel={onCancel} footer={null} width={520} title="Winner story" destroyOnHidden>
-      <p className="text-sm text-mist-400">
-        This story appears publicly on the Winners page for {application.personal.name}.
-      </p>
-      <div className="mt-4">
-        <Input.TextArea
-          rows={5}
-          value={story}
-          status={error ? "error" : undefined}
-          onChange={(e) => {
-            setStory(e.target.value);
-            if (error) setError(null);
-          }}
-          placeholder="Share the impact of this project and why it stood out."
-        />
-        {error && <p className="mt-1.5 text-xs text-danger">{error}</p>}
+    <Modal
+      open={open}
+      onCancel={onCancel}
+      footer={null}
+      width={520}
+      title={
+        <span className="flex items-center gap-2 font-display text-base font-bold text-violet-600">
+          <span className="text-[#f5b544]">
+            <TrophyFilled />
+          </span>
+          Update Winner Information
+        </span>
+      }
+      destroyOnHidden
+    >
+      <div className="mb-4 mt-2 rounded-xl border border-navy-700/60 bg-navy-800/40 p-3.5">
+        <div className="text-sm font-semibold text-cloud-100">
+          {application.personal?.name}
+        </div>
+        <div className="text-xs text-mist-500">
+          {application.grant?.projectName}
+        </div>
       </div>
+
+      <Form form={form} layout="vertical" requiredMark="optional">
+        <Form.Item
+          label="Awarded Amount"
+          name="awardedAmount"
+          tooltip={`Capped by the cycle's maximum grant amount: $${maxAmount}.`}
+        >
+          <InputNumber
+            className="w-full!"
+            min={1}
+            max={maxAmount}
+            prefix="$"
+            placeholder="Enter the awarded amount"
+          />
+        </Form.Item>
+
+        <Form.Item label="Success Story" name="successStory" required>
+          <Input.TextArea
+            rows={4}
+            placeholder="Explain why this project was selected and what impact it is expected to achieve."
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Featured Quote"
+          name="quote"
+          tooltip="An inspiring quote to show on the public winners board."
+        >
+          <Input.TextArea
+            rows={2}
+            placeholder="e.g. 'A small grant does not rewrite a whole economy. It can rewrite one week of work...'"
+          />
+        </Form.Item>
+      </Form>
+
       <div className="mt-5 flex justify-end gap-2 border-t border-navy-700/60 pt-4">
         <Button onClick={onCancel}>Cancel</Button>
-        <Button type="primary" className="btn-gradient !border-0" icon={<EditOutlined />} onClick={handleConfirm}>
-          Save story
+        <Button
+          type="primary"
+          className="btn-linear border-0!"
+          icon={<EditOutlined />}
+          onClick={handleSubmit}
+        >
+          Save Winner Info
         </Button>
       </div>
     </Modal>
