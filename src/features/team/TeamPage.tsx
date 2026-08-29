@@ -1,607 +1,379 @@
-import { useState, useMemo } from "react";
-import {
-  Tabs,
-  Button,
-  Input,
-  Select,
-  Tag,
-  Avatar,
-  Modal,
-  Form,
-  Space,
-  Popconfirm,
-  Badge,
-} from "antd";
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  StopOutlined,
-  UserOutlined,
-  LinkedinOutlined,
-  TwitterOutlined,
-  MailOutlined,
-  PhoneOutlined,
-  EnvironmentOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import { useIFundAyiti } from "@/features/core/IFundAyitiContext";
-import { GlassCard } from "@/components/ui/GlassCard";
-import type { TeamMember, TeamMemberStatus } from "@/features/core/types";
+import { useState } from "react";
+import { Pagination, Spin } from "antd";
+import { TeamOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/ui/EmptyState";
+import {
+  useGetTeamStatsQuery,
+  useGetTeamMembersQuery,
+  useCreateTeamMemberMutation,
+  useUpdateTeamMemberMutation,
+  useChangeTeamStatusMutation,
+  useDeleteTeamMemberMutation,
+} from "@/redux/features/team/teamApi";
+import type { TeamMember, TeamStatus } from "@/redux/features/team/team.types";
+
+import { TeamStatsHeader } from "./components/TeamStatsHeader";
+import { TeamFiltersBar } from "./components/TeamFiltersBar";
+import { TeamMemberCard } from "./components/TeamMemberCard";
+import { TeamMemberTable } from "./components/TeamMemberTable";
+import { TeamMemberModal } from "./components/TeamMemberModal";
+import { TeamMemberDetailModal } from "./components/TeamMemberDetailModal";
+import { RejectVolunteerModal } from "./components/RejectVolunteerModal";
 
 export default function TeamPage() {
-  const { team, addTeamMember, updateTeamMember, deleteTeamMember, changeTeamStatus } =
-    useIFundAyiti();
+  const [activeTab, setActiveTab] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(12);
 
-  const [activeTab, setActiveTab] = useState("core");
-  const [searchText, setSearchText] = useState("");
-  const [memberModalOpen, setMemberModalOpen] = useState(false);
+  // Modals state
+  const [memberModalOpen, setMemberModalOpen] = useState<boolean>(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
-  const [rejectModalOpen, setRejectModalOpen] = useState(false);
-  const [rejectingId, setRejectingId] = useState<string | null>(null);
 
-  const [form] = Form.useForm();
-  const [rejectForm] = Form.useForm();
+  const [detailModalOpen, setDetailModalOpen] = useState<boolean>(false);
+  const [viewingMember, setViewingMember] = useState<TeamMember | null>(null);
 
-  // Filters
-  const coreTeam = useMemo(() => {
-    return team.filter(
-      (m) =>
-        (m.category === "director" || m.category === "member") &&
-        m.name.toLowerCase().includes(searchText.toLowerCase())
-    );
-  }, [team, searchText]);
+  const [rejectModalOpen, setRejectModalOpen] = useState<boolean>(false);
+  const [rejectingMember, setRejectingMember] = useState<TeamMember | null>(
+    null,
+  );
 
-  const volunteers = useMemo(() => {
-    return team.filter(
-      (m) =>
-        m.category === "volunteer" &&
-        m.name.toLowerCase().includes(searchText.toLowerCase())
-    );
-  }, [team, searchText]);
+  // Queries & Mutations
+  const {
+    data: statsRes,
+    isLoading: isLoadingStats,
+    refetch: refetchStats,
+  } = useGetTeamStatsQuery();
 
-  const pendingVolunteersCount = useMemo(() => {
-    return team.filter((m) => m.category === "volunteer" && m.status === "pending").length;
-  }, [team]);
+  const queryCategory =
+    activeTab === "all"
+      ? undefined
+      : activeTab === "pending_volunteers"
+        ? "volunteer"
+        : activeTab;
 
-  // Modal Handlers
+  const queryStatus =
+    activeTab === "pending_volunteers"
+      ? "pending"
+      : statusFilter === "all"
+        ? undefined
+        : statusFilter;
+
+  const {
+    data: teamRes,
+    isLoading: isLoadingTeam,
+    isFetching: isFetchingTeam,
+    refetch: refetchTeam,
+  } = useGetTeamMembersQuery({
+    page,
+    limit: pageSize,
+    searchTerm: searchTerm.trim() || undefined,
+    category: queryCategory,
+    status: queryStatus,
+  });
+
+  const [createTeamMember, { isLoading: isCreating }] =
+    useCreateTeamMemberMutation();
+  const [updateTeamMember, { isLoading: isUpdating }] =
+    useUpdateTeamMemberMutation();
+  const [changeTeamStatus, { isLoading: isChangingStatus }] =
+    useChangeTeamStatusMutation();
+  const [deleteTeamMember] = useDeleteTeamMemberMutation();
+
+  const stats = statsRes?.data;
+  const teamMembers = teamRes?.data || [];
+  const pagination = teamRes?.pagination || {
+    total: 0,
+    page: 1,
+    limit: pageSize,
+    totalPage: 1,
+  };
+
+  // Tab & Filter Handlers
+  const handleTabChange = (key: string) => {
+    setActiveTab(key);
+    setPage(1);
+  };
+
+  const handleSearchChange = (val: string) => {
+    setSearchTerm(val);
+    setPage(1);
+  };
+
+  const handleStatusFilterChange = (val: string) => {
+    setStatusFilter(val);
+    setPage(1);
+  };
+
+  const handlePageChange = (p: number, ps?: number) => {
+    setPage(p);
+    if (ps && ps !== pageSize) {
+      setPageSize(ps);
+    }
+  };
+
+  const handleRefreshAll = () => {
+    refetchStats();
+    refetchTeam();
+  };
+
+  // Member CRUD Actions
   const handleOpenAddModal = () => {
     setEditingMember(null);
-    form.resetFields();
     setMemberModalOpen(true);
   };
 
   const handleOpenEditModal = (member: TeamMember) => {
     setEditingMember(member);
-    form.setFieldsValue({
-      ...member,
-      focusAreas: member.focusAreas.join(", "),
-    });
     setMemberModalOpen(true);
   };
 
-  const handleSaveMember = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        const focusAreasArray = values.focusAreas
-          ? values.focusAreas.split(",").map((s: string) => s.trim()).filter(Boolean)
-          : [];
-
-        const payload = {
-          ...values,
-          focusAreas: focusAreasArray,
-        };
-
-        if (editingMember) {
-          updateTeamMember(editingMember.id, payload);
-          toast.success("Profile updated", {
-            description: `${values.name}'s details have been saved successfully.`,
-          });
-        } else {
-          addTeamMember({
-            ...payload,
-            status: "active", // Directors and Members start as active
-          });
-          toast.success("Team member added", {
-            description: `${values.name} has been added to the Core Team.`,
-          });
-        }
-        setMemberModalOpen(false);
-      })
-      .catch((info) => {
-        console.log("Validation Failed:", info);
-      });
+  const handleOpenDetailModal = (member: TeamMember) => {
+    setViewingMember(member);
+    setDetailModalOpen(true);
   };
 
-  const handleDeleteMember = (id: string) => {
-    deleteTeamMember(id);
-    toast.success("Member removed", {
-      description: "The team member profile has been deleted.",
-    });
-  };
-
-  // Volunteer Moderation Handlers
-  const handleApproveVolunteer = (id: string, name: string) => {
-    changeTeamStatus(id, "active");
-    toast.success("Volunteer approved", {
-      description: `${name} is now an active volunteer.`,
-    });
-  };
-
-  const handleOpenRejectModal = (id: string) => {
-    setRejectingId(id);
-    rejectForm.resetFields();
+  const handleOpenRejectModal = (member: TeamMember) => {
+    setRejectingMember(member);
     setRejectModalOpen(true);
   };
 
-  const handleRejectVolunteer = () => {
-    rejectForm
-      .validateFields()
-      .then((values) => {
-        if (rejectingId) {
-          changeTeamStatus(rejectingId, "rejected", values.reason);
-          const name = team.find((t) => t.id === rejectingId)?.name ?? "Volunteer";
-          toast.success("Application rejected", {
-            description: `${name} has been notified of the rejection reason.`,
-          });
-        }
-        setRejectModalOpen(false);
-      })
-      .catch((info) => {
-        console.log("Validation Failed:", info);
-      });
+  const handleSaveMember = async (formData: FormData) => {
+    try {
+      if (editingMember) {
+        await updateTeamMember({
+          id: editingMember._id,
+          body: formData,
+        }).unwrap();
+        toast.success("Profile updated successfully", {
+          description: "The team member profile details have been saved.",
+        });
+      } else {
+        await createTeamMember(formData).unwrap();
+        toast.success("Team member added successfully", {
+          description: "New member profile has been published to directory.",
+        });
+      }
+      setMemberModalOpen(false);
+      setEditingMember(null);
+    } catch (err: any) {
+      toast.error(
+        editingMember ? "Failed to update profile" : "Failed to add member",
+        {
+          description: err?.data?.message || "An unexpected error occurred",
+        },
+      );
+    }
   };
 
-  const handleBlockVolunteer = (id: string, name: string) => {
-    changeTeamStatus(id, "blocked");
-    toast.success("Volunteer blocked", {
-      description: `${name}'s volunteer status is now blocked.`,
-    });
+  const handleChangeStatus = async (
+    id: string,
+    status: TeamStatus,
+    rejectionReason?: string,
+  ) => {
+    try {
+      await changeTeamStatus({
+        id,
+        body: { status, rejectionReason },
+      }).unwrap();
+
+      const statusLabels: Record<TeamStatus, string> = {
+        active: "Activated",
+        pending: "Moved to Pending",
+        rejected: "Rejected",
+        blocked: "Blocked",
+      };
+
+      toast.success(`Member status updated: ${statusLabels[status] || status}`);
+    } catch (err: any) {
+      toast.error("Failed to update status", {
+        description: err?.data?.message || "An error occurred",
+      });
+    }
+  };
+
+  const handleConfirmReject = async (reason: string) => {
+    if (!rejectingMember) return;
+    try {
+      await changeTeamStatus({
+        id: rejectingMember._id,
+        body: { status: "rejected", rejectionReason: reason },
+      }).unwrap();
+      toast.success("Volunteer application rejected", {
+        description: `${rejectingMember.name}'s application was marked as rejected.`,
+      });
+      setRejectModalOpen(false);
+      setRejectingMember(null);
+    } catch (err: any) {
+      toast.error("Failed to reject application", {
+        description: err?.data?.message || "An error occurred",
+      });
+    }
+  };
+
+  const handleDeleteMember = async (id: string) => {
+    try {
+      await deleteTeamMember(id).unwrap();
+      toast.success("Team member deleted successfully");
+    } catch (err: any) {
+      toast.error("Failed to delete member", {
+        description: err?.data?.message || "An error occurred",
+      });
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Top Search & Actions */}
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div className="relative max-w-xs flex-1">
-          <Input
-            prefix={<SearchOutlined className="text-mist-500" />}
-            placeholder="Search by name..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            allowClear
-            size="large"
-            className="w-full bg-white"
-          />
+      {/* Top Page Title & Subtitle */}
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+        <div>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0B3D2E]">
+            Team & Volunteers
+          </h1>
+          <p className="mt-1 text-sm text-mist-600">
+            Moderate volunteer applicants, assign focus areas, and govern the
+            core foundation team.
+          </p>
         </div>
-        {activeTab === "core" && (
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            size="large"
-            onClick={handleOpenAddModal}
-            className="w-full sm:w-auto"
-          >
-            Add Team Member
-          </Button>
-        )}
       </div>
 
-      {/* Tabs */}
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        className="custom-tabs"
-        items={[
-          {
-            key: "core",
-            label: (
-              <span className="px-1 py-0.5">Core Team</span>
-            ),
-            children: (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {coreTeam.length === 0 ? (
-                  <div className="col-span-full py-12 text-center text-mist-500">
-                    No core team members found.
-                  </div>
-                ) : (
-                  coreTeam.map((member) => (
-                    <GlassCard key={member.id} className="relative flex flex-col p-5 h-full">
-                      {member.featured && (
-                        <Tag
-                          color="gold"
-                          className="absolute right-4 top-4 border-0 font-medium"
-                        >
-                          Featured
-                        </Tag>
-                      )}
-                      <div className="flex items-start gap-4">
-                        <Avatar
-                          src={member.image}
-                          size={64}
-                          icon={<UserOutlined />}
-                          className="border border-navy-700/60"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <h4 className="truncate font-display text-base font-semibold text-cloud-100">
-                            {member.name}
-                          </h4>
-                          <p className="mt-0.5 font-medium text-xs text-violet-600 capitalize">
-                            {member.category}
-                          </p>
-                          <p className="mt-1 flex items-center gap-1 text-[11px] text-mist-500">
-                            <EnvironmentOutlined />
-                            <span className="truncate">{member.location}</span>
-                          </p>
-                        </div>
-                      </div>
-
-                      <p className="mt-4 flex-1 text-xs leading-relaxed text-mist-400 line-clamp-3">
-                        {member.bio}
-                      </p>
-
-                      <div className="mt-3 flex flex-wrap gap-1">
-                        {member.focusAreas.map((area) => (
-                          <Tag key={area} className="border-0 bg-navy-700/50 text-[10px] text-mist-400">
-                            {area}
-                          </Tag>
-                        ))}
-                      </div>
-
-                      {/* Contacts & Socials */}
-                      <div className="mt-4 flex items-center justify-between border-t border-navy-700/60 pt-3">
-                        <div className="flex items-center gap-2">
-                          {member.email && (
-                            <a
-                              href={`mailto:${member.email}`}
-                              title={member.email}
-                              className="text-mist-500 hover:text-violet-600"
-                            >
-                              <MailOutlined className="text-sm" />
-                            </a>
-                          )}
-                          {member.phone && (
-                            <a
-                              href={`tel:${member.phone}`}
-                              title={member.phone}
-                              className="text-mist-500 hover:text-violet-600"
-                            >
-                              <PhoneOutlined className="text-sm" />
-                            </a>
-                          )}
-                          {member.linkedin && (
-                            <a
-                              href={`https://${member.linkedin}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-mist-500 hover:text-violet-600"
-                            >
-                              <LinkedinOutlined className="text-sm" />
-                            </a>
-                          )}
-                          {member.twitter && (
-                            <a
-                              href={`https://${member.twitter}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-mist-500 hover:text-violet-600"
-                            >
-                              <TwitterOutlined className="text-sm" />
-                            </a>
-                          )}
-                        </div>
-
-                        {/* Actions */}
-                        <Space size={8}>
-                          <Button
-                            type="text"
-                            size="small"
-                            icon={<EditOutlined />}
-                            onClick={() => handleOpenEditModal(member)}
-                            className="text-mist-500 hover:text-violet-600 hover:bg-black/5"
-                          />
-                          <Popconfirm
-                            title="Delete team member profile?"
-                            description="This action cannot be undone."
-                            onConfirm={() => handleDeleteMember(member.id)}
-                            okText="Yes, delete"
-                            cancelText="No"
-                            okButtonProps={{ danger: true }}
-                          >
-                            <Button
-                              type="text"
-                              size="small"
-                              danger
-                              icon={<DeleteOutlined />}
-                              className="hover:bg-red-50!"
-                            />
-                          </Popconfirm>
-                        </Space>
-                      </div>
-                    </GlassCard>
-                  ))
-                )}
-              </div>
-            ),
-          },
-          {
-            key: "volunteers",
-            label: (
-              <Badge count={pendingVolunteersCount} size="small" offset={[10, -2]}>
-                <span className="px-1 py-0.5">Volunteer Applications</span>
-              </Badge>
-            ),
-            children: (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {volunteers.length === 0 ? (
-                  <div className="col-span-full py-12 text-center text-mist-500">
-                    No volunteers found.
-                  </div>
-                ) : (
-                  volunteers.map((vol) => (
-                    <GlassCard key={vol.id} className="relative flex flex-col p-5 h-full">
-                      <div className="absolute right-4 top-4">
-                        {vol.status === "pending" && <Tag color="warning">Pending</Tag>}
-                        {vol.status === "active" && <Tag color="success">Active</Tag>}
-                        {vol.status === "rejected" && <Tag color="error">Rejected</Tag>}
-                        {vol.status === "blocked" && <Tag color="default">Blocked</Tag>}
-                      </div>
-
-                      <div className="flex items-start gap-4">
-                        <Avatar
-                          src={vol.image}
-                          size={64}
-                          icon={<UserOutlined />}
-                          className="border border-navy-700/60"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <h4 className="truncate font-display text-base font-semibold text-cloud-100">
-                            {vol.name}
-                          </h4>
-                          <p className="mt-1 flex items-center gap-1 text-[11px] text-mist-500">
-                            <EnvironmentOutlined />
-                            <span className="truncate">{vol.location}</span>
-                          </p>
-                        </div>
-                      </div>
-
-                      <p className="mt-4 flex-1 text-xs leading-relaxed text-mist-400 line-clamp-3">
-                        {vol.bio}
-                      </p>
-
-                      <div className="mt-3 flex flex-wrap gap-1">
-                        {vol.focusAreas.map((area) => (
-                          <Tag key={area} className="border-0 bg-navy-700/50 text-[10px] text-mist-400">
-                            {area}
-                          </Tag>
-                        ))}
-                      </div>
-
-                      {vol.status === "rejected" && vol.rejectionReason && (
-                        <div className="mt-3 rounded-lg bg-red-50 p-2.5 text-[11px] text-red-700">
-                          <strong>Rejection reason:</strong> {vol.rejectionReason}
-                        </div>
-                      )}
-
-                      {/* Contacts & Moderation Controls */}
-                      <div className="mt-4 flex items-center justify-between border-t border-navy-700/60 pt-3">
-                        <div className="flex items-center gap-2">
-                          {vol.email && (
-                            <a
-                              href={`mailto:${vol.email}`}
-                              title={vol.email}
-                              className="text-mist-500 hover:text-violet-600"
-                            >
-                              <MailOutlined className="text-sm" />
-                            </a>
-                          )}
-                          {vol.phone && (
-                            <a
-                              href={`tel:${vol.phone}`}
-                              title={vol.phone}
-                              className="text-mist-500 hover:text-violet-600"
-                            >
-                              <PhoneOutlined className="text-sm" />
-                            </a>
-                          )}
-                        </div>
-
-                        {/* Moderation Controls */}
-                        {vol.status === "pending" ? (
-                          <Space size={4}>
-                            <Button
-                              type="primary"
-                              size="small"
-                              icon={<CheckOutlined />}
-                              onClick={() => handleApproveVolunteer(vol.id, vol.name)}
-                              className="bg-green-600 hover:bg-green-700 border-0 text-[11px]"
-                            >
-                              Approve
-                            </Button>
-                            <Button
-                              size="small"
-                              danger
-                              icon={<CloseOutlined />}
-                              onClick={() => handleOpenRejectModal(vol.id)}
-                              className="text-[11px]"
-                            >
-                              Reject
-                            </Button>
-                            <Button
-                              type="text"
-                              size="small"
-                              icon={<StopOutlined />}
-                              onClick={() => handleBlockVolunteer(vol.id, vol.name)}
-                              className="text-mist-500 hover:text-black/80 hover:bg-black/5 text-[11px]"
-                              title="Block Application"
-                            />
-                          </Space>
-                        ) : (
-                          <div className="flex items-center gap-1.5">
-                            {vol.status !== "active" && (
-                              <Button
-                                size="small"
-                                icon={<CheckOutlined />}
-                                onClick={() => handleApproveVolunteer(vol.id, vol.name)}
-                                className="text-[11px]"
-                              >
-                                Activate
-                              </Button>
-                            )}
-                            {vol.status !== "blocked" && (
-                              <Button
-                                type="text"
-                                size="small"
-                                danger
-                                icon={<StopOutlined />}
-                                onClick={() => handleBlockVolunteer(vol.id, vol.name)}
-                                className="hover:bg-red-50 text-[11px]"
-                              >
-                                Block
-                              </Button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </GlassCard>
-                  ))
-                )}
-              </div>
-            ),
-          },
-        ]}
+      {/* Summary Metrics Cards */}
+      <TeamStatsHeader
+        stats={stats}
+        loading={isLoadingStats}
+        onSelectTab={(tabKey) => {
+          handleTabChange(tabKey);
+        }}
       />
 
-      {/* Member Creation/Modification Modal */}
-      <Modal
-        title={editingMember ? "Edit Team Member" : "Add Team Member"}
+      {/* Filters Bar: Tabs, Search, Status Select, View Toggle, Add Button */}
+      <TeamFiltersBar
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        statusFilter={statusFilter}
+        onStatusFilterChange={handleStatusFilterChange}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        stats={stats}
+        onAddMember={handleOpenAddModal}
+        onRefresh={handleRefreshAll}
+        isFetching={isFetchingTeam}
+      />
+
+      {/* Content Area (Grid or Table View) */}
+      {isLoadingTeam ? (
+        <div className="flex h-64 items-center justify-center">
+          <Spin size="large" tip="Loading team directory..." />
+        </div>
+      ) : teamMembers.length === 0 ? (
+        <EmptyState
+          icon={<TeamOutlined className="text-5xl text-mist-400" />}
+          title="No team members found"
+          description={
+            searchTerm || statusFilter !== "all" || activeTab !== "all"
+              ? "No members match your current filters. Try resetting search or status criteria."
+              : "No team members have been added to this directory yet."
+          }
+          actionLabel="Add Team Member"
+          onAction={handleOpenAddModal}
+        />
+      ) : viewMode === "grid" ? (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {teamMembers.map((member) => (
+              <TeamMemberCard
+                key={member._id}
+                member={member}
+                onView={handleOpenDetailModal}
+                onEdit={handleOpenEditModal}
+                onDelete={handleDeleteMember}
+                onChangeStatus={(id, status) => handleChangeStatus(id, status)}
+                onOpenRejectModal={handleOpenRejectModal}
+              />
+            ))}
+          </div>
+
+          {/* Grid View Pagination */}
+          {pagination.total > pageSize && (
+            <div className="flex justify-end border-t border-navy-700/40 pt-4">
+              <Pagination
+                current={page}
+                pageSize={pageSize}
+                total={pagination.total}
+                onChange={handlePageChange}
+                showSizeChanger
+                pageSizeOptions={["12", "24", "48"]}
+                showTotal={(tot) => `Total ${tot} members`}
+              />
+            </div>
+          )}
+        </div>
+      ) : (
+        <TeamMemberTable
+          data={teamMembers}
+          loading={isLoadingTeam}
+          page={page}
+          pageSize={pageSize}
+          total={pagination.total}
+          onPageChange={handlePageChange}
+          onView={handleOpenDetailModal}
+          onEdit={handleOpenEditModal}
+          onDelete={handleDeleteMember}
+          onChangeStatus={(id, status) => handleChangeStatus(id, status)}
+          onOpenRejectModal={handleOpenRejectModal}
+        />
+      )}
+
+      {/* Add / Edit Member Modal */}
+      <TeamMemberModal
         open={memberModalOpen}
-        onOk={handleSaveMember}
-        onCancel={() => setMemberModalOpen(false)}
-        okText="Save Details"
-        destroyOnClose
-      >
-        <Form form={form} layout="vertical" className="mt-4">
-          <Form.Item
-            name="name"
-            label="Name"
-            rules={[{ required: true, message: "Please input the name" }]}
-          >
-            <Input placeholder="Edline Jean" />
-          </Form.Item>
+        member={editingMember}
+        loading={isCreating || isUpdating}
+        onCancel={() => {
+          setMemberModalOpen(false);
+          setEditingMember(null);
+        }}
+        onSubmit={handleSaveMember}
+      />
 
-          <Form.Item
-            name="category"
-            label="Category"
-            initialValue="member"
-            rules={[{ required: true, message: "Please select a category" }]}
-          >
-            <Select
-              options={[
-                { label: "Director", value: "director" },
-                { label: "Member", value: "member" },
-              ]}
-            />
-          </Form.Item>
+      {/* Detailed Member Profile Viewer */}
+      <TeamMemberDetailModal
+        open={detailModalOpen}
+        member={viewingMember}
+        onCancel={() => {
+          setDetailModalOpen(false);
+          setViewingMember(null);
+        }}
+        onEdit={(member) => {
+          handleOpenEditModal(member);
+        }}
+        onApprove={(member) => {
+          handleChangeStatus(member._id, "active");
+        }}
+        onReject={(member) => {
+          handleOpenRejectModal(member);
+        }}
+        onBlock={(member) => {
+          handleChangeStatus(member._id, "blocked");
+        }}
+      />
 
-          <Form.Item
-            name="location"
-            label="Location"
-            rules={[{ required: true, message: "Please input the location" }]}
-          >
-            <Input placeholder="Port-au-Prince, Haiti" />
-          </Form.Item>
-
-          <Form.Item
-            name="image"
-            label="Avatar Image URL"
-            rules={[{ required: true, message: "Please enter an avatar URL" }]}
-          >
-            <Input placeholder="https://example.com/avatar.jpg" />
-          </Form.Item>
-
-          <Form.Item name="bio" label="Biography">
-            <Input.TextArea placeholder="Enter short bio details..." rows={3} />
-          </Form.Item>
-
-          <Form.Item
-            name="focusAreas"
-            label="Focus Areas (comma-separated)"
-            help="Example: Operations, Finance, Field Reviews"
-          >
-            <Input placeholder="Operations, Partnerships" />
-          </Form.Item>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item
-              name="email"
-              label="Email"
-              rules={[
-                { required: true, message: "Please enter the email" },
-                { type: "email", message: "Please enter a valid email" },
-              ]}
-            >
-              <Input placeholder="name@ifundayiti.org" />
-            </Form.Item>
-
-            <Form.Item name="phone" label="Phone">
-              <Input placeholder="+509 3711 2233" />
-            </Form.Item>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item name="linkedin" label="LinkedIn Path">
-              <Input placeholder="linkedin.com/in/username" />
-            </Form.Item>
-
-            <Form.Item name="twitter" label="Twitter Path">
-              <Input placeholder="twitter.com/username" />
-            </Form.Item>
-          </div>
-
-          <Form.Item
-            name="featured"
-            valuePropName="checked"
-            initialValue={false}
-          >
-            <Select
-              options={[
-                { label: "Standard Member Profile", value: false },
-                { label: "Featured Profile (pinned/starred)", value: true },
-              ]}
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* Reject Reason Dialog */}
-      <Modal
-        title="Reason for Rejection"
+      {/* Volunteer Rejection Modal with Reason */}
+      <RejectVolunteerModal
         open={rejectModalOpen}
-        onOk={handleRejectVolunteer}
-        onCancel={() => setRejectModalOpen(false)}
-        okText="Submit & Notify"
-        okButtonProps={{ danger: true }}
-      >
-        <Form form={rejectForm} layout="vertical" className="mt-4">
-          <Form.Item
-            name="reason"
-            label="Please specify why this volunteer application is being rejected:"
-            rules={[
-              { required: true, message: "Please input a rejection reason" },
-            ]}
-          >
-            <Input.TextArea
-              placeholder="e.g. Focus areas do not align with current program requirements."
-              rows={4}
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
+        member={rejectingMember}
+        loading={isChangingStatus}
+        onCancel={() => {
+          setRejectModalOpen(false);
+          setRejectingMember(null);
+        }}
+        onConfirm={handleConfirmReject}
+      />
     </div>
   );
 }
