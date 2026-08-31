@@ -149,7 +149,7 @@ export function TeamMemberModal({
       if (Array.isArray(values.focusAreas)) {
         values.focusAreas.forEach((area) => {
           if (area.trim()) {
-            formData.append("focusAreas", area.trim());
+            formData.append("focusAreas[]", area.trim());
           }
         });
       }
