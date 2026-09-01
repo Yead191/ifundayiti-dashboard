@@ -98,11 +98,11 @@ export function Sidebar({
   return (
     <div
       className={cn(
-        "flex h-full w-full flex-col border-r border-[#e2eae6] bg-linear-to-b from-[#fcfdfc] to-[#f4f7f5] shadow-xs",
+        "flex h-full w-full flex-col border-r border-navy-700 bg-linear-to-b from-[#fcfdfc] to-[#f4f7f5] shadow-xs",
         mobile ? "" : "",
       )}
     >
-      <div className="flex flex-col items-center px-2 py-2 border-b border-[#e2eae6]/60">
+      <div className="flex flex-col items-center px-2 py-2 border-b border-navy-700/60">
         <img
           src="/logo-ifundayiti-nav.png"
           alt="IFundAyiti"
@@ -122,8 +122,8 @@ export function Sidebar({
                   key={item.key}
                   className={cn(
                     "overflow-hidden rounded-xl transition-all duration-300 border border-transparent",
-                    open && "bg-black/[0.01] border-black/[0.01]",
-                    groupActive && open && "bg-violet-600/[0.01]",
+                    open && "bg-black/1 border-black/[0.01]",
+                    groupActive && open && "bg-violet-600/1",
                   )}
                 >
                   <button
