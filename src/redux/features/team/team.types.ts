@@ -14,6 +14,7 @@ export interface TeamMember {
   phone?: string;
   linkedin?: string;
   twitter?: string;
+  title?: string;
   featured?: boolean;
   rejectionReason?: string;
   createdAt: string;

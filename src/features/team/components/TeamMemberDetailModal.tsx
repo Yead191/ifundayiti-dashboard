@@ -1,11 +1,4 @@
-import {
-  Modal,
-  Avatar,
-  Tag,
-  Button,
-  Space,
-  Divider,
-} from "antd";
+import { Modal, Avatar, Tag, Button, Space, Divider } from "antd";
 import {
   UserOutlined,
   MailOutlined,
@@ -92,7 +85,7 @@ export function TeamMemberDetailModal({
     >
       <div className="mt-4 space-y-5">
         {/* Header Profile Info */}
-        <div className="flex flex-col items-center gap-4 rounded-2xl border border-navy-700/40 bg-gradient-to-r from-navy-800/10 via-navy-800/5 to-transparent p-5 sm:flex-row">
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-navy-700/40 bg-linear-to-r from-navy-800/10 via-navy-800/5 to-transparent p-5 sm:flex-row">
           <Avatar
             src={toFileUrl(member.image)}
             icon={<UserOutlined />}
@@ -105,11 +98,20 @@ export function TeamMemberDetailModal({
                 {member.name}
               </h3>
               {member.featured && (
-                <Tag color="gold" className="rounded-full border-0 text-[10px] font-bold">
+                <Tag
+                  color="gold"
+                  className="rounded-full border-0 text-[10px] font-bold"
+                >
                   ★ Featured
                 </Tag>
               )}
             </div>
+
+            {member.title && (
+              <p className="mt-1 text-sm font-semibold text-violet-500">
+                {member.title}
+              </p>
+            )}
 
             <div className="mt-1.5 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <Tag
@@ -119,7 +121,10 @@ export function TeamMemberDetailModal({
               >
                 {categoryConfig.label}
               </Tag>
-              <Tag color={statusConfig.color} className="rounded-full border-0 font-semibold">
+              <Tag
+                color={statusConfig.color}
+                className="rounded-full border-0 font-semibold"
+              >
                 {statusConfig.label}
               </Tag>
             </div>
@@ -200,7 +205,11 @@ export function TeamMemberDetailModal({
               <span className="text-mist-500">LinkedIn:</span>
               {member.linkedin ? (
                 <a
-                  href={member.linkedin.startsWith("http") ? member.linkedin : `https://${member.linkedin}`}
+                  href={
+                    member.linkedin.startsWith("http")
+                      ? member.linkedin
+                      : `https://${member.linkedin}`
+                  }
                   target="_blank"
                   rel="noreferrer"
                   className="font-medium text-violet-600 hover:underline truncate"
@@ -217,7 +226,11 @@ export function TeamMemberDetailModal({
               <span className="text-mist-500">Twitter:</span>
               {member.twitter ? (
                 <a
-                  href={member.twitter.startsWith("http") ? member.twitter : `https://${member.twitter}`}
+                  href={
+                    member.twitter.startsWith("http")
+                      ? member.twitter
+                      : `https://${member.twitter}`
+                  }
                   target="_blank"
                   rel="noreferrer"
                   className="font-medium text-violet-600 hover:underline truncate"
@@ -235,7 +248,9 @@ export function TeamMemberDetailModal({
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-navy-700/40 pt-3 text-[11px] text-mist-400">
           <div className="flex items-center gap-1.5">
             <CalendarOutlined />
-            <span>Joined on {member.createdAt ? formatDate(member.createdAt) : "—"}</span>
+            <span>
+              Joined on {member.createdAt ? formatDate(member.createdAt) : "—"}
+            </span>
           </div>
           <div>
             ID: <span className="font-mono">{member._id}</span>

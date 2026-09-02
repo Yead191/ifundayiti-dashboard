@@ -150,6 +150,12 @@ export function TeamMemberCard({
               {member.name}
             </h4>
 
+            {member.title && (
+              <p className="mt-0.5 truncate text-[11px] font-medium text-violet-500">
+                {member.title}
+              </p>
+            )}
+
             <div className="mt-1 flex flex-wrap items-center gap-1.5">
               <Tag
                 color={categoryConfig.color}

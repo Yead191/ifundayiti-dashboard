@@ -1,4 +1,13 @@
-import { Table, Avatar, Tag, Space, Button, Popconfirm, Dropdown, Tooltip } from "antd";
+import {
+  Table,
+  Avatar,
+  Tag,
+  Space,
+  Button,
+  Popconfirm,
+  Dropdown,
+  Tooltip,
+} from "antd";
 import type { ColumnsType } from "antd/es/table";
 import type { MenuProps } from "antd";
 import {
@@ -97,11 +106,17 @@ export function TeamMemberTable({
                 {record.name}
               </span>
               {record.featured && (
-                <Tag color="gold" className="rounded-full border-0 text-[9px] font-bold">
+                <Tag
+                  color="gold"
+                  className="rounded-full border-0 text-[9px] font-bold"
+                >
                   ★
                 </Tag>
               )}
             </div>
+            {record.title && (
+              <div className="text-[11px] font-medium text-violet-500 truncate">{record.title}</div>
+            )}
             <div className="text-xs text-mist-500 truncate">{record.email}</div>
           </div>
         </div>
@@ -114,11 +129,28 @@ export function TeamMemberTable({
       render: (category: string) => {
         const config = getCategoryConfig(category);
         return (
-          <Tag color={config.color} icon={config.icon} className="rounded-full border-0 font-medium">
+          <Tag
+            color={config.color}
+            icon={config.icon}
+            className="rounded-full border-0 font-medium"
+          >
             {config.label}
           </Tag>
         );
       },
+    },
+    {
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
+      render: (title: string) =>
+        title ? (
+          <span className="rounded-full bg-violet-600/10 px-2 py-0.5 text-[11px] font-semibold text-violet-600">
+            {title}
+          </span>
+        ) : (
+          <span className="text-xs text-mist-400">—</span>
+        ),
     },
     {
       title: "Status",
@@ -128,11 +160,17 @@ export function TeamMemberTable({
         const config = getStatusConfig(status);
         return (
           <div className="space-y-1">
-            <Tag color={config.color} className="rounded-full border-0 font-semibold">
+            <Tag
+              color={config.color}
+              className="rounded-full border-0 font-semibold"
+            >
               {config.label}
             </Tag>
             {status === "rejected" && record.rejectionReason && (
-              <div className="max-w-[180px] text-[10px] text-rose-600 truncate" title={record.rejectionReason}>
+              <div
+                className="max-w-45 text-[10px] text-rose-600 truncate"
+                title={record.rejectionReason}
+              >
                 Reason: {record.rejectionReason}
               </div>
             )}
@@ -153,12 +191,16 @@ export function TeamMemberTable({
       dataIndex: "focusAreas",
       key: "focusAreas",
       render: (areas: string[]) => (
-        <div className="flex max-w-[200px] flex-wrap gap-1">
-          {Array.isArray(areas) && areas.slice(0, 2).map((area, idx) => (
-            <Tag key={idx} className="rounded-md border-0 bg-navy-700/20 text-[10px] text-mist-600">
-              {area}
-            </Tag>
-          ))}
+        <div className="flex max-w-50 flex-wrap gap-1">
+          {Array.isArray(areas) &&
+            areas.slice(0, 2).map((area, idx) => (
+              <Tag
+                key={idx}
+                className="rounded-md border-0 bg-navy-700/20 text-[10px] text-mist-600"
+              >
+                {area}
+              </Tag>
+            ))}
           {Array.isArray(areas) && areas.length > 2 && (
             <Tooltip title={areas.slice(2).join(", ")}>
               <Tag className="rounded-md border-0 bg-violet-600/10 text-[10px] font-semibold text-violet-600">
@@ -197,7 +239,11 @@ export function TeamMemberTable({
           {record.linkedin && (
             <Tooltip title="LinkedIn">
               <a
-                href={record.linkedin.startsWith("http") ? record.linkedin : `https://${record.linkedin}`}
+                href={
+                  record.linkedin.startsWith("http")
+                    ? record.linkedin
+                    : `https://${record.linkedin}`
+                }
                 target="_blank"
                 rel="noreferrer"
                 className="flex h-6 w-6 items-center justify-center rounded-md border border-navy-700/40 bg-white text-mist-500 hover:text-blue-600"
@@ -209,7 +255,11 @@ export function TeamMemberTable({
           {record.twitter && (
             <Tooltip title="Twitter / X">
               <a
-                href={record.twitter.startsWith("http") ? record.twitter : `https://${record.twitter}`}
+                href={
+                  record.twitter.startsWith("http")
+                    ? record.twitter
+                    : `https://${record.twitter}`
+                }
                 target="_blank"
                 rel="noreferrer"
                 className="flex h-6 w-6 items-center justify-center rounded-md border border-navy-700/40 bg-white text-mist-500 hover:text-sky-500"

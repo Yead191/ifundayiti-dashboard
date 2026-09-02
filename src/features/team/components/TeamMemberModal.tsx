@@ -41,6 +41,7 @@ interface TeamMemberModalProps {
 interface FormValues {
   name: string;
   email: string;
+  title?: string;
   category: TeamMemberCategory;
   location: string;
   status: TeamStatus;
@@ -90,6 +91,7 @@ export function TeamMemberModal({
       form.setFieldsValue({
         name: member.name,
         email: member.email,
+        title: member.title || "",
         category: member.category,
         location: member.location,
         status: member.status,
@@ -141,6 +143,7 @@ export function TeamMemberModal({
       formData.append("status", values.status);
       formData.append("bio", values.bio?.trim() || "");
 
+      if (values.title) formData.append("title", values.title.trim());
       if (values.phone) formData.append("phone", values.phone.trim());
       if (values.linkedin) formData.append("linkedin", values.linkedin.trim());
       if (values.twitter) formData.append("twitter", values.twitter.trim());
@@ -299,6 +302,36 @@ export function TeamMemberModal({
             />
           </Form.Item>
         </div>
+
+        {/* Title / Designation */}
+        <Form.Item
+          name="title"
+          label={
+            <span className="text-xs font-semibold uppercase tracking-wider text-mist-600">
+              Title / Designation
+            </span>
+          }
+          tooltip="The member's official role or designation (e.g. President, Secretary, Treasurer)."
+        >
+          <Select
+            className="w-full rounded-xl"
+            allowClear
+            showSearch
+            placeholder="Select or type a designation..."
+            options={[
+              { label: "President", value: "President" },
+              { label: "Vice President", value: "Vice President" },
+              { label: "Secretary", value: "Secretary" },
+              { label: "Treasurer", value: "Treasurer" },
+              { label: "Executive Director", value: "Executive Director" },
+              { label: "Board Chair", value: "Board Chair" },
+              { label: "Program Coordinator", value: "Program Coordinator" },
+              { label: "Communications Officer", value: "Communications Officer" },
+              { label: "Field Representative", value: "Field Representative" },
+              { label: "Volunteer Lead", value: "Volunteer Lead" },
+            ]}
+          />
+        </Form.Item>
 
         {/* Category, Location, and Status */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
