@@ -18,6 +18,8 @@ const PAGE_META: { match: (path: string) => boolean; title: string; subtitle?: s
   { match: (p) => p === "/periods", title: "Application periods", subtitle: "Create and manage grant cycles" },
   { match: (p) => p === "/donations", title: "Donations", subtitle: "Monitor donations to the IFundAyiti Program Fund" },
   { match: (p) => p === "/team", title: "Team & Volunteers", subtitle: "Moderate volunteer applicants and manage the core team" },
+  { match: (p) => p.startsWith("/projects/"), title: "Project details", subtitle: "Inspect project overview, narrative, and media" },
+  { match: (p) => p === "/projects", title: "Community Projects", subtitle: "Publish and spotlight funded community projects" },
 ];
 
 export default function DashboardLayout() {

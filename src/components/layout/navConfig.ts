@@ -8,6 +8,7 @@ import {
   RollbackOutlined,
   HistoryOutlined,
   TeamOutlined,
+  ProjectOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -38,6 +39,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Applications",
     path: "/applications",
     icon: BookOutlined,
+  },
+  {
+    key: "projects",
+    label: "Projects",
+    path: "/projects",
+    icon: ProjectOutlined,
   },
   // {
   //   key: "store",
