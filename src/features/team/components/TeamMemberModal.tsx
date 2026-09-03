@@ -24,6 +24,7 @@ import {
 } from "@ant-design/icons";
 import type { UploadFile } from "antd/es/upload/interface";
 import { toFileUrl } from "@/config";
+import { TiptapEditor } from "@/components/ui/TiptapEditor";
 import type {
   TeamMember,
   TeamMemberCategory,
@@ -319,16 +320,32 @@ export function TeamMemberModal({
             showSearch
             placeholder="Select or type a designation..."
             options={[
+              { label: "Founder, President, & Executive Director", value: "Founder, President, & Executive Director" },
+              { label: "Executive Director (CEO)", value: "Executive Director (CEO)" },
+              { label: "Chief Operating Officer (COO)", value: "Chief Operating Officer (COO)" },
+              { label: "Chief Financial Officer (CFO)", value: "Chief Financial Officer (CFO)" },
               { label: "President", value: "President" },
               { label: "Vice President", value: "Vice President" },
               { label: "Secretary", value: "Secretary" },
               { label: "Treasurer", value: "Treasurer" },
               { label: "Executive Director", value: "Executive Director" },
-              { label: "Board Chair", value: "Board Chair" },
+              { label: "Program Director", value: "Program Director" },
               { label: "Program Coordinator", value: "Program Coordinator" },
+              { label: "Communications Director", value: "Communications Director" },
               { label: "Communications Officer", value: "Communications Officer" },
+              { label: "Communication & Outreach", value: "Communication & Outreach" },
+              { label: "Fundraising Manager", value: "Fundraising Manager" },
+              { label: "Grant Writer", value: "Grant Writer" },
+              { label: "Volunteer Coordinator", value: "Volunteer Coordinator" },
+              { label: "Event Coordinator", value: "Event Coordinator" },
+              { label: "Event/Project Specialist", value: "Event/Project Specialist" },
+              { label: "Case Manager", value: "Case Manager" },
+              { label: "HR Manager", value: "HR Manager" },
+              { label: "IT Specialist", value: "IT Specialist" },
+              { label: "Administrative Assistant", value: "Administrative Assistant" },
+              { label: "Social Media Coordinator", value: "Social Media Coordinator" },
+              { label: "Graphic Designer", value: "Graphic Designer" },
               { label: "Field Representative", value: "Field Representative" },
-              { label: "Volunteer Lead", value: "Volunteer Lead" },
             ]}
           />
         </Form.Item>
@@ -399,12 +416,26 @@ export function TeamMemberModal({
               Biography & Experience
             </span>
           }
-          rules={[{ required: true, message: "Please provide a short bio" }]}
+          rules={[
+            {
+              required: true,
+              validator: (_, value) => {
+                const plainText = value
+                  ? value.replace(/<[^>]*>/g, "").trim()
+                  : "";
+                if (!plainText) {
+                  return Promise.reject(
+                    new Error("Please provide a biography")
+                  );
+                }
+                return Promise.resolve();
+              },
+            },
+          ]}
         >
-          <Input.TextArea
-            rows={3}
+          <TiptapEditor
             placeholder="Share key background, achievements, and responsibilities within the organization..."
-            className="rounded-xl border-navy-700/60"
+            minHeight={160}
           />
         </Form.Item>
 

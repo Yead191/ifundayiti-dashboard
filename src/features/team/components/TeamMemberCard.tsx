@@ -25,8 +25,10 @@ import {
   HeartOutlined,
   TeamOutlined,
   StopOutlined,
+  StarFilled,
 } from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { cn } from "@/lib/utils";
 import { toFileUrl } from "@/config";
 import type { TeamMember, TeamStatus } from "@/redux/features/team/team.types";
 
@@ -107,27 +109,32 @@ export function TeamMemberCard({
     },
   ];
 
-  return (
-    <GlassCard className="group relative flex flex-col justify-between overflow-hidden border border-navy-700/50 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-violet-600/50 hover:shadow-lg">
-      {/* Featured Star Top Badge */}
-      {member.featured && (
-        <Tag
-          color="gold"
-          className="absolute right-3.5 top-3.5 rounded-full border-0 text-[10px] font-bold shadow-xs"
-        >
-          ★ Featured
-        </Tag>
-      )}
+  const isFeatured = Boolean(member.featured);
 
+  return (
+    <GlassCard
+      className={cn(
+        "group relative flex flex-col justify-between overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
+        isFeatured
+          ? "border-amber-400/40 bg-linear-to-b from-amber-500/4 to-transparent hover:border-amber-400/70 shadow-amber-500/5"
+          : "border-navy-700/50 hover:border-violet-600/50",
+      )}
+    >
       <div>
         {/* Profile Card Header */}
         <div className="flex items-start gap-3.5">
-          <div className="relative cursor-pointer" onClick={() => onView(member)}>
+          <div
+            className="relative shrink-0 cursor-pointer"
+            onClick={() => onView(member)}
+          >
             <Avatar
               src={toFileUrl(member.image)}
               icon={<UserOutlined />}
               size={64}
-              className="border-2 border-violet-600/20 bg-white shadow-sm transition-transform duration-300 group-hover:scale-105"
+              className={cn(
+                "border-2 bg-white shadow-sm transition-transform duration-300 group-hover:scale-105",
+                isFeatured ? "border-amber-400/50" : "border-violet-600/20",
+              )}
             />
             <span
               className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white ${
@@ -143,12 +150,20 @@ export function TeamMemberCard({
           </div>
 
           <div className="min-w-0 flex-1">
-            <h4
-              onClick={() => onView(member)}
-              className="cursor-pointer truncate font-display text-base font-bold text-cloud-100 transition-colors hover:text-violet-600"
-            >
-              {member.name}
-            </h4>
+            <div className="flex items-start justify-between gap-1.5">
+              <h4
+                onClick={() => onView(member)}
+                className="min-w-0 flex-1 cursor-pointer truncate font-display text-base font-bold text-cloud-100 transition-colors hover:text-violet-600"
+              >
+                {member.name}
+              </h4>
+              {isFeatured && (
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-400/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-500 shadow-xs">
+                  <StarFilled className="text-[9px] text-amber-500" />
+                  Featured
+                </span>
+              )}
+            </div>
 
             {member.title && (
               <p className="mt-0.5 truncate text-[11px] font-medium text-violet-500">
@@ -160,11 +175,14 @@ export function TeamMemberCard({
               <Tag
                 color={categoryConfig.color}
                 icon={categoryConfig.icon}
-                className="rounded-full border-0 text-[10px] font-medium"
+                className="m-0 rounded-full border-0 text-[10px] font-medium"
               >
                 {categoryConfig.label}
               </Tag>
-              <Tag color={statusConfig.color} className="rounded-full border-0 text-[10px] font-semibold">
+              <Tag
+                color={statusConfig.color}
+                className="m-0 rounded-full border-0 text-[10px] font-semibold"
+              >
                 {statusConfig.label}
               </Tag>
             </div>
@@ -178,7 +196,9 @@ export function TeamMemberCard({
 
         {/* Short Biography */}
         <p className="mt-3.5 line-clamp-3 text-xs leading-relaxed text-mist-600">
-          {member.bio || "No background details provided."}
+          {member.bio
+            ? member.bio.replace(/<[^>]*>?/gm, "").trim()
+            : "No background details provided."}
         </p>
 
         {/* Focus Areas */}
@@ -205,7 +225,8 @@ export function TeamMemberCard({
         {/* Rejection Notice Snippet */}
         {member.status === "rejected" && member.rejectionReason && (
           <div className="mt-3 rounded-xl border border-rose-200/60 bg-rose-50/70 p-2.5 text-[11px] text-rose-700">
-            <span className="font-semibold">Reason:</span> {member.rejectionReason}
+            <span className="font-semibold">Reason:</span>{" "}
+            {member.rejectionReason}
           </div>
         )}
       </div>
@@ -238,7 +259,11 @@ export function TeamMemberCard({
             {member.linkedin && (
               <Tooltip title="LinkedIn Profile">
                 <a
-                  href={member.linkedin.startsWith("http") ? member.linkedin : `https://${member.linkedin}`}
+                  href={
+                    member.linkedin.startsWith("http")
+                      ? member.linkedin
+                      : `https://${member.linkedin}`
+                  }
                   target="_blank"
                   rel="noreferrer"
                   className="flex h-7 w-7 items-center justify-center rounded-lg border border-navy-700/40 bg-white/70 text-mist-500 transition-colors hover:border-blue-600 hover:text-blue-600"
@@ -250,7 +275,11 @@ export function TeamMemberCard({
             {member.twitter && (
               <Tooltip title="Twitter / X Profile">
                 <a
-                  href={member.twitter.startsWith("http") ? member.twitter : `https://${member.twitter}`}
+                  href={
+                    member.twitter.startsWith("http")
+                      ? member.twitter
+                      : `https://${member.twitter}`
+                  }
                   target="_blank"
                   rel="noreferrer"
                   className="flex h-7 w-7 items-center justify-center rounded-lg border border-navy-700/40 bg-white/70 text-mist-500 transition-colors hover:border-sky-500 hover:text-sky-500"

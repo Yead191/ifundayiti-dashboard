@@ -149,9 +149,12 @@ export function TeamMemberDetailModal({
           <div className="text-xs font-bold uppercase tracking-wider text-mist-500">
             Biography
           </div>
-          <p className="mt-1.5 text-sm leading-relaxed text-mist-600">
-            {member.bio || "No biography provided."}
-          </p>
+          <div
+            className="mt-1.5 text-sm leading-relaxed text-[#111827] [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:my-1.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-1.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h1]:text-base [&_h1]:font-bold [&_h1]:text-cloud-100 [&_h2]:text-sm [&_h2]:font-bold [&_h2]:text-cloud-100 [&_h3]:text-xs [&_h3]:font-bold [&_h3]:text-cloud-100 [&_a]:text-violet-600 [&_a]:underline [&_blockquote]:border-l-2 [&_blockquote]:border-violet-500/50 [&_blockquote]:pl-3 [&_blockquote]:italic [&_strong]:font-semibold [&_strong]:text-black"
+            dangerouslySetInnerHTML={{
+              __html: member.bio || "No biography provided.",
+            }}
+          />
         </div>
 
         {/* Focus Areas */}
