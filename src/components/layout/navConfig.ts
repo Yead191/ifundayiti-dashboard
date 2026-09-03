@@ -9,6 +9,7 @@ import {
   HistoryOutlined,
   TeamOutlined,
   ProjectOutlined,
+  PictureOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -45,6 +46,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Projects",
     path: "/projects",
     icon: ProjectOutlined,
+  },
+  {
+    key: "gallery",
+    label: "Community Gallery",
+    path: "/gallery",
+    icon: PictureOutlined,
   },
   // {
   //   key: "store",

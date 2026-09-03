@@ -45,6 +45,7 @@ const ProjectsPage = lazy(() => import("@/features/projects/ProjectsPage"));
 const ProjectDetailPage = lazy(
   () => import("@/features/projects/ProjectDetailPage"),
 );
+const GalleryPage = lazy(() => import("@/features/gallery/GalleryPage"));
 
 export default function App() {
   return (
@@ -83,6 +84,7 @@ export default function App() {
             <Route path="team" element={<TeamPage />} />
             <Route path="projects" element={<ProjectsPage />} />
             <Route path="projects/:id" element={<ProjectDetailPage />} />
+            <Route path="gallery" element={<GalleryPage />} />
           </Route>
         </Route>
 

@@ -49,6 +49,7 @@ export const baseApi = createApi({
     "Partners",
     "Team",
     "Projects",
+    "Galleries",
   ],
   endpoints: () => ({}),
 });
