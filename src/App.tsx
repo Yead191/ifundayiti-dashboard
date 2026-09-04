@@ -17,7 +17,6 @@ const ResetPasswordPage = lazy(
   () => import("@/features/auth/ResetPasswordPage"),
 );
 const ProfilePage = lazy(() => import("@/features/profile/ProfilePage"));
-const StorePage = lazy(() => import("@/features/store/StorePage"));
 const CouponsPage = lazy(() => import("@/features/coupons/CouponsPage"));
 const RefundsPage = lazy(() => import("@/features/refunds/RefundsPage"));
 const RefundDetailPage = lazy(
@@ -46,6 +45,15 @@ const ProjectDetailPage = lazy(
   () => import("@/features/projects/ProjectDetailPage"),
 );
 const GalleryPage = lazy(() => import("@/features/gallery/GalleryPage"));
+const ProductsPage = lazy(
+  () => import("@/features/shop/products/ProductsPage"),
+);
+const ProductDetailPage = lazy(
+  () => import("@/features/shop/products/ProductDetailPage"),
+);
+const CategoriesPage = lazy(
+  () => import("@/features/shop/categories/CategoriesPage"),
+);
 
 export default function App() {
   return (
@@ -60,7 +68,7 @@ export default function App() {
           <Route element={<DashboardLayout />}>
             <Route index element={<IFundAyitiOverviewPage />} />
 
-            <Route path="store" element={<StorePage />} />
+            {/* <Route path="store" element={<StorePage />} /> */}
             <Route path="store/orders" element={<OrdersPage />} />
             <Route path="store/coupons" element={<CouponsPage />} />
             <Route path="store/refunds" element={<RefundsPage />} />
@@ -85,6 +93,15 @@ export default function App() {
             <Route path="projects" element={<ProjectsPage />} />
             <Route path="projects/:id" element={<ProjectDetailPage />} />
             <Route path="gallery" element={<GalleryPage />} />
+
+            {/* Shop & Merchandise Module */}
+            <Route
+              path="shop"
+              element={<Navigate to="/shop/products" replace />}
+            />
+            <Route path="shop/products" element={<ProductsPage />} />
+            <Route path="shop/products/:id" element={<ProductDetailPage />} />
+            <Route path="shop/categories" element={<CategoriesPage />} />
           </Route>
         </Route>
 

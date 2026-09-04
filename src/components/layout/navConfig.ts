@@ -10,6 +10,8 @@ import {
   TeamOutlined,
   ProjectOutlined,
   PictureOutlined,
+  AppstoreOutlined,
+  SkinOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -52,6 +54,26 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Community Gallery",
     path: "/gallery",
     icon: PictureOutlined,
+  },
+  {
+    key: "shop",
+    label: "Shop",
+    path: "/shop/products",
+    icon: ShopOutlined,
+    children: [
+      {
+        key: "shop-products",
+        label: "Store",
+        path: "/shop/products",
+        icon: SkinOutlined,
+      },
+      {
+        key: "shop-categories",
+        label: "Product Category",
+        path: "/shop/categories",
+        icon: AppstoreOutlined,
+      },
+    ],
   },
   // {
   //   key: "store",
