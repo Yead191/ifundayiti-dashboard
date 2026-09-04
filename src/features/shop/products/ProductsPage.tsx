@@ -58,7 +58,7 @@ export default function ProductsPage() {
     useGetProductStatsQuery();
 
   const { data: categoriesData } = useGetCategoriesQuery({
-    limit: 100,
+    limit: 20,
   });
 
   const {
