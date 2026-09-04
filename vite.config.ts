@@ -18,6 +18,6 @@ export default defineConfig({
   preview: {
     port: 4174,
     host: "0.0.0.0",
-    allowedHosts: ["31.97.103.122"],
+    allowedHosts: ["admin.ifundayiti.org"],
   },
 });
