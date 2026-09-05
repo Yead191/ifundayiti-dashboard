@@ -1,83 +1,162 @@
-/** Match backend enum spelling exactly (including "Deliverd"). */
-export type OrderStatus = "Pending" | "Processing" | "Deliverd" | "Cancelled";
+// Status Enums matching backend specification exactly
+export const ORDER_STATUS = {
+  PENDING: "pending",
+  CONFIRMED: "confirmed",
+  PROCESSING: "processing",
+  SHIPPED: "shipped",
+  DELIVERED: "delivered",
+  CANCELLED: "cancelled",
+} as const;
 
-export type OrderPaymentStatus = "paid" | "unpaid" | "pending" | "refunded" | string;
+export type OrderStatus = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS];
 
-export interface OrderUser {
+export const ORDER_STATUS_LIST: OrderStatus[] = [
+  "pending",
+  "confirmed",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+];
+
+export const PAYMENT_STATUS = {
+  PENDING: "pending",
+  PAID: "paid",
+  FAILED: "failed",
+  REFUNDED: "refunded",
+} as const;
+
+export type PaymentStatus = (typeof PAYMENT_STATUS)[keyof typeof PAYMENT_STATUS];
+
+export const PAYMENT_STATUS_LIST: PaymentStatus[] = [
+  "pending",
+  "paid",
+  "failed",
+  "refunded",
+];
+
+export const PRE_ORDER_STATUS = {
+  PENDING: "pending",
+  CONFIRMED: "confirmed",
+  READY: "ready",
+  COMPLETED: "completed",
+  CANCELLED: "cancelled",
+} as const;
+
+export type PreOrderStatus = (typeof PRE_ORDER_STATUS)[keyof typeof PRE_ORDER_STATUS];
+
+// Order User / Customer
+export interface IOrderUser {
   _id: string;
   name: string;
   email: string;
   image?: string;
+  contact_number?: string;
 }
 
-export interface OrderItem {
-  title: string;
-  image: string;
+// Order Item
+export interface IOrderItem {
+  product:
+    | {
+        _id: string;
+        name: string;
+        images: string[];
+        sold?: number;
+        variants?: any[];
+        category?: string;
+      }
+    | string;
+  name: string;
+  image?: string;
+  size: string;
+  color: string;
   quantity: number;
-  unit_price: number;
+  price: number;
   total_price: number;
+  isPreOrder: boolean;
+  expectedAvailableDate?: string | Date;
+  preOrderStatus?: PreOrderStatus;
 }
 
-export interface OrderPriceBreakdown {
-  products_price: number;
-  serviceFee: number;
-  delivery_charge: number;
+// Price Breakdown
+export interface IPriceBreakdown {
+  subtotal: number;
+  delivery_charge: number; // $11.99 or Free for >= $150
+  tax: number; // 8.875% of subtotal
   discount_amount: number;
   total_price: number;
-  tax: number;
-  subtotal: number;
 }
 
-export interface ApiOrder {
+// Address Breakdown
+export interface IAddressBreakdown {
+  country: string;
+  city: string;
+  postal_code: string;
+  street_address: string;
+}
+
+// Full Order Interface
+export interface IOrder {
   _id: string;
-  user: OrderUser;
-  items: OrderItem[];
+  user: IOrderUser | string;
+  items: IOrderItem[];
+  price_breakdown: IPriceBreakdown;
+  total_items: number;
+  formatted_address: string;
+  address_breakdown: IAddressBreakdown;
+  contact_number: string;
   status: OrderStatus;
-  payment_status: OrderPaymentStatus;
-  payment_intent_id?: string | null;
-  contact_number?: string | null;
-  formatted_address?: string | null;
-  order_id: string;
-  price_breakdown: OrderPriceBreakdown;
-  createdAt?: string;
-  updatedAt?: string;
+  payment_status: PaymentStatus;
+  order_id: string; // e.g. "ORDER-12345678"
+  payment_intent_id?: string;
+  transaction_id?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface PaginationMeta {
-  total: number;
-  limit: number;
+// Pagination
+export interface OrderPagination {
   page: number;
+  limit: number;
+  total: number;
   totalPage: number;
 }
 
+// Query Parameters
 export interface GetOrdersParams {
   page?: number;
   limit?: number;
   searchTerm?: string;
-  status?: OrderStatus | "";
-  payment_status?: OrderPaymentStatus | "";
-  startDate?: string;
-  endDate?: string;
+  status?: OrderStatus | "all" | "";
+  payment_status?: PaymentStatus | "all" | "";
+  sort?: string;
 }
 
+// API Responses
 export interface OrdersListResponse {
+  statusCode?: number;
   success: boolean;
   message: string;
-  pagination: PaginationMeta;
-  data: ApiOrder[];
+  data: IOrder[];
+  pagination?: OrderPagination;
 }
 
-export interface OrderMutationResponse {
+export interface SingleOrderResponse {
+  statusCode?: number;
   success: boolean;
   message: string;
-  data?: ApiOrder;
+  data: IOrder;
 }
 
-export const ORDER_STATUS_OPTIONS: OrderStatus[] = [
-  "Pending",
-  "Processing",
-  "Deliverd",
-  "Cancelled",
-];
+// Mutate Order Status Payload
+export interface UpdateOrderStatusPayload {
+  status: "processing" | "shipped" | "delivered" | "cancelled";
+}
 
-export const ORDER_PAYMENT_STATUS_OPTIONS = ["paid", "unpaid", "pending", "refunded"] as const;
+// Order Statistics for Header
+export interface OrderStats {
+  totalOrders: number;
+  totalRevenue: number;
+  inFulfillmentCount: number; // confirmed + processing
+  deliveredCount: number;
+}

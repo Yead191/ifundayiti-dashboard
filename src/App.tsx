@@ -3,8 +3,6 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { PageLoader } from "@/components/ui/PageLoader";
-import OrdersPage from "./features/orders/OrdersPage";
-// import TeamPage from "./features/ifundayiti/TeamPage";
 
 // Route-level code splitting keeps the initial bundle lean — each page's
 // chunk is only fetched when the admin actually navigates there.
@@ -54,6 +52,12 @@ const ProductDetailPage = lazy(
 const CategoriesPage = lazy(
   () => import("@/features/shop/categories/CategoriesPage"),
 );
+const ShopOrdersPage = lazy(
+  () => import("@/features/shop/orders/OrdersPage"),
+);
+const ShopOrderDetailPage = lazy(
+  () => import("@/features/shop/orders/OrderDetailPage"),
+);
 
 export default function App() {
   return (
@@ -69,7 +73,6 @@ export default function App() {
             <Route index element={<IFundAyitiOverviewPage />} />
 
             {/* <Route path="store" element={<StorePage />} /> */}
-            <Route path="store/orders" element={<OrdersPage />} />
             <Route path="store/coupons" element={<CouponsPage />} />
             <Route path="store/refunds" element={<RefundsPage />} />
             <Route
@@ -102,6 +105,11 @@ export default function App() {
             <Route path="shop/products" element={<ProductsPage />} />
             <Route path="shop/products/:id" element={<ProductDetailPage />} />
             <Route path="shop/categories" element={<CategoriesPage />} />
+            <Route path="shop/orders" element={<ShopOrdersPage />} />
+            <Route path="shop/orders/:id" element={<ShopOrderDetailPage />} />
+
+            {/* Backward compatibility redirects */}
+            <Route path="store/orders" element={<Navigate to="/shop/orders" replace />} />
           </Route>
         </Route>
 

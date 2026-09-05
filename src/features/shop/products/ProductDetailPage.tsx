@@ -477,7 +477,7 @@ export default function ProductDetailPage() {
                         key={idx}
                         type="button"
                         onClick={() => setActiveImageIndex(idx)}
-                        className={`h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl border-2 transition-all ${
+                        className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 transition-all ${
                           idx === activeImageIndex
                             ? "border-emerald-600 ring-2 ring-emerald-600/20"
                             : "border-transparent opacity-70 hover:opacity-100"

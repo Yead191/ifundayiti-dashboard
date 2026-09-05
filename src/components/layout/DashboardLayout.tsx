@@ -6,7 +6,8 @@ import { Topbar } from "./Topbar";
 
 const PAGE_META: { match: (path: string) => boolean; title: string; subtitle?: string }[] = [
   { match: (p) => p === "/", title: "Overview", subtitle: "Micro grant program overview and analytics" },
-  { match: (p) => p === "/store/orders", title: "Manage orders", subtitle: "Track purchases and update fulfillment status" },
+  { match: (p) => p.startsWith("/shop/orders/"), title: "Order details", subtitle: "Inspect items, customer delivery destination, and fulfillment" },
+  { match: (p) => p === "/shop/orders" || p === "/store/orders", title: "Store Orders", subtitle: "Monitor customer purchases, payment receipts, and pre-order batches" },
   { match: (p) => p.startsWith("/store/refunds/"), title: "Refund review", subtitle: "Inspect the request, evidence, and issue a decision" },
   { match: (p) => p === "/store/refunds", title: "Refund requests", subtitle: "Review and action customer refund requests" },
   { match: (p) => p === "/store/coupons", title: "Discount coupons", subtitle: "Create promo codes with percentage or fixed discounts" },

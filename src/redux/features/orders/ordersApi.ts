@@ -1,58 +1,95 @@
 import { baseApi } from "../../api/baseApi";
 import type {
   GetOrdersParams,
-  OrderMutationResponse,
-  OrderStatus,
+  IOrder,
   OrdersListResponse,
+  SingleOrderResponse,
+  UpdateOrderStatusPayload,
 } from "./orders.types";
 
 export const ordersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getOrders: builder.query<OrdersListResponse, GetOrdersParams | void>({
-      query: (params) => ({
-        url: "/order",
-        method: "GET",
-        params: {
-          page: params?.page ?? 1,
-          limit: params?.limit ?? 10,
-          searchTerm: params?.searchTerm ?? "",
-          ...(params?.status ? { status: params.status } : {}),
-          ...(params?.payment_status ? { payment_status: params.payment_status } : {}),
-          ...(params?.startDate ? { startDate: params.startDate } : {}),
-          ...(params?.endDate ? { endDate: params.endDate } : {}),
-        },
-      }),
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params) {
+          if (params.page) queryParams.append("page", String(params.page));
+          if (params.limit) queryParams.append("limit", String(params.limit));
+          if (params.searchTerm && params.searchTerm.trim()) {
+            queryParams.append("searchTerm", params.searchTerm.trim());
+          }
+          if (params.status && params.status !== "all") {
+            queryParams.append("status", params.status);
+          }
+          if (params.payment_status && params.payment_status !== "all") {
+            queryParams.append("payment_status", params.payment_status);
+          }
+          if (params.sort) {
+            queryParams.append("sort", params.sort);
+          }
+        }
+        const qs = queryParams.toString();
+        return {
+          url: `/order${qs ? `?${qs}` : ""}`,
+          method: "GET",
+        };
+      },
       providesTags: (result) =>
         result?.data
           ? [
-              ...result.data.map(({ _id }) => ({ type: "Orders" as const, id: _id })),
+              ...result.data.map(({ _id }) => ({
+                type: "Orders" as const,
+                id: _id,
+              })),
               { type: "Orders", id: "LIST" },
             ]
           : [{ type: "Orders", id: "LIST" }],
     }),
 
+    getOrderById: builder.query<SingleOrderResponse, string>({
+      query: (id) => ({
+        url: `/order/${id}`,
+        method: "GET",
+      }),
+      providesTags: (_res, _err, id) => [{ type: "Orders", id }],
+    }),
+
     updateOrderStatus: builder.mutation<
-      OrderMutationResponse,
-      { id: string; status: OrderStatus }
+      SingleOrderResponse,
+      { id: string; body: UpdateOrderStatusPayload }
     >({
-      query: ({ id, status }) => ({
+      query: ({ id, body }) => ({
         url: `/order/${id}`,
         method: "PATCH",
-        body: { status },
+        body,
       }),
-      invalidatesTags: (_res, _err, arg) => [
-        { type: "Orders", id: arg.id },
+      invalidatesTags: (_res, _err, { id }) => [
+        { type: "Orders", id },
         { type: "Orders", id: "LIST" },
-        "Dashboard",
       ],
     }),
 
-    deleteOrder: builder.mutation<OrderMutationResponse, string>({
+    markPreOrderReady: builder.mutation<
+      SingleOrderResponse,
+      { orderId: string; itemIndex: number }
+    >({
+      query: ({ orderId, itemIndex }) => ({
+        url: `/order/pre-order-ready/${orderId}/items/${itemIndex}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: (_res, _err, { orderId }) => [
+        { type: "Orders", id: orderId },
+        { type: "Orders", id: "LIST" },
+        "Products", // Stock inventory changed atomically
+      ],
+    }),
+
+    deleteOrder: builder.mutation<{ success: boolean; message: string; data?: IOrder }, string>({
       query: (id) => ({
         url: `/order/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "Orders", id: "LIST" }, "Dashboard"],
+      invalidatesTags: [{ type: "Orders", id: "LIST" }],
     }),
   }),
   overrideExisting: false,
@@ -60,6 +97,8 @@ export const ordersApi = baseApi.injectEndpoints({
 
 export const {
   useGetOrdersQuery,
+  useGetOrderByIdQuery,
   useUpdateOrderStatusMutation,
+  useMarkPreOrderReadyMutation,
   useDeleteOrderMutation,
 } = ordersApi;

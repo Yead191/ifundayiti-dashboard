@@ -24,11 +24,14 @@ export function Sidebar({
     page: 1,
     limit: 1,
   });
-  const { data: pendingPartnersRes } = useGetPartnersQuery({
-    status: PARTNER_STATUS.PENDING,
-    page: 1,
-    limit: 1,
-  });
+  const { data: pendingPartnersRes } = useGetPartnersQuery(
+    {
+      status: PARTNER_STATUS.PENDING,
+      page: 1,
+      limit: 1,
+    },
+    { skip: true } // Skip partner badge query since partner module is inactive
+  );
 
   const pendingVendors = (dashboardRes as any)?.data?.pendingVendors ?? 0;
   const reportedPosts = reportedRes?.pagination?.total ?? 0;

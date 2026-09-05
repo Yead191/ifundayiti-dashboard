@@ -73,6 +73,12 @@ export const NAV_ITEMS: NavItem[] = [
         path: "/shop/categories",
         icon: AppstoreOutlined,
       },
+      {
+        key: "shop-orders",
+        label: "Orders",
+        path: "/shop/orders",
+        icon: ShoppingOutlined,
+      },
     ],
   },
   // {
