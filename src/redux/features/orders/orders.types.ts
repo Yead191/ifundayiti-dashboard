@@ -85,6 +85,8 @@ export interface IPriceBreakdown {
   tax: number; // 8.875% of subtotal
   discount_amount: number;
   total_price: number;
+  products_price?: number;
+  serviceFee?: number;
 }
 
 // Address Breakdown
@@ -160,3 +162,13 @@ export interface OrderStats {
   inFulfillmentCount: number; // confirmed + processing
   deliveredCount: number;
 }
+
+// Backward compatibility aliases
+export const ORDER_STATUS_OPTIONS = ORDER_STATUS_LIST;
+export const ORDER_PAYMENT_STATUS_OPTIONS = PAYMENT_STATUS_LIST;
+export type OrderPaymentStatus = PaymentStatus;
+export type OrderPriceBreakdown = IPriceBreakdown;
+export type ApiOrder = IOrder;
+export type OrderItem = IOrderItem;
+export type OrderUser = IOrderUser;
+

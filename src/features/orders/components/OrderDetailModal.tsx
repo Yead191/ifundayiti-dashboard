@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Avatar, Button, Modal, Tooltip,  } from "antd";
+import { Avatar, Button, Modal, Tooltip } from "antd";
 import {
   UserOutlined,
   ShoppingOutlined,
@@ -14,7 +14,7 @@ import { useState } from "react";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { getImageUrl } from "@/lib/getImageUrl";
-import type { ApiOrder, OrderStatus } from "@/redux/features/orders/orders.types";
+import type { OrderStatus } from "@/redux/features/orders/orders.types";
 import {
   orderStatusLabelMap,
   orderStatusToneMap,
@@ -31,7 +31,7 @@ export function OrderDetailModal({
   onClose,
   onStatusChange,
 }: {
-  order: ApiOrder | null;
+  order: any | null;
   open: boolean;
   updating?: boolean;
   onClose: () => void;
@@ -42,7 +42,10 @@ export function OrderDetailModal({
   if (!order) return null;
 
   const breakdown = order.price_breakdown;
-  const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+  const itemCount = (order.items || []).reduce(
+    (sum: number, item: any) => sum + (item.quantity || 0),
+    0,
+  );
   const paymentIntentId = order.payment_intent_id?.trim() || null;
   const contactNumber = order.contact_number?.trim() || null;
   const shippingAddress = order.formatted_address?.trim() || null;
@@ -87,10 +90,17 @@ export function OrderDetailModal({
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <StatusTag tone={orderStatusToneMap[order.status]}>
-                {orderStatusLabelMap[order.status]}
+              <StatusTag
+                tone={
+                  orderStatusToneMap[order.status as OrderStatus] ?? "neutral"
+                }
+              >
+                {orderStatusLabelMap[order.status as OrderStatus] ??
+                  String(order.status)}
               </StatusTag>
-              <StatusTag tone={paymentStatusToneMap[order.payment_status] ?? "neutral"}>
+              <StatusTag
+                tone={paymentStatusToneMap[order.payment_status] ?? "neutral"}
+              >
                 {paymentLabel(order.payment_status)}
               </StatusTag>
             </div>
@@ -99,12 +109,16 @@ export function OrderDetailModal({
             </h2>
             <p className="mt-1 text-sm text-mist-400">
               {itemCount} item{itemCount === 1 ? "" : "s"}
-              {order.createdAt ? ` · Placed ${formatDate(order.createdAt)}` : ""}
+              {order.createdAt
+                ? ` · Placed ${formatDate(order.createdAt)}`
+                : ""}
             </p>
           </div>
 
           <div className="rounded-2xl border border-warning/25 bg-warning/10 px-4 py-3 text-right">
-            <div className="text-[11px] uppercase tracking-wide text-mist-500">Order total</div>
+            <div className="text-[11px] uppercase tracking-wide text-mist-500">
+              Order total
+            </div>
             <div className="font-display text-2xl font-semibold text-warning">
               {formatCurrency(breakdown.total_price)}
             </div>
@@ -120,7 +134,9 @@ export function OrderDetailModal({
           />
           <div className="min-w-0">
             <div className="font-medium text-cloud-100">{order.user.name}</div>
-            <div className="truncate text-xs text-mist-400">{order.user.email}</div>
+            <div className="truncate text-xs text-mist-400">
+              {order.user.email}
+            </div>
           </div>
         </div>
 
@@ -153,7 +169,9 @@ export function OrderDetailModal({
                 <EnvironmentOutlined />
               </span>
               <div className="min-w-0">
-                <div className="text-[11px] text-mist-600">Delivery address</div>
+                <div className="text-[11px] text-mist-600">
+                  Delivery address
+                </div>
                 {shippingAddress ? (
                   <p className="mt-0.5 text-sm leading-relaxed font-medium text-cloud-100">
                     {shippingAddress}
@@ -183,14 +201,22 @@ export function OrderDetailModal({
                   <Button
                     type="text"
                     size="small"
-                    icon={copied ? <CheckOutlined className="text-success" /> : <CopyOutlined />}
+                    icon={
+                      copied ? (
+                        <CheckOutlined className="text-success" />
+                      ) : (
+                        <CopyOutlined />
+                      )
+                    }
                     onClick={copyPaymentIntent}
                     className="text-mist-400! hover:text-violet-glow!"
                   />
                 </Tooltip>
               </div>
             ) : (
-              <p className="mt-1 text-sm text-mist-500">No payment intent recorded for this order.</p>
+              <p className="mt-1 text-sm text-mist-500">
+                No payment intent recorded for this order.
+              </p>
             )}
           </div>
         </div>
@@ -199,7 +225,7 @@ export function OrderDetailModal({
       <div className="border-t border-navy-700/60 px-6 py-5 md:px-8">
         <SectionTitle icon={<ShoppingOutlined />} title="Line items" />
         <div className="mt-3 space-y-2.5">
-          {order.items.map((item, index) => (
+          {order.items?.map((item: any, index: number) => (
             <div
               key={`${item.title}-${index}`}
               className="flex items-center gap-3 rounded-2xl border border-navy-700/60 bg-navy-800/35 p-3"
@@ -212,7 +238,9 @@ export function OrderDetailModal({
                 />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="truncate font-medium text-cloud-100">{item.title}</div>
+                <div className="truncate font-medium text-cloud-100">
+                  {item.title}
+                </div>
                 <div className="mt-0.5 text-xs text-mist-400">
                   {formatCurrency(item.unit_price)} × {item.quantity}
                 </div>
@@ -232,7 +260,11 @@ export function OrderDetailModal({
             <BreakdownRow label="Delivery" value={breakdown.delivery_charge} />
             <BreakdownRow label="Tax" value={breakdown.tax} />
             {breakdown.discount_amount > 0 && (
-              <BreakdownRow label="Discount" value={-breakdown.discount_amount} accent="success" />
+              <BreakdownRow
+                label="Discount"
+                value={-breakdown.discount_amount}
+                accent="success"
+              />
             )}
             <div className="flex items-center justify-between border-t border-navy-700/60 bg-navy-900/40 px-4 py-3.5">
               <span className="text-sm font-medium text-cloud-100">Total</span>
@@ -283,7 +315,13 @@ function BreakdownRow({
   return (
     <div className="flex items-center justify-between border-b border-navy-700/40 px-4 py-2.5 text-sm last:border-b-0">
       <span className="text-mist-400">{label}</span>
-      <span className={accent === "success" ? "font-medium text-success" : "font-medium text-cloud-100"}>
+      <span
+        className={
+          accent === "success"
+            ? "font-medium text-success"
+            : "font-medium text-cloud-100"
+        }
+      >
         {formatCurrency(value)}
       </span>
     </div>

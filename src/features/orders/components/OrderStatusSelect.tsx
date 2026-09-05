@@ -9,7 +9,12 @@ import { orderStatusColorMap, orderStatusLabelMap } from "../statusMaps";
 function StatusOption({ status }: { status: OrderStatus }) {
   return (
     <span className="inline-flex items-center gap-2">
-      <span className={cn("h-2 w-2 shrink-0 rounded-full", orderStatusColorMap[status].dot)} />
+      <span
+        className={cn(
+          "h-2 w-2 shrink-0 rounded-full",
+          orderStatusColorMap[status].dot,
+        )}
+      />
       <span>{orderStatusLabelMap[status]}</span>
     </span>
   );

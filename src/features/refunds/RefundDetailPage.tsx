@@ -191,9 +191,20 @@ export default function RefundDetailPage() {
 
             {breakdown && (
               <div className="mt-5 space-y-2 rounded-xl border border-navy-700/60 bg-navy-800/35 p-4 text-sm">
-                <BreakdownRow label="Products" value={formatCurrency(breakdown.products_price)} />
-                <BreakdownRow label="Service fee" value={formatCurrency(breakdown.serviceFee)} />
-                <BreakdownRow label="Delivery" value={formatCurrency(breakdown.delivery_charge)} />
+                <BreakdownRow
+                  label="Products"
+                  value={formatCurrency(breakdown.products_price ?? breakdown.subtotal ?? 0)}
+                />
+                {breakdown.serviceFee !== undefined && (
+                  <BreakdownRow
+                    label="Service fee"
+                    value={formatCurrency(breakdown.serviceFee)}
+                  />
+                )}
+                <BreakdownRow
+                  label="Delivery"
+                  value={formatCurrency(breakdown.delivery_charge)}
+                />
                 <BreakdownRow label="Tax" value={formatCurrency(breakdown.tax)} />
                 {breakdown.discount_amount > 0 && (
                   <BreakdownRow
