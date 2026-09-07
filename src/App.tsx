@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { PageLoader } from "@/components/ui/PageLoader";
+import DisclaimerEditorPage from "./features/disclaimer/DisclaimerEditorPage";
 
 // Route-level code splitting keeps the initial bundle lean — each page's
 // chunk is only fetched when the admin actually navigates there.
@@ -52,9 +53,7 @@ const ProductDetailPage = lazy(
 const CategoriesPage = lazy(
   () => import("@/features/shop/categories/CategoriesPage"),
 );
-const ShopOrdersPage = lazy(
-  () => import("@/features/shop/orders/OrdersPage"),
-);
+const ShopOrdersPage = lazy(() => import("@/features/shop/orders/OrdersPage"));
 const ShopOrderDetailPage = lazy(
   () => import("@/features/shop/orders/OrderDetailPage"),
 );
@@ -109,7 +108,12 @@ export default function App() {
             <Route path="shop/orders/:id" element={<ShopOrderDetailPage />} />
 
             {/* Backward compatibility redirects */}
-            <Route path="store/orders" element={<Navigate to="/shop/orders" replace />} />
+            <Route
+              path="store/orders"
+              element={<Navigate to="/shop/orders" replace />}
+            />
+
+            <Route path="disclaimer/:type" element={<DisclaimerEditorPage />} />
           </Route>
         </Route>
 

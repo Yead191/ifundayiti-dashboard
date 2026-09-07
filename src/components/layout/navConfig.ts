@@ -12,6 +12,7 @@ import {
   PictureOutlined,
   AppstoreOutlined,
   SkinOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -23,6 +24,7 @@ export interface NavItem {
   children?: NavItem[];
   badgeKey?: "pendingVendors" | "reportedPosts" | "pendingPartners";
 }
+import { DISCLAIMER_PAGES } from "@/features/disclaimer/disclaimerConfig";
 
 export const NAV_ITEMS: NavItem[] = [
   {
@@ -81,54 +83,22 @@ export const NAV_ITEMS: NavItem[] = [
       },
     ],
   },
-  // {
-  //   key: "store",
-  //   label: "Store",
-  //   path: "/store",
-  //   icon: ShopOutlined,
-  //   children: [
-  //     {
-  //       key: "store-catalog",
-  //       label: "Catalog",
-  //       path: "/store",
-  //       icon: ShopOutlined,
-  //     },
-  //     {
-  //       key: "store-orders",
-  //       label: "Manage orders",
-  //       path: "/store/orders",
-  //       icon: ShoppingOutlined,
-  //     },
-  //     {
-  //       key: "store-coupons",
-  //       label: "Discount coupons",
-  //       path: "/store/coupons",
-  //       icon: TagOutlined,
-  //     },
-  //     {
-  //       key: "store-refunds",
-  //       label: "Refunds",
-  //       path: "/store/refunds",
-  //       icon: RollbackOutlined,
-  //     },
-  //   ],
-  // },
-  // {
-  //   key: "events",
-  //   label: "Events",
-  //   path: "/events",
-  //   icon: CalendarOutlined,
-  // },
-  // {
-  //   key: "donations",
-  //   label: "Finances & Donations",
-  //   path: "/donations",
-  //   icon: HistoryOutlined,
-  // },
   {
     key: "team",
     label: "Team & Volunteers",
     path: "/team",
     icon: TeamOutlined,
+  },
+  {
+    key: "disclaimer",
+    label: "Disclaimer",
+    path: "/disclaimer/user-terms",
+    icon: FileTextOutlined,
+    children: DISCLAIMER_PAGES.map((page) => ({
+      key: `disclaimer-${page.type}`,
+      label: page.label,
+      path: page.path,
+      icon: page.icon,
+    })),
   },
 ];
