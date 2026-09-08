@@ -13,20 +13,22 @@ export interface PartnerUser {
   name: string;
   email: string;
   image?: string;
+  phone?: string;
 }
 
 export interface ApiPartner {
   _id: string;
-  user?: PartnerUser | null;
+  user?: PartnerUser | string | null;
   name: string;
   image: string;
-  description: string;
+  description?: string;
   offers: string[];
-  website: string;
-  contactEmail: string;
-  contactPhone: string;
+  website?: string;
+  contactEmail?: string;
+  contactPhone?: string;
   status: PartnerStatus | string;
   featured: boolean;
+  rejectionReason?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -42,11 +44,13 @@ export interface GetPartnersParams {
   page?: number;
   limit?: number;
   searchTerm?: string;
-  status?: PartnerStatus;
+  status?: PartnerStatus | string;
   featured?: boolean;
+  sort?: string;
 }
 
 export interface PartnersListResponse {
+  statusCode?: number;
   success: boolean;
   message: string;
   pagination: PaginationMeta;
@@ -54,12 +58,14 @@ export interface PartnersListResponse {
 }
 
 export interface PartnerDetailResponse {
+  statusCode?: number;
   success: boolean;
   message: string;
   data: ApiPartner;
 }
 
 export interface PartnerMutationResponse {
+  statusCode?: number;
   success: boolean;
   message: string;
   data?: ApiPartner;
@@ -67,19 +73,20 @@ export interface PartnerMutationResponse {
 
 export interface ChangePartnerStatusPayload {
   id: string;
-  status: PartnerStatus;
+  status: PartnerStatus | "APPROVED" | "REJECTED" | "PENDING";
+  rejectionReason?: string;
 }
 
 /** Values collected by the form before building multipart FormData. */
 export interface PartnerFormPayload {
   name: string;
-  description: string;
-  offers: string[];
-  website: string;
-  contactEmail: string;
-  contactPhone: string;
-  status: PartnerStatus;
-  featured: boolean;
-  image: File | null;
+  description?: string;
+  offers?: string[];
+  website?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  status?: PartnerStatus;
+  featured?: boolean;
+  image?: File | null;
   userId?: string | null;
 }

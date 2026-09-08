@@ -57,6 +57,10 @@ const ShopOrdersPage = lazy(() => import("@/features/shop/orders/OrdersPage"));
 const ShopOrderDetailPage = lazy(
   () => import("@/features/shop/orders/OrderDetailPage"),
 );
+const PartnersPage = lazy(() => import("@/features/partners/PartnersPage"));
+const PartnerDetailPage = lazy(
+  () => import("@/features/partners/PartnerDetailPage"),
+);
 
 export default function App() {
   return (
@@ -92,6 +96,10 @@ export default function App() {
             <Route path="periods" element={<IFundAyitiPeriodsPage />} />
             <Route path="donations" element={<IFundAyitiDonationsPage />} />
             <Route path="team" element={<TeamPage />} />
+            <Route path="partners" element={<PartnersPage />} />
+            <Route path="partners/:id" element={<PartnerDetailPage />} />
+            <Route path="partner" element={<Navigate to="/partners" replace />} />
+            <Route path="partner/:id" element={<PartnerDetailPage />} />
             <Route path="projects" element={<ProjectsPage />} />
             <Route path="projects/:id" element={<ProjectDetailPage />} />
             <Route path="gallery" element={<GalleryPage />} />

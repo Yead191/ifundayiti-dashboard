@@ -20,6 +20,7 @@ export const partnersApi = baseApi.injectEndpoints({
           ...(params?.searchTerm ? { searchTerm: params.searchTerm } : {}),
           ...(params?.status ? { status: params.status } : {}),
           ...(typeof params?.featured === "boolean" ? { featured: params.featured } : {}),
+          ...(params?.sort ? { sort: params.sort } : {}),
         },
       }),
       providesTags: (result) =>

@@ -13,6 +13,7 @@ import {
   AppstoreOutlined,
   SkinOutlined,
   FileTextOutlined,
+  SafetyCertificateOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -88,6 +89,13 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Team & Volunteers",
     path: "/team",
     icon: TeamOutlined,
+  },
+  {
+    key: "partners",
+    label: "Partners",
+    path: "/partners",
+    icon: SafetyCertificateOutlined,
+    badgeKey: "pendingPartners",
   },
   {
     key: "disclaimer",
