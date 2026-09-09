@@ -1,5 +1,5 @@
 export type TeamStatus = "pending" | "active" | "rejected" | "blocked";
-export type TeamMemberCategory = "director" | "member" | "volunteer";
+export type TeamMemberCategory = "director" | "member" | "volunteer" | "staff";
 
 export interface TeamMember {
   _id: string;
@@ -27,6 +27,7 @@ export interface TeamStats {
   totalMembers: number;
   totalVolunteers: number;
   totalVolunteersPending: number;
+  totalStaff?: number;
 }
 
 export interface TeamStatsResponse {

@@ -3,6 +3,7 @@ import {
   TeamOutlined,
   HeartOutlined,
   ClockCircleOutlined,
+  IdcardOutlined,
 } from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
 import type { TeamStats } from "@/redux/features/team/team.types";
@@ -28,6 +29,16 @@ export function TeamStatsHeader({
       bgGradient: "from-amber-500/10 via-amber-500/5 to-transparent",
       borderColor: "border-amber-500/30",
       textColor: "text-amber-600",
+    },
+    {
+      id: "staff",
+      title: "Staff Members",
+      count: stats?.totalStaff ?? 0,
+      description: "Salaried staff & administrators",
+      icon: <IdcardOutlined className="text-xl text-blue-500" />,
+      bgGradient: "from-blue-500/10 via-blue-500/5 to-transparent",
+      borderColor: "border-blue-500/30",
+      textColor: "text-blue-600",
     },
     {
       id: "member",
@@ -63,7 +74,7 @@ export function TeamStatsHeader({
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
       {statCards.map((card) => (
         <GlassCard
           key={card.id}

@@ -4,6 +4,7 @@ import {
   Form,
   Input,
   Select,
+  AutoComplete,
   Button,
   Upload,
   Switch,
@@ -312,13 +313,17 @@ export function TeamMemberModal({
               Title / Designation
             </span>
           }
-          tooltip="The member's official role or designation (e.g. President, Secretary, Treasurer)."
+          tooltip="The member's official role or designation. You can pick from suggestions or type your own custom title."
         >
-          <Select
+          <AutoComplete
             className="w-full rounded-xl"
             allowClear
-            showSearch
-            placeholder="Select or type a designation..."
+            placeholder="Select a suggestion or type your own title..."
+            filterOption={(inputValue, option) =>
+              String(option?.value ?? "")
+                .toUpperCase()
+                .includes(inputValue.toUpperCase())
+            }
             options={[
               { label: "Founder, President, & Executive Director", value: "Founder, President, & Executive Director" },
               { label: "Executive Director (CEO)", value: "Executive Director (CEO)" },
@@ -365,6 +370,7 @@ export function TeamMemberModal({
               className="w-full rounded-xl"
               options={[
                 { label: "Board Director", value: "director" },
+                { label: "Staff", value: "staff" },
                 { label: "Core Member", value: "member" },
                 { label: "Volunteer", value: "volunteer" },
               ]}

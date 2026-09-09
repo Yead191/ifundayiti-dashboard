@@ -14,7 +14,10 @@ import {
 } from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { toFileUrl } from "@/config";
-import type { ApiPartner, PartnerUser } from "@/redux/features/partners/partners.types";
+import type {
+  ApiPartner,
+  PartnerUser,
+} from "@/redux/features/partners/partners.types";
 import { PARTNER_STATUS } from "@/redux/features/partners/partners.types";
 import { getPartnerStatusConfig } from "../partnerHelpers";
 
@@ -118,9 +121,15 @@ export function PartnerCard({
             }}
             className="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold"
           >
-            {partner.status === PARTNER_STATUS.APPROVED && <CheckCircleOutlined />}
-            {partner.status === PARTNER_STATUS.PENDING && <ClockCircleOutlined />}
-            {partner.status === PARTNER_STATUS.REJECTED && <CloseCircleOutlined />}
+            {partner.status === PARTNER_STATUS.APPROVED && (
+              <CheckCircleOutlined />
+            )}
+            {partner.status === PARTNER_STATUS.PENDING && (
+              <ClockCircleOutlined />
+            )}
+            {partner.status === PARTNER_STATUS.REJECTED && (
+              <CloseCircleOutlined />
+            )}
             {statusConfig.label}
           </span>
 
@@ -143,7 +152,7 @@ export function PartnerCard({
         </div>
 
         {/* Description snippet */}
-        <p className="text-xs text-mist-600 line-clamp-2 mb-3 min-h-[32px] leading-relaxed">
+        <p className="text-xs text-mist-600 line-clamp-2 mb-3 min-h-8 leading-relaxed">
           {partner.description || "No description provided."}
         </p>
 

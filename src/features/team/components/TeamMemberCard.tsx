@@ -26,6 +26,7 @@ import {
   TeamOutlined,
   StopOutlined,
   StarFilled,
+  IdcardOutlined,
 } from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { cn } from "@/lib/utils";
@@ -54,6 +55,11 @@ export function TeamMemberCard({
       label: "Director",
       color: "gold",
       icon: <CrownOutlined />,
+    },
+    staff: {
+      label: "Staff",
+      color: "cyan",
+      icon: <IdcardOutlined />,
     },
     member: {
       label: "Core Member",

@@ -9,6 +9,7 @@ import {
   TeamOutlined,
   HeartOutlined,
   ClockCircleOutlined,
+  IdcardOutlined,
 } from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
 import type { TeamStats } from "@/redux/features/team/team.types";
@@ -54,6 +55,7 @@ export function TeamFiltersBar({
             <Badge
               count={
                 (stats.totalDirectors || 0) +
+                (stats.totalStaff || 0) +
                 (stats.totalMembers || 0) +
                 (stats.totalVolunteers || 0)
               }
@@ -88,6 +90,32 @@ export function TeamFiltersBar({
                 backgroundColor:
                   activeTab === "director" ? "#d97706" : "rgba(217, 119, 6, 0.1)",
                 color: activeTab === "director" ? "#fff" : "#d97706",
+                boxShadow: "none",
+                fontSize: "10px",
+                height: "18px",
+                lineHeight: "18px",
+                minWidth: "18px",
+                padding: "0 5px",
+              }}
+            />
+          )}
+        </span>
+      ),
+    },
+    {
+      key: "staff",
+      label: (
+        <span className="flex items-center gap-1.5 py-1 px-1 font-semibold">
+          <IdcardOutlined className="text-blue-500" />
+          <span>Staff</span>
+          {stats?.totalStaff !== undefined && (
+            <Badge
+              count={stats.totalStaff}
+              showZero
+              style={{
+                backgroundColor:
+                  activeTab === "staff" ? "#2563eb" : "rgba(37, 99, 235, 0.1)",
+                color: activeTab === "staff" ? "#fff" : "#2563eb",
                 boxShadow: "none",
                 fontSize: "10px",
                 height: "18px",

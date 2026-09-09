@@ -14,6 +14,7 @@ import {
   HeartOutlined,
   TeamOutlined,
   StopOutlined,
+  IdcardOutlined,
 } from "@ant-design/icons";
 import { toFileUrl } from "@/config";
 import { formatDate } from "@/lib/utils";
@@ -45,6 +46,11 @@ export function TeamMemberDetailModal({
       label: "Board Director",
       color: "gold",
       icon: <CrownOutlined />,
+    },
+    staff: {
+      label: "Staff",
+      color: "cyan",
+      icon: <IdcardOutlined />,
     },
     member: {
       label: "Core Member",

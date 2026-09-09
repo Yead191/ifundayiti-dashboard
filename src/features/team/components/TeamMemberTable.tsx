@@ -26,6 +26,7 @@ import {
   HeartOutlined,
   TeamOutlined,
   StopOutlined,
+  IdcardOutlined,
 } from "@ant-design/icons";
 import { toFileUrl } from "@/config";
 import type { TeamMember, TeamStatus } from "@/redux/features/team/team.types";
@@ -61,6 +62,8 @@ export function TeamMemberTable({
     switch (category) {
       case "director":
         return { label: "Director", color: "gold", icon: <CrownOutlined /> };
+      case "staff":
+        return { label: "Staff", color: "cyan", icon: <IdcardOutlined /> };
       case "member":
         return { label: "Core Member", color: "blue", icon: <TeamOutlined /> };
       case "volunteer":

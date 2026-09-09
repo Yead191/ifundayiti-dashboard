@@ -136,11 +136,13 @@ export function PartnerCreateModal({
       width={680}
       title={
         <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#0B3D2E] to-[#062118] text-white shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-[#0B3D2E] to-[#062118] text-white shadow-sm">
             <PlusOutlined className="text-lg" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-cloud-100">Add New Official Partner</h3>
+            <h3 className="text-base font-bold text-cloud-100">
+              Add New Official Partner
+            </h3>
             <p className="text-xs text-mist-500 font-normal">
               Directly onboard an organization, sponsor, or institutional ally.
             </p>
@@ -200,7 +202,8 @@ export function PartnerCreateModal({
                 </Button>
               </Upload>
               <p className="text-xs text-mist-500 mt-1.5 leading-relaxed">
-                PNG, WEBP, SVG, or JPG recommended (transparent background looks best on public carousels).
+                PNG, WEBP, SVG, or JPG recommended (transparent background looks
+                best on public carousels).
               </p>
             </div>
           </div>
@@ -210,8 +213,14 @@ export function PartnerCreateModal({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Form.Item
             name="name"
-            label={<span className="text-xs font-semibold text-mist-700">Organization Name</span>}
-            rules={[{ required: true, message: "Please enter organization name" }]}
+            label={
+              <span className="text-xs font-semibold text-mist-700">
+                Organization Name
+              </span>
+            }
+            rules={[
+              { required: true, message: "Please enter organization name" },
+            ]}
           >
             <Input
               placeholder="e.g. Hope for Haiti Foundation"
@@ -221,7 +230,11 @@ export function PartnerCreateModal({
 
           <Form.Item
             name="website"
-            label={<span className="text-xs font-semibold text-mist-700">Official Website</span>}
+            label={
+              <span className="text-xs font-semibold text-mist-700">
+                Official Website
+              </span>
+            }
           >
             <Input
               prefix={<GlobalOutlined className="text-mist-400" />}
@@ -235,7 +248,11 @@ export function PartnerCreateModal({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Form.Item
             name="contactEmail"
-            label={<span className="text-xs font-semibold text-mist-700">Contact Email</span>}
+            label={
+              <span className="text-xs font-semibold text-mist-700">
+                Contact Email
+              </span>
+            }
             rules={[{ type: "email", message: "Enter a valid email address" }]}
           >
             <Input
@@ -247,7 +264,11 @@ export function PartnerCreateModal({
 
           <Form.Item
             name="contactPhone"
-            label={<span className="text-xs font-semibold text-mist-700">Contact Phone</span>}
+            label={
+              <span className="text-xs font-semibold text-mist-700">
+                Contact Phone
+              </span>
+            }
           >
             <Input
               prefix={<PhoneOutlined className="text-mist-400" />}
@@ -261,14 +282,24 @@ export function PartnerCreateModal({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 rounded-2xl bg-gray-50/70 p-4 border border-gray-100">
           <Form.Item
             name="status"
-            label={<span className="text-xs font-semibold text-mist-700">Initial Status</span>}
+            label={
+              <span className="text-xs font-semibold text-mist-700">
+                Initial Status
+              </span>
+            }
             className="mb-0"
           >
             <Select
               className="h-10 w-full"
               options={[
-                { label: "Approved (Active Immediately)", value: PARTNER_STATUS.APPROVED },
-                { label: "Pending (Draft / In Review)", value: PARTNER_STATUS.PENDING },
+                {
+                  label: "Approved (Active Immediately)",
+                  value: PARTNER_STATUS.APPROVED,
+                },
+                {
+                  label: "Pending (Draft / In Review)",
+                  value: PARTNER_STATUS.PENDING,
+                },
               ]}
             />
           </Form.Item>
@@ -276,7 +307,11 @@ export function PartnerCreateModal({
           <Form.Item
             name="featured"
             valuePropName="checked"
-            label={<span className="text-xs font-semibold text-mist-700">Promote as Featured</span>}
+            label={
+              <span className="text-xs font-semibold text-mist-700">
+                Promote as Featured
+              </span>
+            }
             className="mb-0"
           >
             <div className="flex items-center gap-2.5 pt-1">
@@ -292,7 +327,11 @@ export function PartnerCreateModal({
         {/* Description */}
         <Form.Item
           name="description"
-          label={<span className="text-xs font-semibold text-mist-700">Organization Overview & Mission</span>}
+          label={
+            <span className="text-xs font-semibold text-mist-700">
+              Organization Overview & Mission
+            </span>
+          }
         >
           <TextArea
             rows={3}
@@ -313,7 +352,9 @@ export function PartnerCreateModal({
           {/* Active Offers Tags */}
           <div className="flex flex-wrap gap-1.5 mb-2.5 p-2 rounded-xl border border-gray-100 bg-gray-50/50 min-h-10 items-center">
             {offers.length === 0 && (
-              <span className="text-xs text-mist-400 italic">No offers added yet</span>
+              <span className="text-xs text-mist-400 italic">
+                No offers added yet
+              </span>
             )}
             {offers.map((offer) => (
               <Tag
@@ -329,7 +370,9 @@ export function PartnerCreateModal({
 
           {/* Suggested Quick Select */}
           <div className="flex flex-wrap items-center gap-1 mb-2">
-            <span className="text-[11px] font-semibold text-mist-500 mr-1">Quick Add:</span>
+            <span className="text-[11px] font-semibold text-mist-500 mr-1">
+              Quick Add:
+            </span>
             {SUGGESTED_OFFERS.map((sug) => {
               const isSelected = offers.includes(sug);
               return (
@@ -375,7 +418,11 @@ export function PartnerCreateModal({
 
         {/* Footer Actions */}
         <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100">
-          <Button onClick={onClose} disabled={isLoading} className="rounded-xl h-9">
+          <Button
+            onClick={onClose}
+            disabled={isLoading}
+            className="rounded-xl h-9"
+          >
             Cancel
           </Button>
           <Button

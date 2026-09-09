@@ -14,14 +14,19 @@ export const partnersApi = baseApi.injectEndpoints({
       query: (params) => ({
         url: "/partner",
         method: "GET",
-        params: {
-          page: params?.page ?? 1,
-          limit: params?.limit ?? 12,
-          ...(params?.searchTerm ? { searchTerm: params.searchTerm } : {}),
-          ...(params?.status ? { status: params.status } : {}),
-          ...(typeof params?.featured === "boolean" ? { featured: params.featured } : {}),
-          ...(params?.sort ? { sort: params.sort } : {}),
-        },
+        params: params
+          ? {
+              page: params.page ?? 1,
+              limit: params.limit ?? 12,
+              ...(params.searchTerm ? { searchTerm: params.searchTerm } : {}),
+              ...(params.status ? { status: params.status } : {}),
+              ...(typeof params.featured === "boolean" ? { featured: params.featured } : {}),
+              ...(params.sort ? { sort: params.sort } : {}),
+            }
+          : {
+              page: 1,
+              limit: 12,
+            },
       }),
       providesTags: (result) =>
         result?.data
