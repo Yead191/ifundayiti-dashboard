@@ -50,6 +50,7 @@ export const baseApi = createApi({
     "Team",
     "Projects",
     "Galleries",
+    "Folders",
     "Products",
     "ProductCategories",
   ],

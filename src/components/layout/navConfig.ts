@@ -54,7 +54,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     key: "gallery",
-    label: "Community Gallery",
+    label: "Gallery",
     path: "/gallery",
     icon: PictureOutlined,
   },

@@ -33,6 +33,7 @@ export const teamApi = baseApi.injectEndpoints({
             queryParams.append("status", params.status);
           }
         }
+        queryParams.append("sort", "1");
         const qs = queryParams.toString();
         return {
           url: `/team${qs ? `?${qs}` : ""}`,
@@ -42,7 +43,10 @@ export const teamApi = baseApi.injectEndpoints({
       providesTags: (result) =>
         result?.data
           ? [
-              ...result.data.map(({ _id }) => ({ type: "Team" as const, id: _id })),
+              ...result.data.map(({ _id }) => ({
+                type: "Team" as const,
+                id: _id,
+              })),
               { type: "Team", id: "LIST" },
             ]
           : [{ type: "Team", id: "LIST" }],

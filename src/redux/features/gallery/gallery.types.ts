@@ -19,11 +19,52 @@ export const GALLERY_STATUSES = ["Draft", "Published", "Archived"] as const;
 
 export type GalleryStatus = (typeof GALLERY_STATUSES)[number];
 
+export interface IFolder {
+  _id: string;
+  name: string;
+  galleryCount?: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface FolderPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPage: number;
+}
+
+export interface FolderListParams {
+  page?: number;
+  limit?: number;
+  searchTerm?: string;
+  sort?: string;
+}
+
+export interface FolderListResponse {
+  statusCode?: number;
+  success: boolean;
+  message: string;
+  data: IFolder[];
+  pagination?: FolderPagination;
+}
+
+export interface FolderSingleResponse {
+  statusCode?: number;
+  success: boolean;
+  message: string;
+  data: IFolder;
+}
+
 export interface GalleryItem {
   _id: string;
   title: string;
   description?: string;
   image: string;
+  folder?: {
+    _id: string;
+    name: string;
+  } | string;
   category: GalleryCategory;
   location?: string;
   date?: string;
@@ -41,6 +82,7 @@ export interface GalleryPagination {
 }
 
 export interface GalleryListResponse {
+  statusCode?: number;
   success: boolean;
   message: string;
   data: GalleryItem[];
@@ -48,6 +90,7 @@ export interface GalleryListResponse {
 }
 
 export interface GallerySingleResponse {
+  statusCode?: number;
   success: boolean;
   message: string;
   data: GalleryItem;
@@ -62,6 +105,7 @@ export interface GalleryStats {
 }
 
 export interface GalleryStatsResponse {
+  statusCode?: number;
   success: boolean;
   message: string;
   data: GalleryStats;
@@ -75,6 +119,7 @@ export interface GalleryListParams {
   status?: string;
   featured?: boolean;
   sort?: string;
+  folder?: string;
 }
 
 export interface ChangeGalleryStatusPayload {

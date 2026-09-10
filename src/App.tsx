@@ -44,6 +44,9 @@ const ProjectDetailPage = lazy(
   () => import("@/features/projects/ProjectDetailPage"),
 );
 const GalleryPage = lazy(() => import("@/features/gallery/GalleryPage"));
+const FolderDetailPage = lazy(
+  () => import("@/features/gallery/FolderDetailPage"),
+);
 const ProductsPage = lazy(
   () => import("@/features/shop/products/ProductsPage"),
 );
@@ -103,6 +106,8 @@ export default function App() {
             <Route path="projects" element={<ProjectsPage />} />
             <Route path="projects/:id" element={<ProjectDetailPage />} />
             <Route path="gallery" element={<GalleryPage />} />
+            <Route path="gallery/folder/:folderId" element={<FolderDetailPage />} />
+            <Route path="gallery/:folderId" element={<FolderDetailPage />} />
 
             {/* Shop & Merchandise Module */}
             <Route

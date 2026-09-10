@@ -28,10 +28,12 @@ import {
   type GalleryItem,
   type GalleryStatus,
 } from "@/redux/features/gallery/gallery.types";
+import { useGetFoldersQuery } from "@/redux/features/gallery/galleryApi";
 
 interface GalleryModalProps {
   open: boolean;
   item: GalleryItem | null;
+  defaultFolderId?: string;
   loading?: boolean;
   onCancel: () => void;
   onSubmit: (formData: FormData) => void;
@@ -39,6 +41,7 @@ interface GalleryModalProps {
 
 interface FormValues {
   title: string;
+  folder?: string;
   description?: string;
   category: GalleryCategory;
   location?: string;
@@ -50,12 +53,16 @@ interface FormValues {
 export function GalleryModal({
   open,
   item,
+  defaultFolderId,
   loading = false,
   onCancel,
   onSubmit,
 }: GalleryModalProps) {
   const [form] = Form.useForm<FormValues>();
   const isEdit = Boolean(item);
+
+  const { data: foldersRes } = useGetFoldersQuery({ limit: 100 });
+  const folders = foldersRes?.data ?? [];
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -64,8 +71,11 @@ export function GalleryModal({
     if (!open) return;
 
     if (item) {
+      const itemFolderId =
+        typeof item.folder === "object" ? item.folder?._id : item.folder;
       form.setFieldsValue({
         title: item.title,
+        folder: itemFolderId || defaultFolderId,
         description: item.description || "",
         category: item.category,
         location: item.location || "",
@@ -92,6 +102,7 @@ export function GalleryModal({
     } else {
       form.resetFields();
       form.setFieldsValue({
+        folder: defaultFolderId || (folders[0]?._id ?? ""),
         category: GALLERY_CATEGORIES[0],
         date: dayjs(),
         status: "Draft",
@@ -100,7 +111,7 @@ export function GalleryModal({
       setPreviewUrl(null);
       setFileList([]);
     }
-  }, [open, item, form]);
+  }, [open, item, defaultFolderId, folders, form]);
 
   const handleCustomUpload = ({ file, onSuccess }: any) => {
     const rcFile = file as RcFile;
@@ -132,6 +143,11 @@ export function GalleryModal({
     const formData = new FormData();
     formData.append("title", values.title.trim());
     formData.append("category", values.category);
+
+    const targetFolder = values.folder || defaultFolderId;
+    if (targetFolder) {
+      formData.append("folder", targetFolder);
+    }
 
     if (values.description?.trim()) {
       formData.append("description", values.description.trim());
@@ -190,14 +206,15 @@ export function GalleryModal({
         <Form.Item
           label={
             <span className="text-xs font-bold uppercase tracking-wider text-cloud-100">
-              High-Resolution Photo {!isEdit && <span className="text-rose-500">*</span>}
+              High-Resolution Photo{" "}
+              {!isEdit && <span className="text-rose-500">*</span>}
             </span>
           }
           required={!isEdit}
         >
           {previewUrl ? (
             <div className="relative overflow-hidden rounded-2xl border border-navy-700/80 bg-navy-900/40">
-              <div className="relative aspect-16/9 w-full overflow-hidden">
+              <div className="relative aspect-video w-full overflow-hidden">
                 <img
                   src={previewUrl}
                   alt="Gallery preview"
@@ -250,14 +267,38 @@ export function GalleryModal({
                     Click or drag image to this area to upload
                   </p>
                   <p className="mt-1 text-xs text-mist-600">
-                    Supports JPG, PNG, WEBP up to 15MB. High-resolution landscape
-                    photos recommended.
+                    Supports JPG, PNG, WEBP up to 15MB. High-resolution
+                    landscape photos recommended.
                   </p>
                 </div>
               </div>
             </Upload.Dragger>
           )}
         </Form.Item>
+
+        {/* Album Folder */}
+        {folders.length > 0 && (
+          <Form.Item
+            name="folder"
+            label={
+              <span className="text-xs font-bold uppercase tracking-wider text-cloud-100">
+                Album Folder <span className="text-rose-500">*</span>
+              </span>
+            }
+            rules={[
+              { required: true, message: "Please select an album folder" },
+            ]}
+          >
+            <Select
+              placeholder="Select an album folder"
+              options={folders.map((f) => ({
+                label: `${f.name} (${f.galleryCount ?? 0} photos)`,
+                value: f._id,
+              }))}
+              className="w-full"
+            />
+          </Form.Item>
+        )}
 
         {/* Title */}
         <Form.Item
@@ -341,19 +382,19 @@ export function GalleryModal({
             <Radio.Group className="flex w-full gap-2">
               <Radio.Button
                 value="Published"
-                className="flex-1 text-center rounded-lg font-semibold text-xs !h-9 !leading-9"
+                className="flex-1 text-center rounded-lg font-semibold text-xs h-9! leading-9!"
               >
                 Published
               </Radio.Button>
               <Radio.Button
                 value="Draft"
-                className="flex-1 text-center rounded-lg font-semibold text-xs !h-9 !leading-9"
+                className="flex-1 text-center rounded-lg font-semibold text-xs h-9! leading-9!"
               >
                 Draft
               </Radio.Button>
               <Radio.Button
                 value="Archived"
-                className="flex-1 text-center rounded-lg font-semibold text-xs !h-9 !leading-9"
+                className="flex-1 text-center rounded-lg font-semibold text-xs h-9! leading-9!"
               >
                 Archived
               </Radio.Button>
@@ -386,11 +427,12 @@ export function GalleryModal({
                 <span>Feature in Spotlight</span>
               </div>
               <p className="text-xs text-amber-700/80">
-                Spotlighted photos are prominently highlighted on the public homepage and top of the media gallery.
+                Spotlighted photos are prominently highlighted on the public
+                homepage and top of the media gallery.
               </p>
             </div>
             <Form.Item name="featured" valuePropName="checked" noStyle>
-              <Switch className="!bg-amber-500" />
+              <Switch className="bg-amber-500!" />
             </Form.Item>
           </div>
         </div>

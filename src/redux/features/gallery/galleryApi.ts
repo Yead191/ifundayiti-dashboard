@@ -5,10 +5,91 @@ import type {
   GallerySingleResponse,
   GalleryStatsResponse,
   ChangeGalleryStatusPayload,
+  FolderListParams,
+  FolderListResponse,
+  FolderSingleResponse,
 } from "./gallery.types";
 
 export const galleryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    // Folders
+    getFolders: builder.query<FolderListResponse, FolderListParams | void>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params) {
+          if (params.page) queryParams.append("page", String(params.page));
+          if (params.limit) queryParams.append("limit", String(params.limit));
+          if (params.searchTerm && params.searchTerm.trim()) {
+            queryParams.append("searchTerm", params.searchTerm.trim());
+          }
+          if (params.sort) queryParams.append("sort", params.sort);
+        }
+        const qs = queryParams.toString();
+        return {
+          url: `/folder${qs ? `?${qs}` : ""}`,
+          method: "GET",
+        };
+      },
+      providesTags: (result) =>
+        result?.data
+          ? [
+              ...result.data.map(({ _id }) => ({
+                type: "Folders" as const,
+                id: _id,
+              })),
+              { type: "Folders", id: "LIST" },
+            ]
+          : [{ type: "Folders", id: "LIST" }],
+    }),
+
+    getFolderById: builder.query<FolderSingleResponse, string>({
+      query: (id) => ({
+        url: `/folder/${id}`,
+        method: "GET",
+      }),
+      providesTags: (_res, _err, id) => [{ type: "Folders", id }],
+    }),
+
+    createFolder: builder.mutation<FolderSingleResponse, { name: string }>({
+      query: (body) => ({
+        url: "/folder",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Folders", id: "LIST" }],
+    }),
+
+    updateFolder: builder.mutation<
+      FolderSingleResponse,
+      { id: string; name: string }
+    >({
+      query: ({ id, name }) => ({
+        url: `/folder/${id}`,
+        method: "PATCH",
+        body: { name },
+      }),
+      invalidatesTags: (_res, _err, { id }) => [
+        { type: "Folders", id },
+        { type: "Folders", id: "LIST" },
+      ],
+    }),
+
+    deleteFolder: builder.mutation<
+      { success: boolean; message: string },
+      string
+    >({
+      query: (id) => ({
+        url: `/folder/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [
+        { type: "Folders", id: "LIST" },
+        { type: "Galleries", id: "LIST" },
+        { type: "Galleries", id: "STATS" },
+      ],
+    }),
+
+    // Galleries
     getGalleries: builder.query<GalleryListResponse, GalleryListParams | void>({
       query: (params) => {
         const queryParams = new URLSearchParams();
@@ -29,6 +110,9 @@ export const galleryApi = baseApi.injectEndpoints({
           }
           if (params.sort) {
             queryParams.append("sort", params.sort);
+          }
+          if (params.folder) {
+            queryParams.append("folder", params.folder);
           }
         }
         const qs = queryParams.toString();
@@ -74,6 +158,7 @@ export const galleryApi = baseApi.injectEndpoints({
       invalidatesTags: [
         { type: "Galleries", id: "LIST" },
         { type: "Galleries", id: "STATS" },
+        { type: "Folders", id: "LIST" },
       ],
     }),
 
@@ -90,6 +175,7 @@ export const galleryApi = baseApi.injectEndpoints({
         { type: "Galleries", id },
         { type: "Galleries", id: "LIST" },
         { type: "Galleries", id: "STATS" },
+        { type: "Folders", id: "LIST" },
       ],
     }),
 
@@ -132,6 +218,7 @@ export const galleryApi = baseApi.injectEndpoints({
       invalidatesTags: [
         { type: "Galleries", id: "LIST" },
         { type: "Galleries", id: "STATS" },
+        { type: "Folders", id: "LIST" },
       ],
     }),
   }),
@@ -139,6 +226,11 @@ export const galleryApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useGetFoldersQuery,
+  useGetFolderByIdQuery,
+  useCreateFolderMutation,
+  useUpdateFolderMutation,
+  useDeleteFolderMutation,
   useGetGalleriesQuery,
   useGetGalleryStatsQuery,
   useGetGalleryByIdQuery,
