@@ -1,30 +1,57 @@
-export type FaqAudience = "USER" | "VENDOR";
+export interface IFAQItem {
+  question: string;
+  answer: string;
+}
 
-export interface ApiFaq {
+export interface IFAQ {
   _id: string;
-  question: string;
-  answer: string;
-  audience: FaqAudience;
+  title: string;
+  items: IFAQItem[];
+  isActive: boolean;
+  order: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface GetFaqsParams {
-  audience: FaqAudience;
+export interface FAQPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPage: number;
 }
 
-export interface FaqListResponse {
+export interface FAQListResponse {
+  statusCode?: number;
   success: boolean;
   message: string;
-  data: ApiFaq[];
+  data: IFAQ[];
+  pagination?: FAQPagination;
 }
 
-export interface FaqPayload {
-  question: string;
-  answer: string;
-  audience: FaqAudience;
-}
-
-export interface FaqMutationResponse {
+export interface SingleFAQResponse {
+  statusCode?: number;
   success: boolean;
   message: string;
-  data?: ApiFaq;
+  data: IFAQ;
+}
+
+export interface CreateFAQPayload {
+  title: string;
+  items?: IFAQItem[];
+  isActive?: boolean;
+  order?: number;
+}
+
+export interface UpdateFAQPayload {
+  title?: string;
+  items?: IFAQItem[];
+  isActive?: boolean;
+  order?: number;
+}
+
+export interface GetFAQsParams {
+  isActive?: boolean;
+  page?: number;
+  limit?: number;
+  sort?: string;
 }

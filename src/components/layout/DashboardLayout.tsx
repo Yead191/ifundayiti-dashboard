@@ -48,6 +48,9 @@ const PAGE_META: { match: (path: string) => boolean; title: string; subtitle?: s
   { match: (p) => p.startsWith("/events/"), title: "Event details", subtitle: "Review schedule, media, and organization details" },
   { match: (p) => p === "/events", title: "Events", subtitle: "Publish and manage workshops, meetups, and conferences" },
 
+  // FAQ Management
+  { match: (p) => p === "/faq" || p.startsWith("/faq"), title: "FAQ Management", subtitle: "Manage categorized questions and answers displayed across the storefront" },
+
   // Legal & Disclaimers
   { match: (p) => p.startsWith("/disclaimer/"), title: "Legal & Disclaimers", subtitle: "Edit terms of service, privacy policy, and public disclosures" },
 

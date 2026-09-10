@@ -14,6 +14,7 @@ import {
   SkinOutlined,
   FileTextOutlined,
   SafetyCertificateOutlined,
+  QuestionCircleOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -96,6 +97,12 @@ export const NAV_ITEMS: NavItem[] = [
     path: "/partners",
     icon: SafetyCertificateOutlined,
     badgeKey: "pendingPartners",
+  },
+  {
+    key: "faq",
+    label: "FAQ",
+    path: "/faq",
+    icon: QuestionCircleOutlined,
   },
   {
     key: "disclaimer",

@@ -64,6 +64,7 @@ const PartnersPage = lazy(() => import("@/features/partners/PartnersPage"));
 const PartnerDetailPage = lazy(
   () => import("@/features/partners/PartnerDetailPage"),
 );
+const FaqPage = lazy(() => import("@/features/faq/FaqPage"));
 
 export default function App() {
   return (
@@ -125,6 +126,9 @@ export default function App() {
               path="store/orders"
               element={<Navigate to="/shop/orders" replace />}
             />
+
+            <Route path="faq" element={<FaqPage />} />
+            <Route path="faqs" element={<Navigate to="/faq" replace />} />
 
             <Route path="disclaimer/:type" element={<DisclaimerEditorPage />} />
           </Route>
