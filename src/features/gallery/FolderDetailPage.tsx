@@ -34,6 +34,7 @@ import { GalleryModal } from "./components/GalleryModal";
 import { GalleryLightbox } from "./components/GalleryLightbox";
 import { FolderModal } from "./components/FolderModal";
 import { DeleteFolderModal } from "./components/DeleteFolderModal";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 function getErrorMessage(error: unknown): string {
   if (typeof error === "object" && error !== null) {
@@ -120,7 +121,7 @@ export default function FolderDetailPage() {
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
   const [editingPhoto, setEditingPhoto] = useState<GalleryItem | null>(null);
   const [lightboxPhoto, setLightboxPhoto] = useState<GalleryItem | null>(null);
-  const [renameModalOpen, setRenameModalOpen] = useState(false);
+  const [editFolderModalOpen, setEditFolderModalOpen] = useState(false);
   const [deleteFolderModalOpen, setDeleteFolderModalOpen] = useState(false);
 
   const photos = galleryResponse?.data ?? [];
@@ -155,16 +156,17 @@ export default function FolderDetailPage() {
   }, [photos, pagination.total]);
 
   // Handlers
-  const handleRenameFolder = async (newName: string) => {
+  const handleUpdateFolder = async (formData: FormData) => {
     if (!folder) return;
     try {
-      await updateFolder({ id: folder._id, name: newName }).unwrap();
-      toast.success("Folder Renamed", {
-        description: `Folder renamed to "${newName}".`,
+      await updateFolder({ id: folder._id, body: formData }).unwrap();
+      const updatedName = (formData.get("name") as string) || folder.name;
+      toast.success("Folder Updated", {
+        description: `"${updatedName}" folder was successfully updated.`,
       });
-      setRenameModalOpen(false);
+      setEditFolderModalOpen(false);
     } catch (error) {
-      toast.error("Failed to rename folder", {
+      toast.error("Failed to update folder", {
         description: getErrorMessage(error),
       });
     }
@@ -297,9 +299,19 @@ export default function FolderDetailPage() {
       <GlassCard className="p-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-[#0B3D2E] to-[#062118] text-white shadow-md shadow-[#0B3D2E]/20 ring-1 ring-white/20">
-              <FolderFilled className="text-2xl" />
-            </div>
+            {folder.image ? (
+              <div className="relative h-15 w-15 shrink-0 overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 shadow-md">
+                <img
+                  src={getImageUrl(folder.image)}
+                  alt={folder.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-[#0B3D2E] to-[#062118] text-white shadow-md shadow-[#0B3D2E]/20 ring-1 ring-white/20">
+                <FolderFilled className="text-2xl" />
+              </div>
+            )}
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <Link
@@ -326,9 +338,9 @@ export default function FolderDetailPage() {
                   type="text"
                   size="small"
                   icon={<EditOutlined />}
-                  onClick={() => setRenameModalOpen(true)}
+                  onClick={() => setEditFolderModalOpen(true)}
                   className="text-mist-500 hover:text-[#0B3D2E]"
-                  title="Rename Folder"
+                  title="Edit Folder Details"
                 />
               </div>
 
@@ -510,13 +522,13 @@ export default function FolderDetailPage() {
         onChangeStatus={handleChangeStatus}
       />
 
-      {/* Rename Folder Modal */}
+      {/* Edit Folder Modal */}
       <FolderModal
-        open={renameModalOpen}
+        open={editFolderModalOpen}
         folder={folder}
         loading={isUpdatingFolder}
-        onCancel={() => setRenameModalOpen(false)}
-        onSubmit={handleRenameFolder}
+        onCancel={() => setEditFolderModalOpen(false)}
+        onSubmit={handleUpdateFolder}
       />
 
       {/* Delete Folder Warning Modal */}

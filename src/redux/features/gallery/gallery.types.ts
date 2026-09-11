@@ -22,6 +22,7 @@ export type GalleryStatus = (typeof GALLERY_STATUSES)[number];
 export interface IFolder {
   _id: string;
   name: string;
+  image?: string;
   galleryCount?: number;
   createdAt: string;
   updatedAt?: string;

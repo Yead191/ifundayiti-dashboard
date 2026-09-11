@@ -63,11 +63,12 @@ export default function GalleryFoldersPage() {
   }, [folders]);
 
   // Handlers
-  const handleCreateFolder = async (name: string) => {
+  const handleCreateFolder = async (formData: FormData) => {
     try {
-      await createFolder({ name }).unwrap();
+      await createFolder(formData).unwrap();
+      const folderName = (formData.get("name") as string) || "Album Folder";
       toast.success("Album Folder Created", {
-        description: `"${name}" folder was successfully created.`,
+        description: `"${folderName}" folder was successfully created.`,
       });
       setCreateModalOpen(false);
     } catch (error) {
@@ -77,16 +78,17 @@ export default function GalleryFoldersPage() {
     }
   };
 
-  const handleUpdateFolder = async (name: string) => {
+  const handleUpdateFolder = async (formData: FormData) => {
     if (!editingFolder) return;
     try {
-      await updateFolder({ id: editingFolder._id, name }).unwrap();
-      toast.success("Album Folder Renamed", {
-        description: `Folder renamed to "${name}".`,
+      await updateFolder({ id: editingFolder._id, body: formData }).unwrap();
+      const folderName = (formData.get("name") as string) || editingFolder.name;
+      toast.success("Album Folder Updated", {
+        description: `"${folderName}" folder was successfully updated.`,
       });
       setEditingFolder(null);
     } catch (error) {
-      toast.error("Failed to rename folder", {
+      toast.error("Failed to update folder", {
         description: getErrorMessage(error),
       });
     }

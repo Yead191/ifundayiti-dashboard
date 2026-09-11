@@ -96,11 +96,19 @@ export function FaqCategoryCard({
             </div>
 
             <p className="mt-1 text-xs text-mist-600">
-              Order Priority: <span className="font-semibold text-cloud-100">#{category.order ?? 0}</span> ·{" "}
+              Order Priority:{" "}
+              <span className="font-semibold text-cloud-100">
+                #{category.order ?? 0}
+              </span>{" "}
+              ·{" "}
               {category.isActive ? (
-                <span className="text-emerald-700 font-medium">Visible to public visitors</span>
+                <span className="text-emerald-700 font-medium">
+                  Visible to public visitors
+                </span>
               ) : (
-                <span className="text-amber-700 font-medium">Hidden from public storefront</span>
+                <span className="text-amber-700 font-medium">
+                  Hidden from public storefront
+                </span>
               )}
             </p>
           </div>
@@ -146,7 +154,9 @@ export function FaqCategoryCard({
             title="Delete FAQ Category?"
             description={
               <span className="text-xs text-gray-600">
-                Are you sure you want to permanently delete &quot;{category.title}&quot; and all {items.length} questions inside it?
+                Are you sure you want to permanently delete &quot;
+                {category.title}&quot; and all {items.length} questions inside
+                it?
               </span>
             }
             onConfirm={() => onDeleteCategory(category._id)}
@@ -192,7 +202,8 @@ export function FaqCategoryCard({
                 No Questions in this Category Yet
               </h4>
               <p className="mt-1 text-xs text-mist-600 max-w-sm">
-                Add common questions and helpful answers that will display inside the {category.title} section on your website.
+                Add common questions and helpful answers that will display
+                inside the {category.title} section on your website.
               </p>
               <Button
                 type="primary"
@@ -224,7 +235,7 @@ export function FaqCategoryCard({
                       </div>
 
                       {/* Answer Box (High contrast, clearly legible) */}
-                      <div className="mt-3 ml-0 sm:ml-9 rounded-xl bg-[#FAFBF9] border-l-4 border-[#0B3D2E] border-y border-r border-gray-200/70 p-4">
+                      <div className="mt-3 ml-0 sm:ml-9 rounded-xl bg-[#FAFBF9] border-l-4 border-gray-200/70 border-y border-r border-gray-200/70 p-4">
                         <div className="flex items-start gap-2">
                           <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#0B3D2E] shrink-0 pt-0.5">
                             Answer:

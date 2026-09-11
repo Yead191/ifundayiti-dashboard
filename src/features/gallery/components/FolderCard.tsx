@@ -14,6 +14,7 @@ import {
 import { GlassCard } from "@/components/ui/GlassCard";
 import { formatDate } from "@/lib/utils";
 import type { IFolder } from "@/redux/features/gallery/gallery.types";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 interface FolderCardProps {
   folder: IFolder;
@@ -24,6 +25,7 @@ interface FolderCardProps {
 export function FolderCard({ folder, onEdit, onDelete }: FolderCardProps) {
   const navigate = useNavigate();
   const count = folder.galleryCount ?? 0;
+  const coverUrl = folder.image ? getImageUrl(folder.image) : null;
 
   const menuItems: MenuProps["items"] = [
     {
@@ -33,8 +35,8 @@ export function FolderCard({ folder, onEdit, onDelete }: FolderCardProps) {
       onClick: () => navigate(`/gallery/folder/${folder._id}`),
     },
     {
-      key: "rename",
-      label: "Rename Folder",
+      key: "edit",
+      label: "Edit Folder",
       icon: <EditOutlined />,
       onClick: () => onEdit(folder),
     },
@@ -51,28 +53,60 @@ export function FolderCard({ folder, onEdit, onDelete }: FolderCardProps) {
   ];
 
   return (
-    <GlassCard className="group relative flex flex-col justify-between p-5 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-700/40 hover:shadow-md cursor-pointer">
+    <GlassCard className="group relative flex flex-col justify-between p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-700/40 hover:shadow-md cursor-pointer">
       <div onClick={() => navigate(`/gallery/folder/${folder._id}`)}>
-        {/* Top bar: Folder icon and menu */}
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/60 text-emerald-800 border border-emerald-200/60 shadow-2xs group-hover:scale-105 transition-transform">
-            <FolderFilled className="text-2xl text-[#0B3D2E]" />
-          </div>
+        {/* Top Cover Image or Icon Header */}
+        {coverUrl ? (
+          <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-gray-100 mb-3.5 border border-gray-100 shadow-2xs">
+            <img
+              src={coverUrl}
+              alt={folder.name}
+              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60" />
 
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1"
-          >
-            <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
-              <Button
-                type="text"
-                size="small"
-                icon={<MoreOutlined className="text-base text-mist-500" />}
-                className="h-8 w-8 rounded-xl hover:bg-gray-100"
-              />
-            </Dropdown>
+            {/* Floating Menu Button */}
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="absolute top-2.5 right-2.5 z-10"
+            >
+              <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<MoreOutlined className="text-base text-white" />}
+                  className="h-7 w-7 rounded-xl bg-black/40 backdrop-blur-md hover:bg-black/60 flex items-center justify-center border border-white/20 shadow-xs"
+                />
+              </Dropdown>
+            </div>
+
+            {/* Bottom Album Badge */}
+            <div className="absolute bottom-2.5 left-2.5 z-10 flex items-center gap-1.5 rounded-lg bg-black/50 backdrop-blur-md px-2 py-0.5 text-[11px] font-semibold text-white">
+              <FolderFilled className="text-xs text-emerald-400" />
+              <span>Cover Album</span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/60 text-emerald-800 border border-emerald-200/60 shadow-2xs group-hover:scale-105 transition-transform">
+              <FolderFilled className="text-2xl text-[#0B3D2E]" />
+            </div>
+
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-1"
+            >
+              <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<MoreOutlined className="text-base text-mist-500" />}
+                  className="h-8 w-8 rounded-xl hover:bg-gray-100"
+                />
+              </Dropdown>
+            </div>
+          </div>
+        )}
 
         {/* Title */}
         <h3 className="font-bold text-base text-cloud-100 group-hover:text-[#0B3D2E] transition-colors line-clamp-1">
@@ -98,7 +132,7 @@ export function FolderCard({ folder, onEdit, onDelete }: FolderCardProps) {
       </div>
 
       {/* Card Footer Action */}
-      <div className="mt-5 pt-3 border-t border-gray-100 flex items-center justify-between">
+      <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
         <span className="text-[11px] font-medium text-mist-400">
           Album Gallery
         </span>

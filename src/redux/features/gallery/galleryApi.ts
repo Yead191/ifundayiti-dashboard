@@ -50,7 +50,7 @@ export const galleryApi = baseApi.injectEndpoints({
       providesTags: (_res, _err, id) => [{ type: "Folders", id }],
     }),
 
-    createFolder: builder.mutation<FolderSingleResponse, { name: string }>({
+    createFolder: builder.mutation<FolderSingleResponse, FormData>({
       query: (body) => ({
         url: "/folder",
         method: "POST",
@@ -61,12 +61,12 @@ export const galleryApi = baseApi.injectEndpoints({
 
     updateFolder: builder.mutation<
       FolderSingleResponse,
-      { id: string; name: string }
+      { id: string; body: FormData }
     >({
-      query: ({ id, name }) => ({
+      query: ({ id, body }) => ({
         url: `/folder/${id}`,
         method: "PATCH",
-        body: { name },
+        body,
       }),
       invalidatesTags: (_res, _err, { id }) => [
         { type: "Folders", id },
