@@ -124,7 +124,7 @@ export function Sidebar({
                     onClick={() => toggleGroup(item.key)}
                     aria-expanded={open}
                     className={cn(
-                      "surface-hover flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13.5px] font-medium transition-all duration-200",
+                      "surface-hover flex w-full items-center gap-3 rounded-xl pl-5 pr-3 py-2.5 text-left text-[13.5px] font-medium transition-all duration-200",
                       groupActive
                         ? "text-[#0B3D2E] font-semibold"
                         : "text-[#455850] hover:bg-black/3 hover:text-[#0B3D2E]",

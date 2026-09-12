@@ -24,6 +24,13 @@ const PAGE_META: { match: (path: string) => boolean; title: string; subtitle?: s
   { match: (p) => p.startsWith("/gallery/folder/") || (p.startsWith("/gallery/") && p !== "/gallery"), title: "Album Gallery", subtitle: "Browse and manage photos in this album" },
   { match: (p) => p === "/gallery", title: "Gallery", subtitle: "Organize photos into categorized album folders" },
 
+  // Editorial & Blogs
+  { match: (p) => p === "/blogs/create", title: "Write Article", subtitle: "Craft an editorial article with rich formatted text and media" },
+  { match: (p) => p.startsWith("/blogs/edit/"), title: "Edit Article", subtitle: "Update article narrative, cover photo, and publishing settings" },
+  { match: (p) => p === "/blogs/categories", title: "Blog Categories", subtitle: "Organize articles and field stories into thematic categories" },
+  { match: (p) => p.startsWith("/blogs/") && p !== "/blogs", title: "Article Details", subtitle: "Preview story layout, reading metrics, and editorial settings" },
+  { match: (p) => p === "/blogs" || p === "/blog", title: "Editorial & Blogs", subtitle: "Publish and moderate field stories, dispatches, and updates" },
+
   // Shop & Merchandise
   { match: (p) => p.startsWith("/shop/orders/"), title: "Order details", subtitle: "Inspect items, customer delivery destination, and fulfillment" },
   { match: (p) => p === "/shop/orders" || p === "/store/orders", title: "Store Orders", subtitle: "Monitor customer purchases, payment receipts, and pre-order batches" },

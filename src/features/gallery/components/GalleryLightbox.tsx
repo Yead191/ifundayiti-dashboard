@@ -74,9 +74,9 @@ export function GalleryLightbox({
       }}
       className="p-0 overflow-hidden"
     >
-      <div className="relative flex flex-col lg:flex-row min-h-[500px] max-h-[90vh] overflow-hidden bg-[#0B110E]">
+      <div className="relative flex flex-col lg:flex-row min-h-125 max-h-[90vh] overflow-hidden bg-[#0B110E]">
         {/* Left Side: Photo Theater Canvas */}
-        <div className="relative flex-1 flex flex-col items-center justify-center p-6 sm:p-10 bg-radial from-[#15231c] via-[#0c1410] to-[#060a08] min-h-[380px] lg:min-h-[580px] overflow-hidden select-none">
+        <div className="relative flex-1 flex flex-col items-center justify-center p-6 sm:p-10 bg-radial from-[#15231c] via-[#0c1410] to-[#060a08] min-h-95 lg:min-h-145 overflow-hidden select-none">
           {/* Subtle Ambient Aurora Glow */}
           <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-emerald-600/15 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[#0B3D2E]/25 blur-3xl" />
@@ -138,7 +138,7 @@ export function GalleryLightbox({
         </div>
 
         {/* Right Side: Editorial Metadata & Actions Inspector */}
-        <div className="w-full lg:w-[380px] shrink-0 flex flex-col justify-between bg-white p-6 sm:p-7 border-t lg:border-t-0 lg:border-l border-gray-150 overflow-y-auto">
+        <div className="w-full lg:w-95 shrink-0 flex flex-col justify-between bg-white p-6 sm:p-7 border-t lg:border-t-0 lg:border-l border-gray-150 overflow-y-auto">
           {/* Top Section */}
           <div className="space-y-5">
             {/* Header: Album Tag & Dedicated Close Button */}
@@ -250,7 +250,7 @@ export function GalleryLightbox({
                   <InfoCircleOutlined />
                   <span>Photo ID</span>
                 </span>
-                <span className="font-mono text-[11px] text-gray-500 truncate max-w-[150px]">
+                <span className="font-mono text-[11px] text-gray-500 truncate max-w-37.5">
                   {item._id}
                 </span>
               </div>
@@ -309,4 +309,3 @@ export function GalleryLightbox({
     </Modal>
   );
 }
-

@@ -53,6 +53,9 @@ export const baseApi = createApi({
     "Folders",
     "Products",
     "ProductCategories",
+    "Blogs",
+    "BlogCategories",
+    "BlogStats",
   ],
   endpoints: () => ({}),
 });

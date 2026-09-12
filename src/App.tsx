@@ -65,6 +65,12 @@ const PartnerDetailPage = lazy(
   () => import("@/features/partners/PartnerDetailPage"),
 );
 const FaqPage = lazy(() => import("@/features/faq/FaqPage"));
+const BlogsPage = lazy(() => import("@/features/blogs/BlogsPage"));
+const BlogDetailPage = lazy(() => import("@/features/blogs/BlogDetailPage"));
+const BlogEditorPage = lazy(() => import("@/features/blogs/BlogEditorPage"));
+const BlogCategoriesPage = lazy(
+  () => import("@/features/blogs/BlogCategoriesPage"),
+);
 
 export default function App() {
   return (
@@ -129,6 +135,19 @@ export default function App() {
 
             <Route path="faq" element={<FaqPage />} />
             <Route path="faqs" element={<Navigate to="/faq" replace />} />
+
+            {/* Editorial & Blogs Module */}
+            <Route path="blogs" element={<BlogsPage />} />
+            <Route path="blogs/create" element={<BlogEditorPage />} />
+            <Route path="blogs/edit/:id" element={<BlogEditorPage />} />
+            <Route path="blogs/categories" element={<BlogCategoriesPage />} />
+            <Route path="blogs/:id" element={<BlogDetailPage />} />
+
+            {/* Backward compatibility redirects */}
+            <Route path="blog" element={<Navigate to="/blogs" replace />} />
+            <Route path="blog/create" element={<Navigate to="/blogs/create" replace />} />
+            <Route path="blog/categories" element={<Navigate to="/blogs/categories" replace />} />
+            <Route path="blog/:id" element={<BlogDetailPage />} />
 
             <Route path="disclaimer/:type" element={<DisclaimerEditorPage />} />
           </Route>

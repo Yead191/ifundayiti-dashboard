@@ -15,6 +15,7 @@ import {
   FileTextOutlined,
   SafetyCertificateOutlined,
   QuestionCircleOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -58,6 +59,32 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Gallery",
     path: "/gallery",
     icon: PictureOutlined,
+  },
+  {
+    key: "blogs",
+    label: "Blogs",
+    path: "/blogs",
+    icon: FileTextOutlined,
+    children: [
+      {
+        key: "blogs-all",
+        label: "All Articles",
+        path: "/blogs",
+        icon: FileTextOutlined,
+      },
+      {
+        key: "blogs-create",
+        label: "Write Article",
+        path: "/blogs/create",
+        icon: EditOutlined,
+      },
+      {
+        key: "blogs-categories",
+        label: "Categories",
+        path: "/blogs/categories",
+        icon: TagOutlined,
+      },
+    ],
   },
   {
     key: "shop",

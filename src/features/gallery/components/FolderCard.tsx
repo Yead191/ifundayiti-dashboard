@@ -145,7 +145,7 @@ export function FolderCard({
               alt={folder.name}
               className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-70" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-70" />
 
             {/* Top Badges Floating */}
             <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">
@@ -188,7 +188,7 @@ export function FolderCard({
           </div>
         ) : (
           <div className="flex items-start justify-between gap-3 mb-4">
-            <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/60 text-emerald-800 border border-emerald-200/60 shadow-2xs group-hover:scale-105 transition-transform">
+            <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-50 to-emerald-100/60 text-emerald-800 border border-emerald-200/60 shadow-2xs group-hover:scale-105 transition-transform">
               <FolderFilled className="text-2xl text-[#0B3D2E]" />
             </div>
 
@@ -276,7 +276,7 @@ export function FolderCard({
           )}
 
           {folder.location && (
-            <span className="flex items-center gap-1 text-mist-500 text-[11px] truncate max-w-[140px]">
+            <span className="flex items-center gap-1 text-mist-500 text-[11px] truncate max-w-35">
               <EnvironmentOutlined className="text-emerald-700" />
               <span>{folder.location}</span>
             </span>
