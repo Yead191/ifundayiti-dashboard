@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
-import { Modal, Form, Input, Button, Upload } from "antd";
+import {
+  Modal,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Switch,
+  Button,
+  Upload,
+  Segmented,
+} from "antd";
 import {
   FolderOutlined,
   FolderAddOutlined,
@@ -7,8 +17,16 @@ import {
   UploadOutlined,
   DeleteOutlined,
   PictureOutlined,
+  EnvironmentOutlined,
+  CalendarOutlined,
+  StarFilled,
 } from "@ant-design/icons";
-import type { IFolder } from "@/redux/features/gallery/gallery.types";
+import dayjs from "dayjs";
+import {
+  GALLERY_CATEGORIES,
+  type IFolder,
+  type GalleryStatus,
+} from "@/redux/features/gallery/gallery.types";
 import { getImageUrl } from "@/lib/getImageUrl";
 
 interface FolderModalProps {
@@ -19,6 +37,16 @@ interface FolderModalProps {
   onSubmit: (formData: FormData) => void;
 }
 
+interface FormValues {
+  name: string;
+  category?: string;
+  location?: string;
+  date?: dayjs.Dayjs | null;
+  status: GalleryStatus;
+  featured: boolean;
+  description?: string;
+}
+
 export function FolderModal({
   open,
   folder,
@@ -26,7 +54,7 @@ export function FolderModal({
   onCancel,
   onSubmit,
 }: FolderModalProps) {
-  const [form] = Form.useForm<{ name: string }>();
+  const [form] = Form.useForm<FormValues>();
   const [fileList, setFileList] = useState<File[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -35,7 +63,15 @@ export function FolderModal({
   useEffect(() => {
     if (open) {
       if (folder) {
-        form.setFieldsValue({ name: folder.name });
+        form.setFieldsValue({
+          name: folder.name,
+          category: folder.category || undefined,
+          location: folder.location || "",
+          date: folder.date ? dayjs(folder.date) : null,
+          status: folder.status || "Published",
+          featured: Boolean(folder.featured),
+          description: folder.description || "",
+        });
         if (folder.image) {
           setPreviewUrl(getImageUrl(folder.image));
         } else {
@@ -43,6 +79,11 @@ export function FolderModal({
         }
       } else {
         form.resetFields();
+        form.setFieldsValue({
+          status: "Published",
+          featured: false,
+          category: GALLERY_CATEGORIES[0],
+        });
         setPreviewUrl(null);
       }
       setFileList([]);
@@ -62,9 +103,27 @@ export function FolderModal({
     setFileList([]);
   };
 
-  const handleFinish = (values: { name: string }) => {
+  const handleFinish = (values: FormValues) => {
     const formData = new FormData();
     formData.append("name", values.name.trim());
+
+    if (values.category) {
+      formData.append("category", values.category);
+    }
+    if (values.location?.trim()) {
+      formData.append("location", values.location.trim());
+    }
+    if (values.date) {
+      formData.append("date", values.date.toISOString());
+    }
+    formData.append("status", values.status);
+    formData.append("featured", String(Boolean(values.featured)));
+
+    if (values.description?.trim()) {
+      formData.append("description", values.description.trim());
+    } else {
+      formData.append("description", "");
+    }
 
     if (fileList.length > 0) {
       formData.append("image", fileList[0]);
@@ -78,15 +137,22 @@ export function FolderModal({
       open={open}
       onCancel={onCancel}
       footer={null}
-      width={520}
+      width={680}
       destroyOnClose
       centered
       title={
-        <div className="flex items-center gap-2.5 pb-2 border-b border-gray-100 font-display text-base font-bold text-cloud-100">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800">
+        <div className="flex items-center gap-3 pb-3 border-b border-gray-100 font-display text-lg font-bold text-cloud-100">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0B3D2E]/10 text-[#0B3D2E] text-xl">
             {isEdit ? <EditOutlined /> : <FolderAddOutlined />}
           </div>
-          <span>{isEdit ? "Edit Album Folder" : "Create New Gallery Folder"}</span>
+          <div>
+            <h3>{isEdit ? "Edit Album Details" : "Create New Photo Album"}</h3>
+            <p className="text-xs font-normal text-mist-500">
+              {isEdit
+                ? "Update story information, cover photo, category, and public visibility."
+                : "Create a photo album with cover image, location, and storytelling metadata."}
+            </p>
+          </div>
         </div>
       }
     >
@@ -94,19 +160,19 @@ export function FolderModal({
         form={form}
         layout="vertical"
         onFinish={handleFinish}
-        className="pt-3 space-y-4"
+        className="pt-3 space-y-4 max-h-[72vh] overflow-y-auto pr-1"
       >
-        {/* Folder Name */}
+        {/* Album Name */}
         <Form.Item
           name="name"
           label={
-            <span className="text-xs font-semibold text-mist-700">
-              Folder / Album Name <span className="text-rose-500">*</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-700">
+              Album / Folder Name <span className="text-rose-500">*</span>
             </span>
           }
           rules={[
-            { required: true, message: "Please enter a folder name" },
-            { min: 2, message: "Folder name must be at least 2 characters" },
+            { required: true, message: "Please enter an album name" },
+            { min: 2, message: "Album name must be at least 2 characters" },
           ]}
         >
           <Input
@@ -117,10 +183,116 @@ export function FolderModal({
           />
         </Form.Item>
 
+        {/* Category & Location */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Form.Item
+            name="category"
+            label={
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-700">
+                Category
+              </span>
+            }
+          >
+            <Select
+              placeholder="Select category"
+              className="h-10 w-full"
+              options={GALLERY_CATEGORIES.map((cat) => ({
+                label: cat,
+                value: cat,
+              }))}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="location"
+            label={
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-700">
+                Location
+              </span>
+            }
+          >
+            <Input
+              prefix={<EnvironmentOutlined className="text-mist-400" />}
+              placeholder="e.g. Cap-Haïtien, Haiti"
+              className="rounded-xl h-10"
+            />
+          </Form.Item>
+        </div>
+
+        {/* Date & Status */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Form.Item
+            name="date"
+            label={
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-700">
+                Event / Capture Date
+              </span>
+            }
+          >
+            <DatePicker
+              className="w-full rounded-xl h-10"
+              placeholder="Select date"
+              prefix={<CalendarOutlined className="text-mist-400 mr-1" />}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="status"
+            label={
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-700">
+                Visibility Status
+              </span>
+            }
+          >
+            <Segmented
+              block
+              className="p-1 rounded-xl bg-gray-100 font-medium"
+              options={[
+                { label: "Published", value: "Published" },
+                { label: "Draft", value: "Draft" },
+                { label: "Archived", value: "Archived" },
+              ]}
+            />
+          </Form.Item>
+        </div>
+
+        {/* Featured in Spotlight */}
+        <div className="flex items-center justify-between rounded-2xl border border-gray-200 bg-gray-50/70 p-4">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-1.5 font-bold text-sm text-cloud-100">
+              <StarFilled className="text-amber-500 text-sm" />
+              <span>Feature in Spotlight</span>
+            </div>
+            <p className="text-xs text-mist-500">
+              Spotlighted albums are pinned to the top of the gallery directory
+              and public storefront carousels.
+            </p>
+          </div>
+          <Form.Item name="featured" valuePropName="checked" noStyle>
+            <Switch />
+          </Form.Item>
+        </div>
+
+        {/* Description / Field Narrative */}
+        <Form.Item
+          name="description"
+          label={
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-700">
+              Album Description / Field Note
+            </span>
+          }
+        >
+          <Input.TextArea
+            rows={3}
+            placeholder="Share the story and grassroots context behind this album..."
+            className="rounded-xl text-sm"
+          />
+        </Form.Item>
+
         {/* Cover Image Upload */}
         <div>
-          <label className="block text-xs font-semibold text-mist-700 mb-1.5">
-            Folder Cover Image
+          <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+            Album Cover Image
           </label>
 
           {previewUrl ? (
@@ -128,7 +300,7 @@ export function FolderModal({
               <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
                 <img
                   src={previewUrl}
-                  alt="Folder cover preview"
+                  alt="Album cover preview"
                   className="h-full w-full object-cover"
                 />
               </div>
@@ -148,7 +320,7 @@ export function FolderModal({
                       icon={<UploadOutlined />}
                       className="rounded-lg text-xs font-medium text-cloud-100"
                     >
-                      Change
+                      Change Cover
                     </Button>
                   </Upload>
                   <Button
@@ -179,7 +351,8 @@ export function FolderModal({
                     Click or drag cover image to this area
                   </p>
                   <p className="mt-0.5 text-[11px] text-mist-500">
-                    Supports JPG, PNG, WEBP up to 10MB. 16:9 landscape recommended.
+                    Supports JPG, PNG, WEBP up to 15MB. 16:9 landscape
+                    recommended.
                   </p>
                 </div>
               </div>
@@ -187,23 +360,21 @@ export function FolderModal({
           )}
         </div>
 
-        <p className="text-xs text-mist-500 leading-relaxed pt-1">
-          {isEdit
-            ? "Updating this folder will synchronize its name and cover image across the dashboard and public storefront."
-            : "Folders organize community photos, field projects, and grant programs into tidy public albums."}
-        </p>
-
         <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100">
-          <Button onClick={onCancel} disabled={loading} className="rounded-xl h-9">
+          <Button
+            onClick={onCancel}
+            disabled={loading}
+            className="rounded-xl h-10 px-5 font-medium"
+          >
             Cancel
           </Button>
           <Button
             type="primary"
             htmlType="submit"
             loading={loading}
-            className="rounded-xl h-9 px-5 bg-[#0B3D2E]! hover:bg-[#082e23]! text-white! font-semibold shadow-sm border-0"
+            className="rounded-xl h-10 px-6 bg-[#0B3D2E]! hover:bg-[#082e23]! text-white! font-semibold shadow-sm border-0"
           >
-            {isEdit ? "Save Changes" : "Create Folder"}
+            {isEdit ? "Save Changes" : "Create Album"}
           </Button>
         </div>
       </Form>

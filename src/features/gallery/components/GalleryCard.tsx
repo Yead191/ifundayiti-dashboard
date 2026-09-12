@@ -47,15 +47,15 @@ export function GalleryCard({
 }: GalleryCardProps) {
   const isFeatured = Boolean(item.featured);
   const imageUrl = toFileUrl(item.image);
-  const categoryConfig = GALLERY_CATEGORY_CONFIG[item.category] || {
-    label: item.category,
+  const categoryConfig = (item.category && GALLERY_CATEGORY_CONFIG[item.category]) || {
+    label: item.category || "General",
     color: "default",
     bg: "bg-slate-500/10",
     text: "text-slate-700",
     border: "border-slate-500/20",
   };
-  const statusConfig = GALLERY_STATUS_CONFIG[item.status] || {
-    label: item.status,
+  const statusConfig = (item.status && GALLERY_STATUS_CONFIG[item.status]) || {
+    label: item.status || "Published",
     color: "default",
     bg: "bg-slate-500/10",
     text: "text-slate-700",
