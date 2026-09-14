@@ -38,6 +38,9 @@ const IFundAyitiPeriodsPage = lazy(
 const IFundAyitiDonationsPage = lazy(
   () => import("@/features/donations/DonationsPage"),
 );
+const TransactionsPage = lazy(
+  () => import("@/features/transactions/TransactionsPage"),
+);
 const TeamPage = lazy(() => import("@/features/team/TeamPage"));
 const ProjectsPage = lazy(() => import("@/features/projects/ProjectsPage"));
 const ProjectDetailPage = lazy(
@@ -70,6 +73,9 @@ const BlogDetailPage = lazy(() => import("@/features/blogs/BlogDetailPage"));
 const BlogEditorPage = lazy(() => import("@/features/blogs/BlogEditorPage"));
 const BlogCategoriesPage = lazy(
   () => import("@/features/blogs/BlogCategoriesPage"),
+);
+const NotificationsPage = lazy(
+  () => import("@/features/notifications/NotificationsPage"),
 );
 
 export default function App() {
@@ -107,6 +113,9 @@ export default function App() {
             <Route path="donations" element={<IFundAyitiDonationsPage />} />
             <Route path="fund-transactions" element={<Navigate to="/donations" replace />} />
             <Route path="admin/donations" element={<Navigate to="/donations" replace />} />
+            <Route path="transactions" element={<TransactionsPage />} />
+            <Route path="admin/transactions" element={<Navigate to="/transactions" replace />} />
+            <Route path="admin/financials" element={<Navigate to="/transactions" replace />} />
             <Route path="team" element={<TeamPage />} />
             <Route path="partners" element={<PartnersPage />} />
             <Route path="partners/:id" element={<PartnerDetailPage />} />
@@ -129,10 +138,35 @@ export default function App() {
             <Route path="shop/orders" element={<ShopOrdersPage />} />
             <Route path="shop/orders/:id" element={<ShopOrderDetailPage />} />
 
+            {/* Notifications Module */}
+            <Route path="notifications" element={<NotificationsPage />} />
+            <Route
+              path="admin/notifications"
+              element={<Navigate to="/notifications" replace />}
+            />
+
             {/* Backward compatibility redirects */}
             <Route
               path="store/orders"
               element={<Navigate to="/shop/orders" replace />}
+            />
+            <Route
+              path="orders"
+              element={<Navigate to="/shop/orders" replace />}
+            />
+            <Route path="orders/:id" element={<ShopOrderDetailPage />} />
+            <Route path="order/:id" element={<ShopOrderDetailPage />} />
+            <Route
+              path="refunds"
+              element={<Navigate to="/store/refunds" replace />}
+            />
+            <Route
+              path="refunds/:refundId"
+              element={<RefundDetailPage />}
+            />
+            <Route
+              path="subscriptions"
+              element={<Navigate to="/transactions" replace />}
             />
 
             <Route path="faq" element={<FaqPage />} />

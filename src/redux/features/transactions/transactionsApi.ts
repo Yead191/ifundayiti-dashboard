@@ -1,22 +1,39 @@
 import { baseApi } from "../../api/baseApi";
 import type {
+  DeleteMultipleTransactionsResponse,
+  DeleteTransactionResponse,
   GetTransactionsParams,
-  TransactionMutationResponse,
+  SingleTransactionResponse,
+  TransactionStatsResponse,
   TransactionsListResponse,
 } from "./transactions.types";
 
 export const transactionsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getTransactions: builder.query<TransactionsListResponse, GetTransactionsParams | void>({
-      query: (params) => ({
-        url: "/transaction",
-        method: "GET",
-        params: {
-          page: params?.page ?? 1,
-          limit: params?.limit ?? 10,
-          ...(params?.searchTerm ? { searchTerm: params.searchTerm } : {}),
-        },
-      }),
+      query: (params) => {
+        const queryParams: Record<string, any> = {
+          page: 1,
+          limit: 10,
+          sort: "-createdAt",
+        };
+
+        if (params) {
+          if (params.page !== undefined) queryParams.page = params.page;
+          if (params.limit !== undefined) queryParams.limit = params.limit;
+          if (params.sort !== undefined) queryParams.sort = params.sort;
+          if (params.searchTerm) queryParams.searchTerm = params.searchTerm;
+          if (params.category) queryParams.category = params.category;
+          if (params.status) queryParams.status = params.status;
+          if (params.type) queryParams.type = params.type;
+        }
+
+        return {
+          url: "/transaction",
+          method: "GET",
+          params: queryParams,
+        };
+      },
       providesTags: (result) =>
         result?.data
           ? [
@@ -26,15 +43,57 @@ export const transactionsApi = baseApi.injectEndpoints({
           : [{ type: "Transactions", id: "LIST" }],
     }),
 
-    deleteTransaction: builder.mutation<TransactionMutationResponse, string>({
+    getTransactionStats: builder.query<TransactionStatsResponse, void>({
+      query: () => ({
+        url: "/transaction/stats",
+        method: "GET",
+      }),
+      providesTags: [{ type: "Transactions", id: "STATS" }],
+    }),
+
+    getTransactionById: builder.query<SingleTransactionResponse, string>({
+      query: (id) => ({
+        url: `/transaction/${id}`,
+        method: "GET",
+      }),
+      providesTags: (_result, _error, id) => [{ type: "Transactions", id }],
+    }),
+
+    deleteTransaction: builder.mutation<DeleteTransactionResponse, string>({
       query: (id) => ({
         url: `/transaction/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "Transactions", id: "LIST" }, "Dashboard"],
+      invalidatesTags: [
+        { type: "Transactions", id: "LIST" },
+        { type: "Transactions", id: "STATS" },
+        "Dashboard",
+      ],
+    }),
+
+    deleteMultipleTransactions: builder.mutation<
+      DeleteMultipleTransactionsResponse,
+      { ids: string[] }
+    >({
+      query: (body) => ({
+        url: "/transaction/delete-multiple",
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: [
+        { type: "Transactions", id: "LIST" },
+        { type: "Transactions", id: "STATS" },
+        "Dashboard",
+      ],
     }),
   }),
   overrideExisting: false,
 });
 
-export const { useGetTransactionsQuery, useDeleteTransactionMutation } = transactionsApi;
+export const {
+  useGetTransactionsQuery,
+  useGetTransactionStatsQuery,
+  useGetTransactionByIdQuery,
+  useDeleteTransactionMutation,
+  useDeleteMultipleTransactionsMutation,
+} = transactionsApi;

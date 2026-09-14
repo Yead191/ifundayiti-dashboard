@@ -17,6 +17,8 @@ import {
   QuestionCircleOutlined,
   EditOutlined,
   HeartOutlined,
+  CreditCardOutlined,
+  BellOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -38,6 +40,12 @@ export const NAV_ITEMS: NavItem[] = [
     icon: DashboardOutlined,
   },
   {
+    key: "notifications",
+    label: "Notifications",
+    path: "/notifications",
+    icon: BellOutlined,
+  },
+  {
     key: "periods",
     label: "Grant Cycles",
     path: "/periods",
@@ -54,6 +62,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Donations & Fund",
     path: "/donations",
     icon: HeartOutlined,
+  },
+  {
+    key: "transactions",
+    label: "Transactions",
+    path: "/transactions",
+    icon: CreditCardOutlined,
   },
   {
     key: "projects",

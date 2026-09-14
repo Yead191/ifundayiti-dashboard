@@ -16,6 +16,9 @@ const PAGE_META: { match: (path: string) => boolean; title: string; subtitle?: s
   // Donations
   { match: (p) => p === "/donations" || p === "/admin/donations" || p === "/fund-transactions", title: "Fund & Received Donations", subtitle: "Monitor live program fund liquidity, global donor contributions, and awarded grants" },
 
+  // Financial Transactions
+  { match: (p) => p === "/transactions" || p === "/admin/transactions" || p === "/admin/financials", title: "Financial Transactions", subtitle: "Audit Stripe checkout payments, membership subscriptions, store orders, and ledger events" },
+
   // Community Projects
   { match: (p) => p.startsWith("/projects/"), title: "Project details", subtitle: "Inspect project overview, narrative, and media" },
   { match: (p) => p === "/projects", title: "Community Projects", subtitle: "Publish and spotlight funded community projects" },

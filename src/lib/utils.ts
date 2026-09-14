@@ -37,6 +37,22 @@ export function formatDateTime(value: string | Date) {
   });
 }
 
+/** Format a Date into a friendly relative string, e.g. "Just now", "2m ago", "1h ago", "Yesterday". */
+export function formatRelativeTime(value: string | Date): string {
+  const date = typeof value === "string" ? new Date(value) : value;
+  if (Number.isNaN(date.getTime())) return "—";
+  const diffInSeconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (diffInSeconds < 45) return "Just now";
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}h ago`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays === 1) return "Yesterday";
+  if (diffInDays < 7) return `${diffInDays}d ago`;
+  return formatDate(date);
+}
+
 /** Format a byte count into a human-readable size, e.g. 1284000 -> "1.2 MB". */
 export function formatFileSize(bytes: number) {
   if (!bytes) return "—";

@@ -1,210 +1,486 @@
-import { useEffect, useState } from "react";
-import { Avatar, Button, Table, Tooltip, type TableProps } from "antd";
+import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
+  Input,
+  Table,
+  Button,
+  Segmented,
+  Select,
+  Tooltip,
+  Tag,
+  Avatar,
+} from "antd";
+import type { TableProps } from "antd";
+import {
+  SearchOutlined,
+  ReloadOutlined,
+  DownloadOutlined,
   DeleteOutlined,
   EyeOutlined,
-  HistoryOutlined,
-  UserOutlined,
-  DollarOutlined,
+  CopyOutlined,
+  CheckOutlined,
+  DollarCircleOutlined,
   ShoppingOutlined,
   CrownOutlined,
+  SafetyCertificateOutlined,
+  UserOutlined,
+  CreditCardOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  ArrowRightOutlined,
   AppstoreOutlined,
 } from "@ant-design/icons";
 import { toast } from "sonner";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { StatusTag } from "@/components/ui/StatusTag";
-import { SearchInput } from "@/components/ui/SearchInput";
-import { ConfirmDeleteModal } from "@/components/ui/ConfirmDeleteModal";
-import { useConfirmDelete } from "@/hooks/useConfirmDelete";
-import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { getImageUrl } from "@/lib/getImageUrl";
+import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 import {
-  useDeleteTransactionMutation,
   useGetTransactionsQuery,
+  useGetTransactionStatsQuery,
+  useDeleteTransactionMutation,
+  useDeleteMultipleTransactionsMutation,
 } from "@/redux/features/transactions/transactionsApi";
-import type { ApiTransaction } from "@/redux/features/transactions/transactions.types";
-import {
-  formatTransactionLabel,
-  isMembershipCategory,
-  isServiceCategory,
-  isShopCategory,
-  transactionCategoryToneMap,
-  transactionStatusToneMap,
-  transactionTypeToneMap,
-} from "./statusMaps";
+import type {
+  ITransaction,
+  TransactionOrderRef,
+  TransactionUser,
+} from "@/redux/features/transactions/transactions.types";
 import { TransactionDetailModal } from "./components/TransactionDetailModal";
-
-function getErrorMessage(error: unknown) {
-  if (typeof error === "object" && error !== null) {
-    const err = error as { data?: { message?: string }; message?: string };
-    return err.data?.message ?? err.message ?? "Something went wrong. Please try again.";
-  }
-  return "Something went wrong. Please try again.";
-}
-
-function categoryIcon(category: string) {
-  if (isMembershipCategory(category)) return <CrownOutlined />;
-  if (isShopCategory(category)) return <ShoppingOutlined />;
-  if (isServiceCategory(category)) return <AppstoreOutlined />;
-  return <DollarOutlined />;
-}
-
-function transactionLabel(record: ApiTransaction) {
-  return record.transaction_id || `${record._id.slice(0, 10)}…`;
-}
+import { DeleteTransactionModal } from "./components/DeleteTransactionModal";
 
 export default function TransactionsPage() {
-  const {
-    value: search,
-    setValue: setSearch,
-    debouncedValue: searchTerm,
-  } = useDebouncedSearch();
+  // Query & Filter states
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [viewing, setViewing] = useState<ApiTransaction | null>(null);
+  const {
+    value: searchInput,
+    setValue: setSearchInput,
+    debouncedValue: searchTerm,
+  } = useDebouncedSearch();
 
-  useEffect(() => {
-    setPage(1);
-  }, [searchTerm]);
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
 
-  const { data, isFetching } = useGetTransactionsQuery({
-    page,
-    limit,
-    searchTerm,
-  });
+  // Selection & Modal states
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [inspectingTx, setInspectingTx] = useState<ITransaction | null>(null);
+  const [deletingTx, setDeletingTx] = useState<ITransaction | null>(null);
+  const [batchDeleteModalOpen, setBatchDeleteModalOpen] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const [deleteTransaction] = useDeleteTransactionMutation();
+  // Stats query
+  const {
+    data: statsRes,
+    isLoading: isLoadingStats,
+    refetch: refetchStats,
+  } = useGetTransactionStatsQuery();
 
-  const transactions = data?.data ?? [];
-  const pagination = data?.pagination;
+  // Transactions query
+  const queryParams = useMemo(
+    () => ({
+      page,
+      limit,
+      searchTerm: searchTerm.trim() || undefined,
+      category: categoryFilter !== "all" ? categoryFilter : undefined,
+      status: statusFilter !== "all" ? statusFilter : undefined,
+      type: typeFilter !== "all" ? typeFilter : undefined,
+      sort: "-createdAt",
+    }),
+    [page, limit, searchTerm, categoryFilter, statusFilter, typeFilter],
+  );
 
-  const deleteFlow = useConfirmDelete<ApiTransaction>(async (record) => {
-    const label = transactionLabel(record);
-    const promise = deleteTransaction(record._id)
-      .unwrap()
-      .then(() => {
-        setViewing((prev) => (prev?._id === record._id ? null : prev));
-      });
+  const {
+    data: txRes,
+    isLoading: isLoadingTx,
+    isFetching,
+    refetch: refetchTx,
+  } = useGetTransactionsQuery(queryParams);
 
-    toast.promise(promise, {
-      loading: `Deleting ${label}…`,
-      success: `${label} was deleted.`,
-      error: (err) => getErrorMessage(err),
+  const [deleteTransaction, { isLoading: isDeletingSingle }] =
+    useDeleteTransactionMutation();
+  const [deleteMultiple, { isLoading: isDeletingMultiple }] =
+    useDeleteMultipleTransactionsMutation();
+
+  const transactions = txRes?.data || [];
+  const pagination = txRes?.pagination;
+
+  const stats = statsRes?.data || {
+    totalRevenue: 0,
+    shopRevenue: 0,
+    membershipRevenue: 0,
+    totalTransactions: 0,
+    successfulTransactions: 0,
+    pendingTransactions: 0,
+    failedTransactions: 0,
+    creditTransactions: 0,
+    debitTransactions: 0,
+  };
+
+  const handleRefresh = () => {
+    refetchStats();
+    refetchTx();
+  };
+
+  const handleCopy = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(id);
+    setCopiedId(id);
+    toast.success("Reference copied to clipboard");
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleConfirmDeleteSingle = async () => {
+    if (!deletingTx) return;
+    try {
+      await deleteTransaction(deletingTx._id).unwrap();
+      toast.success("Transaction record deleted successfully");
+      setDeletingTx(null);
+      if (inspectingTx?._id === deletingTx._id) {
+        setInspectingTx(null);
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to delete transaction");
+    }
+  };
+
+  const handleConfirmBatchDelete = async () => {
+    if (selectedRowKeys.length === 0) return;
+    try {
+      const ids = selectedRowKeys.map(String);
+      const res = await deleteMultiple({ ids }).unwrap();
+      toast.success(
+        `${res?.data?.deletedCount || ids.length} transaction(s) deleted successfully`,
+      );
+      setSelectedRowKeys([]);
+      setBatchDeleteModalOpen(false);
+    } catch (err: any) {
+      toast.error(
+        err?.data?.message || "Failed to delete selected transactions",
+      );
+    }
+  };
+
+  // Export CSV
+  const handleExportCSV = () => {
+    if (transactions.length === 0) {
+      toast.warning("No transactions available to export");
+      return;
+    }
+
+    const headers = [
+      "Transaction ID",
+      "Payment Intent ID",
+      "Customer Name",
+      "Customer Email",
+      "Category",
+      "Type",
+      "Amount ($)",
+      "Received ($)",
+      "Discount ($)",
+      "Status",
+      "Payment Method",
+      "Order Number",
+      "Created At",
+    ];
+
+    const rows = transactions.map((t) => {
+      const u = typeof t.user === "object" ? t.user : null;
+      const o = typeof t.order === "object" ? t.order : null;
+      return [
+        `"${t.transaction_id || t._id}"`,
+        `"${t.payment_intent_id || ""}"`,
+        `"${u?.name || "Customer"}"`,
+        `"${u?.email || ""}"`,
+        `"${t.category || ""}"`,
+        `"${t.type || ""}"`,
+        t.total_price ?? t.amount ?? 0,
+        t.payment_received ?? 0,
+        t.discount_amount ?? 0,
+        `"${t.status || ""}"`,
+        `"${t.payment_method || "stripe"}"`,
+        `"${o?.orderNumber || ""}"`,
+        `"${t.createdAt}"`,
+      ];
     });
 
-    await promise.catch(() => undefined);
-  });
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute(
+      "download",
+      `ifundayiti-transactions-${new Date().toISOString().slice(0, 10)}.csv`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Transactions exported successfully");
+  };
 
-  const columns: TableProps<ApiTransaction>["columns"] = [
+  const columns: TableProps<ITransaction>["columns"] = [
     {
-      title: "Transaction",
-      key: "id",
-      render: (_, record) => (
-        <button
-          type="button"
-          className="text-left"
-          onClick={() => setViewing(record)}
-        >
-          <code className="font-mono text-xs font-medium text-cloud-100 transition hover:text-violet-glow">
-            {transactionLabel(record)}
-          </code>
-          <div className="mt-0.5 text-[11px] text-mist-500">
-            {record.createdAt ? formatDate(record.createdAt) : "—"}
+      title: "Transaction ID / Ref",
+      key: "transaction_id",
+      width: 220,
+      render: (_, record) => {
+        const displayRef =
+          record.transaction_id || record.payment_intent_id || record._id;
+        const shortRef =
+          displayRef.length > 18
+            ? `${displayRef.slice(0, 8)}…${displayRef.slice(-6)}`
+            : displayRef;
+        const isCopied = copiedId === displayRef;
+
+        return (
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-1.5">
+              <span className="font-mono text-xs font-semibold text-gray-800 bg-gray-100/90 px-2 py-0.5 rounded-md border border-gray-200/60">
+                {shortRef}
+              </span>
+              <Tooltip title={isCopied ? "Copied" : "Copy reference"}>
+                <button
+                  type="button"
+                  onClick={(e) => handleCopy(displayRef, e)}
+                  className="text-gray-400 hover:text-[#0B3D2E] transition-colors p-0.5"
+                >
+                  {isCopied ? (
+                    <CheckOutlined className="text-emerald-600 text-xs" />
+                  ) : (
+                    <CopyOutlined className="text-xs" />
+                  )}
+                </button>
+              </Tooltip>
+            </div>
+            <div className="text-[11px] text-gray-400">
+              {record.payment_method ? (
+                <span className="capitalize">{record.payment_method}</span>
+              ) : (
+                "Stripe"
+              )}
+            </div>
           </div>
-        </button>
-      ),
+        );
+      },
     },
     {
       title: "Customer",
       key: "user",
-      render: (_, record) => (
-        <div className="flex items-center gap-3">
-          <Avatar
-            src={getImageUrl(record?.user?.image || "")}
-            icon={<UserOutlined />}
-            size={38}
-            className="bg-violet-600/25! text-violet-glow!"
-          />
-          <div className="min-w-0">
-            <div className="font-medium text-cloud-100">{record?.user?.name || "Deleted user"}</div>
-            <div className="max-w-48 truncate text-xs text-mist-400">
-              {record?.user?.email || "—"}
+      width: 220,
+      render: (_, record) => {
+        const user =
+          typeof record.user === "object"
+            ? (record.user as TransactionUser)
+            : null;
+
+        return (
+          <div className="flex items-center gap-2.5">
+            <Avatar
+              src={getImageUrl(user?.image || "")}
+              icon={<UserOutlined />}
+              size={36}
+              className="bg-emerald-50 text-[#0B3D2E] border border-emerald-100/80 shrink-0"
+            />
+            <div className="min-w-0">
+              <div className="font-semibold text-xs text-gray-900 truncate">
+                {user?.name || "Verified Customer"}
+              </div>
+              <div className="text-[11px] text-gray-400 truncate">
+                {user?.email || "—"}
+              </div>
             </div>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       title: "Category",
       key: "category",
-      responsive: ["md"],
-      render: (_, record) => (
-        <StatusTag
-          tone={transactionCategoryToneMap[record.category] ?? "neutral"}
-          icon={categoryIcon(record.category)}
-        >
-          {formatTransactionLabel(record.category)}
-        </StatusTag>
-      ),
+      width: 140,
+      render: (_, record) => {
+        const cat = String(record.category || "Shop");
+        const isShop = cat.toLowerCase() === "shop";
+        const isMembership = cat.toLowerCase() === "membership";
+
+        return (
+          <Tag
+            bordered={false}
+            className={`rounded-full text-xs font-semibold px-2.5 py-0.5 m-0 border ${
+              isMembership
+                ? "bg-amber-50 text-amber-700 border-amber-200"
+                : isShop
+                  ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                  : "bg-teal-50 text-teal-700 border-teal-200"
+            }`}
+          >
+            <span className="flex items-center gap-1">
+              {isMembership ? (
+                <CrownOutlined />
+              ) : isShop ? (
+                <ShoppingOutlined />
+              ) : (
+                <AppstoreOutlined />
+              )}
+              <span>{cat}</span>
+            </span>
+          </Tag>
+        );
+      },
     },
     {
       title: "Amount",
-      key: "total_price",
-      render: (_, record) => (
-        <div>
-          <div className="font-display font-semibold text-cloud-100">
-            {formatCurrency(record.total_price ?? 0)}
-          </div>
-          <div className="text-[11px] text-mist-500">
-            Received {formatCurrency(record.payment_received ?? 0)}
-            {(record.discount_amount ?? 0) > 0
-              ? ` · −${formatCurrency(record.discount_amount ?? 0)}`
-              : ""}
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "Type",
-      key: "type",
-      responsive: ["lg"],
-      render: (_, record) => (
-        <StatusTag tone={transactionTypeToneMap[record.type] ?? "neutral"}>
-          {formatTransactionLabel(record.type)}
-        </StatusTag>
-      ),
+      key: "amount",
+      width: 150,
+      render: (_, record) => {
+        const isCredit = String(record.type).toLowerCase() === "credit";
+        const price = record.total_price ?? record.amount ?? 0;
+        const discount = record.discount_amount || 0;
+        const fee = record.platform_fee || 0;
+
+        return (
+          <Tooltip
+            title={
+              <div className="text-xs space-y-1 py-0.5">
+                <div>Base Price: {formatCurrency(price)}</div>
+                {discount > 0 && (
+                  <div>Discount: -{formatCurrency(discount)}</div>
+                )}
+                {fee > 0 && <div>Platform Fee: {formatCurrency(fee)}</div>}
+                <div className="font-bold border-t border-white/20 pt-1">
+                  Net:{" "}
+                  {formatCurrency(record.payment_received ?? price - discount)}
+                </div>
+              </div>
+            }
+          >
+            <div className="cursor-help">
+              <span
+                className={`font-display text-sm font-bold ${
+                  isCredit ? "text-emerald-700" : "text-gray-900"
+                }`}
+              >
+                {isCredit ? "+" : "-"}
+                {formatCurrency(price)}
+              </span>
+              {discount > 0 && (
+                <div className="text-[11px] text-amber-600 font-medium">
+                  -{formatCurrency(discount)} off
+                </div>
+              )}
+            </div>
+          </Tooltip>
+        );
+      },
     },
     {
       title: "Status",
       key: "status",
+      width: 120,
+      render: (_, record) => {
+        const st = String(record.status || "Success");
+        const isSuccess = st.toLowerCase() === "success";
+        const isPending = st.toLowerCase() === "pending";
+
+        return (
+          <Tag
+            bordered={false}
+            className={`rounded-full text-xs font-semibold px-2.5 py-0.5 m-0 border ${
+              isSuccess
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                : isPending
+                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                  : "bg-rose-50 text-rose-700 border-rose-200"
+            }`}
+          >
+            <span className="flex items-center gap-1">
+              {isSuccess ? (
+                <CheckCircleOutlined />
+              ) : isPending ? (
+                <ClockCircleOutlined />
+              ) : (
+                <CloseCircleOutlined />
+              )}
+              <span>{st}</span>
+            </span>
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "Linked Order",
+      key: "order",
+      width: 160,
+      render: (_, record) => {
+        const order =
+          typeof record.order === "object"
+            ? (record.order as TransactionOrderRef)
+            : null;
+        const orderId =
+          order?._id ||
+          (typeof record.order === "string" ? record.order : null);
+        const orderNumber =
+          order?.orderNumber ||
+          (orderId ? `ORD-${orderId.slice(-6).toUpperCase()}` : null);
+
+        if (!orderId) {
+          return <span className="text-gray-400 text-xs">—</span>;
+        }
+
+        return (
+          <Link
+            to={`/shop/orders/${orderId}`}
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50/80 hover:bg-indigo-100/80 px-2 py-0.5 rounded-lg transition-colors border border-indigo-200/60"
+          >
+            <span>{orderNumber}</span>
+            <ArrowRightOutlined className="text-[10px]" />
+          </Link>
+        );
+      },
+    },
+    {
+      title: "Date & Time",
+      key: "createdAt",
+      width: 170,
       render: (_, record) => (
-        <StatusTag tone={transactionStatusToneMap[record.status] ?? "neutral"}>
-          {formatTransactionLabel(record.status)}
-        </StatusTag>
+        <span className="text-xs text-gray-500">
+          {formatDateTime(record.createdAt)}
+        </span>
       ),
     },
     {
-      title: "",
+      title: "Actions",
       key: "actions",
-      width: 108,
+      width: 100,
+      align: "right",
       render: (_, record) => (
-        <div className="flex items-center justify-end gap-1">
-          <Tooltip title="View transaction">
+        <div
+          className="flex items-center justify-end gap-1"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Tooltip title="View Transaction Details">
             <Button
               type="text"
-              className="text-mist-400! hover:bg-violet-600/15! hover:text-violet-glow!"
+              size="small"
               icon={<EyeOutlined />}
-              onClick={() => setViewing(record)}
+              onClick={() => setInspectingTx(record)}
+              className="h-8 w-8 rounded-lg text-gray-500 hover:text-[#0B3D2E] hover:bg-emerald-50"
             />
           </Tooltip>
-          <Tooltip title="Delete transaction">
+
+          <Tooltip title="Delete Transaction">
             <Button
               type="text"
+              size="small"
               danger
               icon={<DeleteOutlined />}
-              onClick={() => deleteFlow.request(record)}
+              onClick={() => setDeletingTx(record)}
+              className="h-8 w-8 rounded-lg hover:bg-rose-50"
             />
           </Tooltip>
         </div>
@@ -213,93 +489,329 @@ export default function TransactionsPage() {
   ];
 
   return (
-    <div>
-      <div className="aurora-field glass-panel mb-6 overflow-hidden p-6 md:p-7">
-        <div className="relative flex flex-col justify-between gap-4 md:flex-row md:items-center">
-          <div className="pointer-events-none absolute -right-8 -top-16 h-44 w-44 rounded-full bg-warning/15 blur-[60px]" />
-          <div className="pointer-events-none absolute -bottom-20 left-1/4 h-36 w-36 rounded-full bg-violet-600/20 blur-[50px]" />
+    <div className="space-y-6 pb-12">
+      {/* Top Header */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-cloud-100">
+            Financial Transactions
+          </h1>
+          <p className="text-xs sm:text-sm text-mist-600 mt-1">
+            Audit Stripe checkout payments, shop orders, membership renewals,
+            and platform ledger events.
+          </p>
+        </div>
 
-          <div className="relative flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-[#8131F0] to-[#4A1C8A] shadow-[0_8px_24px_-8px_rgba(129,49,240,0.65)]">
-              <HistoryOutlined className="text-lg text-white" />
-            </div>
-            <div>
-              <h2 className="font-display text-xl font-semibold text-cloud-100">
-                Transaction history
-              </h2>
-              <p className="mt-1 max-w-xl text-sm text-mist-400">
-                Review payments across membership, shop, and service purchases.
-                Search by transaction ID.
-              </p>
-            </div>
-          </div>
+        <div className="flex items-center gap-2.5">
+          <Button
+            icon={<DownloadOutlined />}
+            onClick={handleExportCSV}
+            className="h-10 rounded-xl font-medium border-gray-200 hover:border-[#0B3D2E]"
+          >
+            Export CSV
+          </Button>
 
-          <div className="relative rounded-2xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm">
-            <div className="font-semibold text-warning">
-              {pagination?.total ?? 0} total
-            </div>
-            <div className="text-xs text-mist-400">Ledger entries</div>
-          </div>
+          <Tooltip title="Refresh transaction statistics & data">
+            <Button
+              icon={
+                <ReloadOutlined className={isFetching ? "animate-spin" : ""} />
+              }
+              onClick={handleRefresh}
+              className="h-10 w-10 rounded-xl"
+            />
+          </Tooltip>
         </div>
       </div>
 
-      <GlassCard flat className="mb-4">
-        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-          <SearchInput
-            placeholder="Search by transaction ID, name, or email…"
-            value={search}
-            onChange={setSearch}
-            className="sm:w-80!"
-          />
-          <div className="text-xs text-mist-600">
-            {pagination?.total ?? 0} transaction
-            {(pagination?.total ?? 0) === 1 ? "" : "s"}
+      {/* 4 Top-Tier Metric Widgets (GlassCards) */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Total Gross Revenue */}
+        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0B3D2E]">
+              Total Gross Revenue
+            </span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-[#0B3D2E] ring-1 ring-emerald-200/50">
+              <DollarCircleOutlined className="text-lg" />
+            </div>
+          </div>
+          <div>
+            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#0B3D2E]">
+              {isLoadingStats ? "…" : formatCurrency(stats.totalRevenue)}
+            </h2>
+            <p className="text-xs text-mist-500 mt-1">
+              {stats.successfulTransactions} successful payments
+            </p>
+          </div>
+          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-emerald-500/10 blur-xl" />
+        </GlassCard>
+
+        {/* Shop / Merchandise Revenue */}
+        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-700">
+              Shop / Store Revenue
+            </span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200/50">
+              <ShoppingOutlined className="text-lg" />
+            </div>
+          </div>
+          <div>
+            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-indigo-950">
+              {isLoadingStats ? "…" : formatCurrency(stats.shopRevenue)}
+            </h2>
+            <p className="text-xs text-mist-500 mt-1">
+              Direct merchandise & store sales
+            </p>
+          </div>
+          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-indigo-500/10 blur-xl" />
+        </GlassCard>
+
+        {/* Membership Subscriptions */}
+        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
+              Membership Subscriptions
+            </span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 ring-1 ring-amber-200/50">
+              <CrownOutlined className="text-lg" />
+            </div>
+          </div>
+          <div>
+            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-amber-700">
+              {isLoadingStats ? "…" : formatCurrency(stats.membershipRevenue)}
+            </h2>
+            <p className="text-xs text-mist-500 mt-1">
+              Recurring membership contributions
+            </p>
+          </div>
+          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-amber-500/10 blur-xl" />
+        </GlassCard>
+
+        {/* Transaction Health & Volume */}
+        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-teal-700">
+              Transaction Health & Volume
+            </span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 ring-1 ring-teal-200/50">
+              <SafetyCertificateOutlined className="text-lg" />
+            </div>
+          </div>
+          <div>
+            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-teal-950">
+              {isLoadingStats ? "…" : `${stats.totalTransactions} events`}
+            </h2>
+            <p className="text-xs text-mist-500 mt-1">
+              {stats.pendingTransactions} Pending • {stats.failedTransactions}{" "}
+              Failed
+            </p>
+          </div>
+          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-teal-500/10 blur-xl" />
+        </GlassCard>
+      </div>
+
+      {/* Filter & Action Toolbar */}
+      <GlassCard className="p-4 sm:p-5">
+        <div className="flex flex-col gap-3.5 lg:flex-row lg:items-center lg:justify-between">
+          {/* Search Input */}
+          <div className="relative w-full lg:max-w-xs">
+            <Input
+              prefix={<SearchOutlined className="text-mist-400 mr-1" />}
+              placeholder="Search ID, intent, or method..."
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                setPage(1);
+              }}
+              allowClear
+              className="h-10 rounded-xl"
+            />
+          </div>
+
+          {/* Filter Controls & Batch Actions */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Category Segmented */}
+            <Segmented
+              value={categoryFilter}
+              onChange={(val) => {
+                setCategoryFilter(val as string);
+                setPage(1);
+              }}
+              className="p-1 rounded-xl bg-gray-100 font-medium"
+              options={[
+                { value: "all", label: "All Categories" },
+                {
+                  value: "Shop",
+                  label: (
+                    <span className="flex items-center gap-1.5">
+                      <ShoppingOutlined className="text-indigo-600 text-xs" />
+                      <span>Shop</span>
+                    </span>
+                  ),
+                },
+                {
+                  value: "Membership",
+                  label: (
+                    <span className="flex items-center gap-1.5">
+                      <CrownOutlined className="text-amber-600 text-xs" />
+                      <span>Membership</span>
+                    </span>
+                  ),
+                },
+                {
+                  value: "Service",
+                  label: (
+                    <span className="flex items-center gap-1.5">
+                      <AppstoreOutlined className="text-teal-600 text-xs" />
+                      <span>Service</span>
+                    </span>
+                  ),
+                },
+              ]}
+            />
+
+            {/* Status Dropdown */}
+            <Select
+              value={statusFilter}
+              onChange={(val) => {
+                setStatusFilter(val);
+                setPage(1);
+              }}
+              className="h-10 min-w-30"
+              options={[
+                { value: "all", label: "All Status" },
+                { value: "Success", label: "Success" },
+                { value: "Pending", label: "Pending" },
+                { value: "Failed", label: "Failed" },
+              ]}
+            />
+
+            {/* Type Dropdown */}
+            <Select
+              value={typeFilter}
+              onChange={(val) => {
+                setTypeFilter(val);
+                setPage(1);
+              }}
+              className="h-10 min-w-27.5"
+              options={[
+                { value: "all", label: "All Types" },
+                { value: "Credit", label: "Credit" },
+                { value: "Debit", label: "Debit" },
+              ]}
+            />
+
+            {/* Batch Delete Action */}
+            {selectedRowKeys.length > 0 && (
+              <Button
+                danger
+                type="primary"
+                icon={<DeleteOutlined />}
+                onClick={() => setBatchDeleteModalOpen(true)}
+                className="h-10 rounded-xl bg-rose-600! hover:bg-rose-700! font-semibold px-4 shadow-sm border-0 animate-in fade-in"
+              >
+                Delete Selected ({selectedRowKeys.length})
+              </Button>
+            )}
           </div>
         </div>
       </GlassCard>
 
-      <GlassCard flat padded={false}>
-        {!isFetching && transactions.length === 0 ? (
+      {/* Main Transactions Table */}
+      {transactions.length === 0 && !isLoadingTx ? (
+        <GlassCard className="p-12 text-center">
           <EmptyState
-            icon={<HistoryOutlined />}
-            title="No transactions found"
-            description="Try another transaction ID, or clear the search to see the full ledger."
+            icon={<CreditCardOutlined className="text-4xl text-[#0B3D2E]" />}
+            title={
+              searchTerm ||
+              categoryFilter !== "all" ||
+              statusFilter !== "all" ||
+              typeFilter !== "all"
+                ? "No Matching Transactions"
+                : "No Transactions Recorded"
+            }
+            description={
+              searchTerm ||
+              categoryFilter !== "all" ||
+              statusFilter !== "all" ||
+              typeFilter !== "all"
+                ? "No transaction records match your search or filter parameters. Try clearing your filters."
+                : "Platform Stripe payments, merchandise purchases, and membership contributions will appear here."
+            }
+            actionLabel={
+              searchTerm ||
+              categoryFilter !== "all" ||
+              statusFilter !== "all" ||
+              typeFilter !== "all"
+                ? "Reset Filters"
+                : undefined
+            }
+            onAction={() => {
+              setSearchInput("");
+              setCategoryFilter("all");
+              setStatusFilter("all");
+              setTypeFilter("all");
+              setPage(1);
+            }}
           />
-        ) : (
-          <Table
+        </GlassCard>
+      ) : (
+        <GlassCard className="p-0 overflow-hidden">
+          <Table<ITransaction>
             rowKey="_id"
             columns={columns}
             dataSource={transactions}
-            loading={isFetching}
+            loading={isLoadingTx || isFetching}
+            onRow={(record) => ({
+              onClick: () => setInspectingTx(record),
+              className:
+                "cursor-pointer hover:bg-emerald-50/20 transition-colors",
+            })}
+            rowSelection={{
+              selectedRowKeys,
+              onChange: (keys) => setSelectedRowKeys(keys),
+            }}
             pagination={{
               current: pagination?.page ?? page,
               pageSize: pagination?.limit ?? limit,
               total: pagination?.total ?? 0,
               showSizeChanger: true,
-              showTotal: (total) => `${total} transactions`,
-              onChange: (nextPage, nextPageSize) => {
+              showTotal: (total) => `${total} total transactions`,
+              onChange: (nextPage, nextSize) => {
                 setPage(nextPage);
-                setLimit(nextPageSize);
+                setLimit(nextSize);
               },
             }}
+            scroll={{ x: 1100 }}
           />
-        )}
-      </GlassCard>
+        </GlassCard>
+      )}
 
+      {/* Slide-out Transaction Detail Modal */}
       <TransactionDetailModal
-        transaction={viewing}
-        open={!!viewing}
-        onClose={() => setViewing(null)}
+        open={!!inspectingTx}
+        transaction={inspectingTx}
+        onClose={() => setInspectingTx(null)}
+        onDelete={(record) => setDeletingTx(record)}
       />
 
-      <ConfirmDeleteModal
-        open={deleteFlow.isOpen}
-        title={`Delete ${deleteFlow.target ? transactionLabel(deleteFlow.target) : "transaction"}?`}
-        description="This permanently removes the transaction from the ledger. This can't be undone."
-        confirmLabel="Delete transaction"
-        loading={deleteFlow.loading}
-        onConfirm={deleteFlow.confirm}
-        onCancel={deleteFlow.cancel}
+      {/* Delete Single Transaction Confirmation Modal */}
+      <DeleteTransactionModal
+        open={!!deletingTx}
+        transaction={deletingTx}
+        loading={isDeletingSingle}
+        onCancel={() => setDeletingTx(null)}
+        onConfirm={handleConfirmDeleteSingle}
+      />
+
+      {/* Batch Delete Confirmation Modal */}
+      <DeleteTransactionModal
+        open={batchDeleteModalOpen}
+        batchCount={selectedRowKeys.length}
+        loading={isDeletingMultiple}
+        onCancel={() => setBatchDeleteModalOpen(false)}
+        onConfirm={handleConfirmBatchDelete}
       />
     </div>
   );
