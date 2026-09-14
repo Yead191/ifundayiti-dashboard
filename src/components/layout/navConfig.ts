@@ -40,12 +40,7 @@ export const NAV_ITEMS: NavItem[] = [
     path: "/",
     icon: DashboardOutlined,
   },
-  {
-    key: "notifications",
-    label: "Notifications",
-    path: "/notifications",
-    icon: BellOutlined,
-  },
+
   {
     key: "users",
     label: "Users",

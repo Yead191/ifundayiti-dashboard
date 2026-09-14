@@ -13,7 +13,10 @@ import {
 import { StatusTag } from "@/components/ui/StatusTag";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { getImageUrl } from "@/lib/getImageUrl";
-import type { ApiUser, UserAccountStatus } from "@/redux/features/users/users.types";
+import type {
+  ApiUser,
+  UserAccountStatus,
+} from "@/redux/features/users/users.types";
 import {
   subscriptionStatusToneMap,
   userStatusLabelMap,
@@ -66,12 +69,12 @@ export function UserProfileModal({
 
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start">
           <div className="relative shrink-0">
-            <div className="rounded-2xl bg-gradient-to-br from-violet-600/50 to-violet-900/40 p-[2px] shadow-[0_12px_40px_-12px_rgba(129,49,240,0.65)]">
+            <div className="rounded-2xl bg-linear-to-br from-violet-600/50 to-violet-900/40 p-0.5 shadow-[0_12px_40px_-12px_rgba(129,49,240,0.65)]">
               <Avatar
                 src={getImageUrl(user.image)}
                 icon={<UserOutlined />}
                 size={88}
-                className="!rounded-[14px] !bg-navy-800"
+                className="rounded-[14px]! bg-navy-800!"
                 shape="square"
               />
             </div>
@@ -124,8 +127,16 @@ export function UserProfileModal({
 
       <div className="border-t border-navy-700/60 px-6 py-5 md:px-8">
         <div className="grid grid-cols-2 gap-3">
-          <Metric icon={<BankOutlined />} label="Company" value={user.company || "—"} />
-          <Metric icon={<AimOutlined />} label="Interest" value={user.interest || "—"} />
+          <Metric
+            icon={<BankOutlined />}
+            label="Company"
+            value={user.company || "—"}
+          />
+          <Metric
+            icon={<AimOutlined />}
+            label="Interest"
+            value={user.interest || "—"}
+          />
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
@@ -134,7 +145,7 @@ export function UserProfileModal({
         </div>
 
         {subscription ? (
-          <div className="mt-5 overflow-hidden rounded-2xl border border-[#f5b544]/25 bg-gradient-to-br from-[#f5b544]/10 to-transparent">
+          <div className="mt-5 overflow-hidden rounded-2xl border border-[#f5b544]/25 bg-linear-to-br from-[#f5b544]/10 to-transparent">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#f5b544]/15 px-4 py-3.5">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f5b544]/15 text-[#f5b544]">
@@ -150,12 +161,20 @@ export function UserProfileModal({
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <StatusTag tone={(subscription.status && subscriptionStatusToneMap[subscription.status]) || "neutral"}>
+                <StatusTag
+                  tone={
+                    (subscription.status &&
+                      subscriptionStatusToneMap[subscription.status]) ||
+                    "neutral"
+                  }
+                >
                   {subscription.status || "Active"}
                 </StatusTag>
                 <span className="font-display text-base font-semibold text-[#f5b544]">
                   {formatCurrency(subscription.price || 0)}
-                  <span className="text-xs font-normal text-mist-400">/{subscription.recuring || "month"}</span>
+                  <span className="text-xs font-normal text-mist-400">
+                    /{subscription.recuring || "month"}
+                  </span>
                 </span>
               </div>
             </div>
@@ -165,14 +184,22 @@ export function UserProfileModal({
                 <CalendarOutlined className="text-mist-600" />
                 <div>
                   <div className="text-[11px] text-mist-600">Starts</div>
-                  <div className="font-medium text-cloud-100">{subscription.start_date ? formatDate(subscription.start_date) : "—"}</div>
+                  <div className="font-medium text-cloud-100">
+                    {subscription.start_date
+                      ? formatDate(subscription.start_date)
+                      : "—"}
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-mist-300">
                 <CalendarOutlined className="text-mist-600" />
                 <div>
                   <div className="text-[11px] text-mist-600">Ends</div>
-                  <div className="font-medium text-cloud-100">{subscription.end_date ? formatDate(subscription.end_date) : "—"}</div>
+                  <div className="font-medium text-cloud-100">
+                    {subscription.end_date
+                      ? formatDate(subscription.end_date)
+                      : "—"}
+                  </div>
                 </div>
               </div>
             </div>
@@ -195,7 +222,9 @@ export function UserProfileModal({
         ) : (
           <div className="mt-5 rounded-2xl border border-dashed border-navy-600/70 px-4 py-5 text-center">
             <CrownOutlined className="text-lg text-mist-600" />
-            <p className="mt-2 text-sm text-mist-400">No subscription package on this account.</p>
+            <p className="mt-2 text-sm text-mist-400">
+              No subscription package on this account.
+            </p>
           </div>
         )}
       </div>
@@ -214,7 +243,11 @@ export function UserProfileModal({
         </div>
         <div className="flex gap-2 sm:shrink-0">
           <Button onClick={onClose}>Close</Button>
-          <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(user)}>
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => onDelete(user)}
+          >
             Delete user
           </Button>
         </div>
@@ -223,14 +256,24 @@ export function UserProfileModal({
   );
 }
 
-function Metric({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+function Metric({
+  icon,
+  label,
+  value,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="rounded-xl border border-navy-700/60 bg-navy-800/40 p-3.5">
       <div className="flex items-center gap-1.5 text-xs text-mist-600">
         <span className="text-violet-glow/80">{icon}</span>
         {label}
       </div>
-      <div className="mt-1.5 truncate font-display text-sm font-semibold text-cloud-100">{value}</div>
+      <div className="mt-1.5 truncate font-display text-sm font-semibold text-cloud-100">
+        {value}
+      </div>
     </div>
   );
 }

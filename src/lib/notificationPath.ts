@@ -62,6 +62,10 @@ const EXACT_PATH_MAP: Record<string, string> = {
   "/notification": "/notifications",
   "/admin/notifications": "/notifications",
   "/dashboard/notifications": "/notifications",
+  "/users": "/users",
+  "/user": "/users",
+  "/admin/users": "/users",
+  "/dashboard/users": "/users",
   "/subscriptions": "/transactions",
   "/membership": "/transactions",
 };
@@ -149,6 +153,12 @@ export function resolveNotificationPath(path?: string | null): string {
   const galleryMatch = normalized.match(/^\/gallery\/(?:folder\/)?([^/?#]+)/i);
   if (galleryMatch) {
     return `/gallery/folder/${galleryMatch[1]}`;
+  }
+
+  // /users/:id or /user/:id -> /users/:id
+  const userMatch = normalized.match(/^\/(?:users|user)\/([^/?#]+)/i);
+  if (userMatch) {
+    return `/users/${userMatch[1]}`;
   }
 
   return normalized;
