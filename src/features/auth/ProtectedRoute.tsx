@@ -26,7 +26,7 @@ export function ProtectedRoute() {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  if (profile.data.role !== "SUPER_ADMIN") {
+  if (profile.data.role !== "SUPER_ADMIN" && profile.data.role !== "ADMIN") {
     toast.error("You are not authorized to access this page");
     handleLogout();
     return <Navigate to="/" replace />;
