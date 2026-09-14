@@ -105,6 +105,8 @@ export default function App() {
             />
             <Route path="periods" element={<IFundAyitiPeriodsPage />} />
             <Route path="donations" element={<IFundAyitiDonationsPage />} />
+            <Route path="fund-transactions" element={<Navigate to="/donations" replace />} />
+            <Route path="admin/donations" element={<Navigate to="/donations" replace />} />
             <Route path="team" element={<TeamPage />} />
             <Route path="partners" element={<PartnersPage />} />
             <Route path="partners/:id" element={<PartnerDetailPage />} />

@@ -16,6 +16,7 @@ import {
   SafetyCertificateOutlined,
   QuestionCircleOutlined,
   EditOutlined,
+  HeartOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -47,6 +48,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Applications",
     path: "/applications",
     icon: BookOutlined,
+  },
+  {
+    key: "donations",
+    label: "Donations & Fund",
+    path: "/donations",
+    icon: HeartOutlined,
   },
   {
     key: "projects",

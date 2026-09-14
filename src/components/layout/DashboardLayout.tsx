@@ -14,7 +14,7 @@ const PAGE_META: { match: (path: string) => boolean; title: string; subtitle?: s
   { match: (p) => p === "/periods", title: "Grant Cycles", subtitle: "Create and manage application periods and funding windows" },
 
   // Donations
-  { match: (p) => p === "/donations", title: "Donations", subtitle: "Monitor donations to the IFundAyiti Program Fund" },
+  { match: (p) => p === "/donations" || p === "/admin/donations" || p === "/fund-transactions", title: "Fund & Received Donations", subtitle: "Monitor live program fund liquidity, global donor contributions, and awarded grants" },
 
   // Community Projects
   { match: (p) => p.startsWith("/projects/"), title: "Project details", subtitle: "Inspect project overview, narrative, and media" },

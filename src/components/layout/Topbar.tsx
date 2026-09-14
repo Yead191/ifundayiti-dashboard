@@ -57,7 +57,7 @@ export function Topbar({
   ];
 
   return (
-    <div className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-[#e2eae6]/80 bg-white/70 px-4 backdrop-blur-md md:px-6 shadow-xs shadow-green-950/[0.01]">
+    <div className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-navy-700/80 bg-white/70 px-4 backdrop-blur-md md:px-6 shadow-xs shadow-green-950/1">
       <button
         type="button"
         onClick={onOpenMobileNav}
@@ -72,7 +72,9 @@ export function Topbar({
           {title}
         </h1>
         {subtitle && (
-          <p className="hidden truncate text-xs text-mist-400 sm:block">{subtitle}</p>
+          <p className="hidden truncate text-xs text-mist-400 sm:block">
+            {subtitle}
+          </p>
         )}
       </div>
 
@@ -80,19 +82,30 @@ export function Topbar({
         <Input
           prefix={<SearchOutlined className="text-mist-500" />}
           placeholder="Search anything…"
-          className="!rounded-full !bg-slate-50/50 hover:!border-[#0B3D2E]/30 focus:!border-[#0B3D2E] hover:!bg-white focus:!bg-white !transition-all !duration-200"
+          className="rounded-full! bg-slate-50/50! hover:border-[#0B3D2E]/30! focus:border-[#0B3D2E]! hover:bg-white! focus:bg-white! transition-all! duration-200!"
         />
       </div>
 
       <TopbarNotifications userId={user?._id} />
 
-      <Dropdown menu={{ items: userMenuItems }} trigger={["click"]} placement="bottomRight">
+      <Dropdown
+        menu={{ items: userMenuItems }}
+        trigger={["click"]}
+        placement="bottomRight"
+      >
         <button
           type="button"
-          className="flex items-center gap-2 rounded-full pl-1.5 pr-3 py-1 border border-[#e2eae6] bg-white/60 hover:bg-white transition-all shadow-xs hover:shadow-sm duration-200"
+          className="flex items-center gap-2 rounded-full pl-1.5 pr-3 py-1 border border-navy-700 bg-white/60 hover:bg-white transition-all shadow-xs hover:shadow-sm duration-200"
         >
-          <Avatar src={getImageUrl(user?.image)} icon={<UserOutlined />} size={28} className="border border-[#e2eae6]" />
-          <span className="hidden text-xs font-semibold text-[#0B3D2E] sm:inline">{user?.name}</span>
+          <Avatar
+            src={getImageUrl(user?.image)}
+            icon={<UserOutlined />}
+            size={28}
+            className="border border-navy-700"
+          />
+          <span className="hidden text-xs font-semibold text-[#0B3D2E] sm:inline">
+            {user?.name}
+          </span>
         </button>
       </Dropdown>
     </div>

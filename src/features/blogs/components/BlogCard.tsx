@@ -32,7 +32,10 @@ interface BlogCardProps {
   blog: IBlog;
   onDelete: (blog: IBlog) => void;
   onToggleFeatured?: (id: string) => void;
-  onChangeStatus?: (id: string, status: (typeof BLOG_STATUS)[keyof typeof BLOG_STATUS]) => void;
+  onChangeStatus?: (
+    id: string,
+    status: (typeof BLOG_STATUS)[keyof typeof BLOG_STATUS],
+  ) => void;
 }
 
 export function BlogCard({
@@ -44,7 +47,8 @@ export function BlogCard({
   const navigate = useNavigate();
   const coverUrl = blog.image ? toFileUrl(blog.image) : null;
   const isFeatured = Boolean(blog.isFeatured);
-  const statusCfg = BLOG_STATUS_CONFIG[blog.status] || BLOG_STATUS_CONFIG[BLOG_STATUS.DRAFT];
+  const statusCfg =
+    BLOG_STATUS_CONFIG[blog.status] || BLOG_STATUS_CONFIG[BLOG_STATUS.DRAFT];
   const categoryName = getCategoryName(blog.category);
   const author = getAuthorInfo(blog.author);
   const readTime = estimateReadTime(blog.content);
@@ -110,7 +114,9 @@ export function BlogCard({
       ? [
           {
             key: "featured",
-            label: isFeatured ? "Remove from Spotlight" : "Feature in Spotlight",
+            label: isFeatured
+              ? "Remove from Spotlight"
+              : "Feature in Spotlight",
             icon: <StarFilled className={isFeatured ? "text-amber-500" : ""} />,
             onClick: () => onToggleFeatured(blog._id),
           },
@@ -141,13 +147,15 @@ export function BlogCard({
               loading="lazy"
             />
           ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#10382B] to-[#061B14] text-white/40">
+            <div className="flex h-full w-full flex-col items-center justify-center bg-linear-to-br from-[#10382B] to-[#061B14] text-white/40">
               <FileTextOutlined className="text-4xl text-emerald-600/50 mb-1" />
-              <span className="text-xs font-semibold text-emerald-200/50">IFundAyiti Editorial</span>
+              <span className="text-xs font-semibold text-emerald-200/50">
+                IFundAyiti Editorial
+              </span>
             </div>
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60" />
 
           {/* Top Left: Category Badge */}
           <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">
@@ -162,7 +170,11 @@ export function BlogCard({
             onClick={(e) => e.stopPropagation()}
           >
             {onToggleFeatured && (
-              <Tooltip title={isFeatured ? "Featured in Spotlight" : "Click to Spotlight"}>
+              <Tooltip
+                title={
+                  isFeatured ? "Featured in Spotlight" : "Click to Spotlight"
+                }
+              >
                 <button
                   type="button"
                   onClick={() => onToggleFeatured(blog._id)}
@@ -177,7 +189,11 @@ export function BlogCard({
               </Tooltip>
             )}
 
-            <Dropdown menu={{ items: actionMenuItems }} trigger={["click"]} placement="bottomRight">
+            <Dropdown
+              menu={{ items: actionMenuItems }}
+              trigger={["click"]}
+              placement="bottomRight"
+            >
               <button
                 type="button"
                 className="flex h-7 w-7 items-center justify-center rounded-lg bg-black/50 text-white backdrop-blur-md hover:bg-black/70 transition-all shadow-xs cursor-pointer"
@@ -198,22 +214,31 @@ export function BlogCard({
         {/* Content Details */}
         <div className="space-y-2">
           {/* Status and Slug Row */}
-          <div className="flex items-center justify-between gap-2" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-center justify-between gap-2"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Dropdown menu={{ items: statusMenuItems }} trigger={["click"]}>
               <Tag
                 bordered={false}
                 className={`rounded-md px-2 py-0.5 text-[11px] font-semibold m-0 cursor-pointer transition-colors ${statusCfg.bg} ${statusCfg.text} border ${statusCfg.border}`}
               >
                 <span className="flex items-center gap-1">
-                  {blog.status === BLOG_STATUS.PUBLISHED && <CheckCircleFilled className="text-[10px]" />}
-                  {blog.status === BLOG_STATUS.DRAFT && <ClockCircleFilled className="text-[10px]" />}
-                  {blog.status === BLOG_STATUS.ARCHIVED && <InboxOutlined className="text-[10px]" />}
+                  {blog.status === BLOG_STATUS.PUBLISHED && (
+                    <CheckCircleFilled className="text-[10px]" />
+                  )}
+                  {blog.status === BLOG_STATUS.DRAFT && (
+                    <ClockCircleFilled className="text-[10px]" />
+                  )}
+                  {blog.status === BLOG_STATUS.ARCHIVED && (
+                    <InboxOutlined className="text-[10px]" />
+                  )}
                   <span>{statusCfg.label}</span>
                 </span>
               </Tag>
             </Dropdown>
 
-            <span className="font-mono text-[10px] text-gray-400 truncate max-w-[150px]">
+            <span className="font-mono text-[10px] text-gray-400 truncate max-w-37.5">
               /{blog.slug}
             </span>
           </div>
@@ -244,7 +269,7 @@ export function BlogCard({
               {author.name.charAt(0).toUpperCase()}
             </div>
           )}
-          <span className="font-medium text-gray-700 truncate max-w-[120px]">
+          <span className="font-medium text-gray-700 truncate max-w-30">
             {author.name}
           </span>
         </div>

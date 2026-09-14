@@ -115,7 +115,7 @@ export function Sidebar({
                   key={item.key}
                   className={cn(
                     "overflow-hidden rounded-xl transition-all duration-300 border border-transparent",
-                    open && "bg-black/1 border-black/[0.01]",
+                    open && "bg-black/1 border-black/1",
                     groupActive && open && "bg-violet-600/1",
                   )}
                 >
@@ -127,15 +127,15 @@ export function Sidebar({
                       "surface-hover flex w-full items-center gap-3 rounded-xl pl-5 pr-3 py-2.5 text-left text-[13.5px] font-medium transition-all duration-200",
                       groupActive
                         ? "text-[#0B3D2E] font-semibold"
-                        : "text-[#455850] hover:bg-black/3 hover:text-[#0B3D2E]",
+                        : "text-mist-400 hover:bg-black/3 hover:text-[#0B3D2E]",
                     )}
                   >
                     <span
                       className={cn(
                         "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-all duration-200 shadow-xs",
                         groupActive
-                          ? "bg-[#0B3D2E] text-white shadow-sm shadow-[#0b3d2e]/20"
-                          : "bg-white border border-[#e2eae6] text-[#455850]",
+                          ? "bg-[#0B3D2E] text-white shadow-sm shadow-violet-600/20"
+                          : "bg-white border border-navy-700 text-mist-400",
                       )}
                     >
                       <item.icon />
@@ -153,8 +153,8 @@ export function Sidebar({
                     )}
                     <DownOutlined
                       className={cn(
-                        "text-[9px] text-[#8ca399] transition-transform duration-300 ease-out",
-                        open && "rotate-180 text-[#0b3d2e]",
+                        "text-[9px] text-navy-500 transition-transform duration-300 ease-out",
+                        open && "rotate-180 text-violet-600",
                       )}
                     />
                   </button>
@@ -168,7 +168,7 @@ export function Sidebar({
                     )}
                   >
                     <div className="min-h-0 overflow-hidden">
-                      <div className="relative ml-6.5 space-y-1 border-l border-[#e2eae6] py-1.5 pl-3 pr-1">
+                      <div className="relative ml-6.5 space-y-1 border-l border-navy-700 py-1.5 pl-3 pr-1">
                         {open && (
                           <span className="pointer-events-none absolute -left-px top-2 bottom-2 w-px bg-linear-to-b from-[#0B3D2E]/60 via-[#E6D5B8]/30 to-transparent" />
                         )}
@@ -240,7 +240,7 @@ function NavLink({
         compact ? "py-2" : "py-2.5",
         active
           ? "bg-linear-to-r from-[#0B3D2E]/8 to-[#E6D5B8]/20 text-[#0B3D2E] font-semibold border-[#0B3D2E]/10 shadow-xs"
-          : "text-[#455850] hover:bg-black/3 hover:text-[#0B3D2E]",
+          : "text-mist-400 hover:bg-black/3 hover:text-[#0B3D2E]",
       )}
     >
       {active && (
@@ -250,8 +250,8 @@ function NavLink({
         className={cn(
           "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-all duration-200 shadow-xs",
           active
-            ? "bg-[#0B3D2E] text-white shadow-sm shadow-[#0b3d2e]/15"
-            : "bg-white border border-[#e2eae6] text-[#455850]",
+            ? "bg-[#0B3D2E] text-white shadow-sm shadow-violet-600/15"
+            : "bg-white border border-navy-700 text-mist-400",
         )}
       >
         <Icon />
