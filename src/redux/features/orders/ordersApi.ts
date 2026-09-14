@@ -27,6 +27,9 @@ export const ordersApi = baseApi.injectEndpoints({
           if (params.sort) {
             queryParams.append("sort", params.sort);
           }
+          if (params.user) {
+            queryParams.append("user", params.user);
+          }
         }
         const qs = queryParams.toString();
         return {

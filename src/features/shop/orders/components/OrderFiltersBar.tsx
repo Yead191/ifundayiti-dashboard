@@ -232,7 +232,7 @@ export function OrderFiltersBar({
           <div className="relative flex-1">
             <Input
               prefix={<SearchOutlined className="text-mist-400" />}
-              placeholder="Search by Order ID, customer name, contact phone, or product title..."
+              placeholder="Search by Order ID, customer name, email, phone, or product..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
               allowClear

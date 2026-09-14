@@ -1,7 +1,7 @@
-import { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Spin } from "antd";
-import { ShoppingOutlined } from "@ant-design/icons";
+import { ShoppingOutlined, UserOutlined } from "@ant-design/icons";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
@@ -20,23 +20,58 @@ import { OrdersTable } from "./components/OrdersTable";
 
 export default function ShopOrdersPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlSearchTerm = searchParams.get("searchTerm") || "";
+  const userParam = searchParams.get("user") || undefined;
+
+  // Track the last processed URL search param to avoid reverting user input or clearing
+  const lastProcessedUrlQuery = useRef(urlSearchTerm);
 
   // Filter and pagination states
   const [activeStatus, setActiveStatus] = useState<string>("all");
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | "all" | "">("all");
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>(urlSearchTerm);
+  const [debouncedSearch, setDebouncedSearch] = useState<string>(urlSearchTerm);
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
 
-  // Debounce search input by 350ms
+  // Sync state ONLY if URL query changes externally (e.g. browser navigation or external link)
+  useEffect(() => {
+    const currentUrlParam = searchParams.get("searchTerm") || "";
+    if (currentUrlParam !== lastProcessedUrlQuery.current) {
+      lastProcessedUrlQuery.current = currentUrlParam;
+      setSearchTerm(currentUrlParam);
+      setDebouncedSearch(currentUrlParam);
+      setPage(1);
+    }
+  }, [searchParams]);
+
+  // Debounce search input & sync to URL query params
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm);
       setPage(1);
-    }, 350);
+
+      const currentParam = searchParams.get("searchTerm") || "";
+      const trimmed = searchTerm.trim();
+      if (trimmed !== currentParam) {
+        lastProcessedUrlQuery.current = trimmed;
+        setSearchParams(
+          (prev) => {
+            const next = new URLSearchParams(prev);
+            if (trimmed) {
+              next.set("searchTerm", trimmed);
+            } else {
+              next.delete("searchTerm");
+            }
+            return next;
+          },
+          { replace: true }
+        );
+      }
+    }, searchTerm ? 350 : 50);
     return () => clearTimeout(handler);
-  }, [searchTerm]);
+  }, [searchTerm, searchParams, setSearchParams]);
 
   // Main paginated query
   const {
@@ -50,6 +85,7 @@ export default function ShopOrdersPage() {
     searchTerm: debouncedSearch,
     status: activeStatus === "all" ? undefined : (activeStatus as any),
     payment_status: paymentStatus === "all" ? undefined : paymentStatus,
+    user: userParam,
   });
 
   // Mutations
@@ -57,7 +93,7 @@ export default function ShopOrdersPage() {
   const [deleteOrder] = useDeleteOrderMutation();
 
   // Extracted data
-  const orders = ordersResponse?.data ?? [];
+  const orders = useMemo(() => ordersResponse?.data ?? [], [ordersResponse?.data]);
   const pagination = ordersResponse?.pagination ?? {
     page: 1,
     limit: pageSize,
@@ -176,6 +212,36 @@ export default function ShopOrdersPage() {
         isFetching={isFetchingOrders}
       />
 
+      {/* Active User Filter Chip */}
+      {userParam && (
+        <div className="flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3.5 py-2 text-xs text-emerald-900 shadow-2xs">
+          <div className="flex items-center gap-2">
+            <UserOutlined className="text-emerald-700" />
+            <span>
+              Filtering orders for Customer ID:{" "}
+              <span className="font-mono font-bold text-emerald-950">{userParam}</span>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setSearchParams(
+                (prev) => {
+                  const next = new URLSearchParams(prev);
+                  next.delete("user");
+                  return next;
+                },
+                { replace: true }
+              );
+              setPage(1);
+            }}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold text-emerald-800 hover:bg-emerald-200/60 hover:text-emerald-950 transition cursor-pointer"
+          >
+            Clear User Filter ✕
+          </button>
+        </div>
+      )}
+
       {/* Content: Table or Empty State */}
       {isLoadingOrders ? (
         <div className="flex h-72 items-center justify-center">
@@ -186,8 +252,8 @@ export default function ShopOrdersPage() {
           icon={<ShoppingOutlined className="text-5xl text-mist-400" />}
           title="No orders found"
           description={
-            searchTerm || activeStatus !== "all" || paymentStatus !== "all"
-              ? "No orders match your current filter parameters. Try clearing the search or status filters."
+            searchTerm || activeStatus !== "all" || paymentStatus !== "all" || userParam
+              ? "No orders match your current filter parameters. Try clearing the search, user, or status filters."
               : "No customer orders have been received in the store yet."
           }
         />

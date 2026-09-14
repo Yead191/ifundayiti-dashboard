@@ -132,6 +132,7 @@ export interface GetOrdersParams {
   status?: OrderStatus | "all" | "";
   payment_status?: PaymentStatus | "all" | "";
   sort?: string;
+  user?: string;
 }
 
 // API Responses

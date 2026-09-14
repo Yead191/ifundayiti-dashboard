@@ -1,9 +1,15 @@
 import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { PageLoader } from "@/components/ui/PageLoader";
 import DisclaimerEditorPage from "./features/disclaimer/DisclaimerEditorPage";
+
+function RedirectWithSearch({ to }: { to: string }) {
+  const [searchParams] = useSearchParams();
+  const search = searchParams.toString();
+  return <Navigate to={`${to}${search ? `?${search}` : ""}`} replace />;
+}
 
 // Route-level code splitting keeps the initial bundle lean — each page's
 // chunk is only fetched when the admin actually navigates there.
@@ -77,6 +83,8 @@ const BlogCategoriesPage = lazy(
 const NotificationsPage = lazy(
   () => import("@/features/notifications/NotificationsPage"),
 );
+const UsersPage = lazy(() => import("@/features/users/UsersPage"));
+const UserDetailPage = lazy(() => import("@/features/users/UserDetailPage"));
 
 export default function App() {
   return (
@@ -114,8 +122,8 @@ export default function App() {
             <Route path="fund-transactions" element={<Navigate to="/donations" replace />} />
             <Route path="admin/donations" element={<Navigate to="/donations" replace />} />
             <Route path="transactions" element={<TransactionsPage />} />
-            <Route path="admin/transactions" element={<Navigate to="/transactions" replace />} />
-            <Route path="admin/financials" element={<Navigate to="/transactions" replace />} />
+            <Route path="admin/transactions" element={<RedirectWithSearch to="/transactions" />} />
+            <Route path="admin/financials" element={<RedirectWithSearch to="/transactions" />} />
             <Route path="team" element={<TeamPage />} />
             <Route path="partners" element={<PartnersPage />} />
             <Route path="partners/:id" element={<PartnerDetailPage />} />
@@ -145,14 +153,20 @@ export default function App() {
               element={<Navigate to="/notifications" replace />}
             />
 
+            {/* User Management Module */}
+            <Route path="users" element={<UsersPage />} />
+            <Route path="users/:id" element={<UserDetailPage />} />
+            <Route path="admin/users" element={<Navigate to="/users" replace />} />
+            <Route path="admin/users/:id" element={<Navigate to="/users/:id" replace />} />
+
             {/* Backward compatibility redirects */}
             <Route
               path="store/orders"
-              element={<Navigate to="/shop/orders" replace />}
+              element={<RedirectWithSearch to="/shop/orders" />}
             />
             <Route
               path="orders"
-              element={<Navigate to="/shop/orders" replace />}
+              element={<RedirectWithSearch to="/shop/orders" />}
             />
             <Route path="orders/:id" element={<ShopOrderDetailPage />} />
             <Route path="order/:id" element={<ShopOrderDetailPage />} />

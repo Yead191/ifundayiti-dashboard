@@ -103,6 +103,7 @@ export interface GetTransactionsParams {
   status?: string;
   type?: string;
   sort?: string;
+  user?: string;
 }
 
 export interface TransactionsListResponse {

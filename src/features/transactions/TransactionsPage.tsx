@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Input,
   Table,
@@ -52,6 +52,13 @@ import { TransactionDetailModal } from "./components/TransactionDetailModal";
 import { DeleteTransactionModal } from "./components/DeleteTransactionModal";
 
 export default function TransactionsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlSearchTerm = searchParams.get("searchTerm") || "";
+  const userParam = searchParams.get("user") || undefined;
+
+  // Track the last processed URL search param to avoid reverting user input or clearing
+  const lastProcessedUrlQuery = useRef(urlSearchTerm);
+
   // Query & Filter states
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -59,11 +66,42 @@ export default function TransactionsPage() {
     value: searchInput,
     setValue: setSearchInput,
     debouncedValue: searchTerm,
-  } = useDebouncedSearch();
+  } = useDebouncedSearch({ initialValue: urlSearchTerm });
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+
+  // Sync search input ONLY if URL search param changes externally (e.g. back/forward navigation)
+  useEffect(() => {
+    const currentUrlParam = searchParams.get("searchTerm") || "";
+    if (currentUrlParam !== lastProcessedUrlQuery.current) {
+      lastProcessedUrlQuery.current = currentUrlParam;
+      setSearchInput(currentUrlParam);
+      setPage(1);
+    }
+  }, [searchParams, setSearchInput]);
+
+  // Sync debounced search back into URL search params
+  useEffect(() => {
+    const currentParam = searchParams.get("searchTerm") || "";
+    const trimmed = searchTerm.trim();
+    if (trimmed !== currentParam) {
+      lastProcessedUrlQuery.current = trimmed;
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (trimmed) {
+            next.set("searchTerm", trimmed);
+          } else {
+            next.delete("searchTerm");
+          }
+          return next;
+        },
+        { replace: true }
+      );
+    }
+  }, [searchTerm, searchParams, setSearchParams]);
 
   // Selection & Modal states
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -89,8 +127,9 @@ export default function TransactionsPage() {
       status: statusFilter !== "all" ? statusFilter : undefined,
       type: typeFilter !== "all" ? typeFilter : undefined,
       sort: "-createdAt",
+      user: userParam,
     }),
-    [page, limit, searchTerm, categoryFilter, statusFilter, typeFilter],
+    [page, limit, searchTerm, categoryFilter, statusFilter, typeFilter, userParam],
   );
 
   const {
@@ -618,7 +657,7 @@ export default function TransactionsPage() {
           <div className="relative w-full lg:max-w-xs">
             <Input
               prefix={<SearchOutlined className="text-mist-400 mr-1" />}
-              placeholder="Search ID, intent, or method..."
+              placeholder="Search by email, ID, intent, method..."
               value={searchInput}
               onChange={(e) => {
                 setSearchInput(e.target.value);
@@ -718,6 +757,36 @@ export default function TransactionsPage() {
         </div>
       </GlassCard>
 
+      {/* Active User Filter Chip */}
+      {userParam && (
+        <div className="flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3.5 py-2 text-xs text-emerald-900 shadow-2xs">
+          <div className="flex items-center gap-2">
+            <UserOutlined className="text-emerald-700" />
+            <span>
+              Filtering transactions for Customer ID:{" "}
+              <span className="font-mono font-bold text-emerald-950">{userParam}</span>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setSearchParams(
+                (prev) => {
+                  const next = new URLSearchParams(prev);
+                  next.delete("user");
+                  return next;
+                },
+                { replace: true }
+              );
+              setPage(1);
+            }}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold text-emerald-800 hover:bg-emerald-200/60 hover:text-emerald-950 transition cursor-pointer"
+          >
+            Clear User Filter ✕
+          </button>
+        </div>
+      )}
+
       {/* Main Transactions Table */}
       {transactions.length === 0 && !isLoadingTx ? (
         <GlassCard className="p-12 text-center">
@@ -727,7 +796,8 @@ export default function TransactionsPage() {
               searchTerm ||
               categoryFilter !== "all" ||
               statusFilter !== "all" ||
-              typeFilter !== "all"
+              typeFilter !== "all" ||
+              userParam
                 ? "No Matching Transactions"
                 : "No Transactions Recorded"
             }
@@ -735,7 +805,8 @@ export default function TransactionsPage() {
               searchTerm ||
               categoryFilter !== "all" ||
               statusFilter !== "all" ||
-              typeFilter !== "all"
+              typeFilter !== "all" ||
+              userParam
                 ? "No transaction records match your search or filter parameters. Try clearing your filters."
                 : "Platform Stripe payments, merchandise purchases, and membership contributions will appear here."
             }

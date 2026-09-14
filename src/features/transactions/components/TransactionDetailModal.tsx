@@ -65,10 +65,15 @@ export function TransactionDetailModal({
     window.print();
   };
 
-  const user = typeof tx.user === "object" ? (tx.user as TransactionUser) : null;
-  const order = typeof tx.order === "object" ? (tx.order as TransactionOrderRef) : null;
-  const orderId = order?._id || (typeof tx.order === "string" ? tx.order : null);
-  const orderNumber = order?.orderNumber || (orderId ? `ORD-${orderId.slice(-6).toUpperCase()}` : null);
+  const user =
+    typeof tx.user === "object" ? (tx.user as TransactionUser) : null;
+  const order =
+    typeof tx.order === "object" ? (tx.order as TransactionOrderRef) : null;
+  const orderId =
+    order?._id || (typeof tx.order === "string" ? tx.order : null);
+  const orderNumber =
+    order?.orderNumber ||
+    (orderId ? `ORD-${orderId.slice(-6).toUpperCase()}` : null);
 
   const isCredit = String(tx.type).toLowerCase() === "credit";
   const category = String(tx.category || "Shop");
@@ -78,8 +83,8 @@ export function TransactionDetailModal({
     category.toLowerCase() === "membership"
       ? "text-amber-700 bg-amber-50 border-amber-200"
       : category.toLowerCase() === "shop"
-      ? "text-indigo-700 bg-indigo-50 border-indigo-200"
-      : "text-teal-700 bg-teal-50 border-teal-200";
+        ? "text-indigo-700 bg-indigo-50 border-indigo-200"
+        : "text-teal-700 bg-teal-50 border-teal-200";
 
   const categoryIcon =
     category.toLowerCase() === "membership" ? (
@@ -94,14 +99,14 @@ export function TransactionDetailModal({
     status.toLowerCase() === "success"
       ? "text-emerald-700 bg-emerald-50 border-emerald-200"
       : status.toLowerCase() === "pending"
-      ? "text-amber-700 bg-amber-50 border-amber-200"
-      : "text-rose-700 bg-rose-50 border-rose-200";
+        ? "text-amber-700 bg-amber-50 border-amber-200"
+        : "text-rose-700 bg-rose-50 border-rose-200";
 
   const discountAmount = tx.discount_amount || 0;
   const discountPct = tx.discount_percentage || 0;
   const platformFee = tx.platform_fee || 0;
   const totalPrice = tx.total_price ?? tx.amount ?? 0;
-  const netReceived = tx.payment_received ?? (totalPrice - discountAmount);
+  const netReceived = tx.payment_received ?? totalPrice - discountAmount;
 
   return (
     <Modal
@@ -125,13 +130,19 @@ export function TransactionDetailModal({
             <h3 className="text-base font-bold text-gray-900 font-display m-0">
               Transaction Breakdown
             </h3>
-            <Tag bordered={false} className={`rounded-full text-xs font-semibold px-2.5 py-0.5 m-0 border ${categoryColor}`}>
+            <Tag
+              bordered={false}
+              className={`rounded-full text-xs font-semibold px-2.5 py-0.5 m-0 border ${categoryColor}`}
+            >
               <span className="flex items-center gap-1">
                 {categoryIcon}
                 <span>{category}</span>
               </span>
             </Tag>
-            <Tag bordered={false} className={`rounded-full text-xs font-semibold px-2.5 py-0.5 m-0 border ${statusColor}`}>
+            <Tag
+              bordered={false}
+              className={`rounded-full text-xs font-semibold px-2.5 py-0.5 m-0 border ${statusColor}`}
+            >
               {status}
             </Tag>
           </div>
@@ -171,20 +182,26 @@ export function TransactionDetailModal({
           <div className="space-y-2 text-xs">
             <div className="flex items-center justify-between text-gray-600">
               <span>Base / Gross Amount</span>
-              <span className="font-semibold text-gray-900">{formatCurrency(totalPrice)}</span>
+              <span className="font-semibold text-gray-900">
+                {formatCurrency(totalPrice)}
+              </span>
             </div>
 
             {discountAmount > 0 && (
               <div className="flex items-center justify-between text-amber-700 bg-amber-50/70 px-2.5 py-1.5 rounded-lg">
                 <span>Discount Applied ({discountPct}%)</span>
-                <span className="font-semibold">-{formatCurrency(discountAmount)}</span>
+                <span className="font-semibold">
+                  -{formatCurrency(discountAmount)}
+                </span>
               </div>
             )}
 
             {platformFee > 0 && (
               <div className="flex items-center justify-between text-gray-600">
                 <span>Platform Processing Fee</span>
-                <span className="font-semibold text-gray-900">{formatCurrency(platformFee)}</span>
+                <span className="font-semibold text-gray-900">
+                  {formatCurrency(platformFee)}
+                </span>
               </div>
             )}
 
@@ -216,7 +233,9 @@ export function TransactionDetailModal({
                 <div className="font-semibold text-gray-900 text-sm">
                   {user?.name || "Verified Customer"}
                 </div>
-                <div className="text-xs text-gray-500 truncate">{user?.email || "—"}</div>
+                <div className="text-xs text-gray-500 truncate">
+                  {user?.email || "—"}
+                </div>
               </div>
             </div>
 
@@ -252,17 +271,25 @@ export function TransactionDetailModal({
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
               <div className="rounded-xl bg-white p-2.5 border border-indigo-100/60">
-                <div className="text-gray-400 text-[10px] uppercase font-medium">Order Reference</div>
-                <div className="font-mono font-bold text-gray-800 mt-0.5">{orderNumber}</div>
+                <div className="text-gray-400 text-[10px] uppercase font-medium">
+                  Order Reference
+                </div>
+                <div className="font-mono font-bold text-gray-800 mt-0.5">
+                  {orderNumber}
+                </div>
               </div>
               <div className="rounded-xl bg-white p-2.5 border border-indigo-100/60">
-                <div className="text-gray-400 text-[10px] uppercase font-medium">Fulfillment Status</div>
+                <div className="text-gray-400 text-[10px] uppercase font-medium">
+                  Fulfillment Status
+                </div>
                 <div className="font-semibold text-indigo-900 capitalize mt-0.5">
                   {order.deliveryStatus || order.status || "Processing"}
                 </div>
               </div>
               <div className="rounded-xl bg-white p-2.5 border border-indigo-100/60 col-span-2 sm:col-span-1">
-                <div className="text-gray-400 text-[10px] uppercase font-medium">Order Total</div>
+                <div className="text-gray-400 text-[10px] uppercase font-medium">
+                  Order Total
+                </div>
                 <div className="font-bold text-gray-900 mt-0.5">
                   {formatCurrency(order.totalAmount || totalPrice)}
                 </div>
@@ -271,18 +298,29 @@ export function TransactionDetailModal({
 
             {Array.isArray(order.items) && order.items.length > 0 && (
               <div className="mt-3 pt-2.5 border-t border-indigo-100/70 text-xs">
-                <div className="text-gray-500 font-medium mb-1.5 text-[11px]">Items Preview:</div>
+                <div className="text-gray-500 font-medium mb-1.5 text-[11px]">
+                  Items Preview:
+                </div>
                 <div className="space-y-1">
                   {order.items.slice(0, 3).map((item, idx) => {
-                    const prod = typeof item.product === "object" ? item.product : null;
+                    const prod =
+                      typeof item.product === "object" ? item.product : null;
                     const prodName = prod?.name || "Store Item";
                     return (
-                      <div key={idx} className="flex items-center justify-between text-gray-700">
-                        <span className="truncate max-w-[220px]">
-                          {prodName} <span className="text-gray-400">×{item.quantity || 1}</span>
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between text-gray-700"
+                      >
+                        <span className="truncate max-w-55">
+                          {prodName}{" "}
+                          <span className="text-gray-400">
+                            ×{item.quantity || 1}
+                          </span>
                         </span>
                         <span className="font-medium text-gray-900">
-                          {formatCurrency((item.price || 0) * (item.quantity || 1))}
+                          {formatCurrency(
+                            (item.price || 0) * (item.quantity || 1),
+                          )}
                         </span>
                       </div>
                     );
@@ -308,7 +346,9 @@ export function TransactionDetailModal({
           <div className="space-y-2 text-xs">
             <div className="flex items-center justify-between rounded-xl bg-white p-2.5 border border-gray-200/60">
               <div className="min-w-0 pr-2">
-                <div className="text-[10px] text-gray-400 uppercase font-medium">Payment Method</div>
+                <div className="text-[10px] text-gray-400 uppercase font-medium">
+                  Payment Method
+                </div>
                 <div className="font-medium text-gray-800 capitalize flex items-center gap-1.5 mt-0.5">
                   <SafetyCertificateOutlined className="text-emerald-600" />
                   <span>{tx.payment_method || "Stripe Checkout"}</span>
@@ -333,33 +373,60 @@ export function TransactionDetailModal({
                   <Button
                     type="text"
                     size="small"
-                    icon={copiedKey === "txid" ? <CheckOutlined className="text-emerald-600" /> : <CopyOutlined />}
-                    onClick={() => handleCopy(tx.transaction_id!, "txid", "Transaction ID")}
+                    icon={
+                      copiedKey === "txid" ? (
+                        <CheckOutlined className="text-emerald-600" />
+                      ) : (
+                        <CopyOutlined />
+                      )
+                    }
+                    onClick={() =>
+                      handleCopy(tx.transaction_id!, "txid", "Transaction ID")
+                    }
                     className="text-gray-400 hover:text-[#0B3D2E]"
                   />
                 </Tooltip>
               </div>
             )}
 
-            {tx.payment_intent_id && tx.payment_intent_id !== tx.transaction_id && (
-              <div className="flex items-center justify-between rounded-xl bg-white p-2.5 border border-gray-200/60">
-                <div className="min-w-0 pr-2">
-                  <div className="text-[10px] text-gray-400 uppercase font-medium">Payment Intent ID</div>
-                  <div className="font-mono text-xs text-gray-800 truncate mt-0.5">
-                    {tx.payment_intent_id}
+            {tx.payment_intent_id &&
+              tx.payment_intent_id !== tx.transaction_id && (
+                <div className="flex items-center justify-between rounded-xl bg-white p-2.5 border border-gray-200/60">
+                  <div className="min-w-0 pr-2">
+                    <div className="text-[10px] text-gray-400 uppercase font-medium">
+                      Payment Intent ID
+                    </div>
+                    <div className="font-mono text-xs text-gray-800 truncate mt-0.5">
+                      {tx.payment_intent_id}
+                    </div>
                   </div>
+                  <Tooltip
+                    title={
+                      copiedKey === "pi" ? "Copied" : "Copy Payment Intent"
+                    }
+                  >
+                    <Button
+                      type="text"
+                      size="small"
+                      icon={
+                        copiedKey === "pi" ? (
+                          <CheckOutlined className="text-emerald-600" />
+                        ) : (
+                          <CopyOutlined />
+                        )
+                      }
+                      onClick={() =>
+                        handleCopy(
+                          tx.payment_intent_id!,
+                          "pi",
+                          "Payment Intent ID",
+                        )
+                      }
+                      className="text-gray-400 hover:text-[#0B3D2E]"
+                    />
+                  </Tooltip>
                 </div>
-                <Tooltip title={copiedKey === "pi" ? "Copied" : "Copy Payment Intent"}>
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={copiedKey === "pi" ? <CheckOutlined className="text-emerald-600" /> : <CopyOutlined />}
-                    onClick={() => handleCopy(tx.payment_intent_id!, "pi", "Payment Intent ID")}
-                    className="text-gray-400 hover:text-[#0B3D2E]"
-                  />
-                </Tooltip>
-              </div>
-            )}
+              )}
 
             {tx.prev_transaction_id && (
               <div className="flex items-center justify-between rounded-xl bg-white p-2.5 border border-gray-200/60">
@@ -371,12 +438,26 @@ export function TransactionDetailModal({
                     {tx.prev_transaction_id}
                   </div>
                 </div>
-                <Tooltip title={copiedKey === "prev" ? "Copied" : "Copy Previous ID"}>
+                <Tooltip
+                  title={copiedKey === "prev" ? "Copied" : "Copy Previous ID"}
+                >
                   <Button
                     type="text"
                     size="small"
-                    icon={copiedKey === "prev" ? <CheckOutlined className="text-emerald-600" /> : <CopyOutlined />}
-                    onClick={() => handleCopy(tx.prev_transaction_id!, "prev", "Previous Transaction ID")}
+                    icon={
+                      copiedKey === "prev" ? (
+                        <CheckOutlined className="text-emerald-600" />
+                      ) : (
+                        <CopyOutlined />
+                      )
+                    }
+                    onClick={() =>
+                      handleCopy(
+                        tx.prev_transaction_id!,
+                        "prev",
+                        "Previous Transaction ID",
+                      )
+                    }
                     className="text-gray-400 hover:text-[#0B3D2E]"
                   />
                 </Tooltip>

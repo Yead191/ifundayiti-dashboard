@@ -9,7 +9,6 @@ import {
   MoreOutlined,
   UserOutlined,
   ThunderboltOutlined,
-  CheckOutlined,
   SyncOutlined,
   CarOutlined,
   CheckCircleOutlined,
@@ -18,7 +17,7 @@ import {
 import { toast } from "sonner";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { toFileUrl } from "@/config";
-import type { IOrder, OrderStatus } from "@/redux/features/orders/orders.types";
+import type { IOrder } from "@/redux/features/orders/orders.types";
 import {
   ORDER_STATUS_CONFIG,
   PAYMENT_STATUS_CONFIG,

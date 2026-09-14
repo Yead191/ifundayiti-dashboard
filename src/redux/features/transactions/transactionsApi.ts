@@ -26,6 +26,7 @@ export const transactionsApi = baseApi.injectEndpoints({
           if (params.category) queryParams.category = params.category;
           if (params.status) queryParams.status = params.status;
           if (params.type) queryParams.type = params.type;
+          if (params.user) queryParams.user = params.user;
         }
 
         return {

@@ -19,6 +19,7 @@ import {
   HeartOutlined,
   CreditCardOutlined,
   BellOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -44,6 +45,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Notifications",
     path: "/notifications",
     icon: BellOutlined,
+  },
+  {
+    key: "users",
+    label: "Users",
+    path: "/users",
+    icon: UserOutlined,
   },
   {
     key: "periods",

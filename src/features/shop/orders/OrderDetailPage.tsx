@@ -22,7 +22,6 @@ import {
   MailOutlined,
   ShoppingOutlined,
   ThunderboltOutlined,
-  CheckOutlined,
   SyncOutlined,
   CarOutlined,
   CheckCircleOutlined,
@@ -40,7 +39,10 @@ import {
   useMarkPreOrderReadyMutation,
   useDeleteOrderMutation,
 } from "@/redux/features/orders/ordersApi";
-import type { IOrderItem, OrderStatus } from "@/redux/features/orders/orders.types";
+import type {
+  IOrderItem,
+  OrderStatus,
+} from "@/redux/features/orders/orders.types";
 import {
   ORDER_STATUS_CONFIG,
   PAYMENT_STATUS_CONFIG,
@@ -65,8 +67,10 @@ export default function ShopOrderDetailPage() {
   } = useGetOrderByIdQuery(id, { skip: !id });
 
   // Mutations
-  const [updateOrderStatus, { isLoading: isUpdatingStatus }] = useUpdateOrderStatusMutation();
-  const [markPreOrderReady, { isLoading: isMarkingReady }] = useMarkPreOrderReadyMutation();
+  const [updateOrderStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateOrderStatusMutation();
+  const [markPreOrderReady, { isLoading: isMarkingReady }] =
+    useMarkPreOrderReadyMutation();
   const [deleteOrder] = useDeleteOrderMutation();
 
   // Pre-Order Modal State
@@ -128,12 +132,17 @@ export default function ShopOrderDetailPage() {
       disabled: order.status === "processing",
       onClick: async () => {
         try {
-          await updateOrderStatus({ id: order._id, body: { status: "processing" } }).unwrap();
+          await updateOrderStatus({
+            id: order._id,
+            body: { status: "processing" },
+          }).unwrap();
           toast.success("Order marked as Processing", {
             description: "Status notification dispatched to customer.",
           });
         } catch (err: any) {
-          toast.error("Failed to update status", { description: err?.data?.message });
+          toast.error("Failed to update status", {
+            description: err?.data?.message,
+          });
         }
       },
     },
@@ -144,12 +153,17 @@ export default function ShopOrderDetailPage() {
       disabled: order.status === "shipped",
       onClick: async () => {
         try {
-          await updateOrderStatus({ id: order._id, body: { status: "shipped" } }).unwrap();
+          await updateOrderStatus({
+            id: order._id,
+            body: { status: "shipped" },
+          }).unwrap();
           toast.success("Order marked as Shipped", {
             description: "Shipping notification email dispatched to customer.",
           });
         } catch (err: any) {
-          toast.error("Failed to update status", { description: err?.data?.message });
+          toast.error("Failed to update status", {
+            description: err?.data?.message,
+          });
         }
       },
     },
@@ -160,12 +174,17 @@ export default function ShopOrderDetailPage() {
       disabled: order.status === "delivered",
       onClick: async () => {
         try {
-          await updateOrderStatus({ id: order._id, body: { status: "delivered" } }).unwrap();
+          await updateOrderStatus({
+            id: order._id,
+            body: { status: "delivered" },
+          }).unwrap();
           toast.success("Order marked as Delivered", {
             description: "Delivery receipt dispatched to customer.",
           });
         } catch (err: any) {
-          toast.error("Failed to update status", { description: err?.data?.message });
+          toast.error("Failed to update status", {
+            description: err?.data?.message,
+          });
         }
       },
     },
@@ -180,12 +199,17 @@ export default function ShopOrderDetailPage() {
       disabled: order.status === "cancelled",
       onClick: async () => {
         try {
-          await updateOrderStatus({ id: order._id, body: { status: "cancelled" } }).unwrap();
+          await updateOrderStatus({
+            id: order._id,
+            body: { status: "cancelled" },
+          }).unwrap();
           toast.success("Order cancelled", {
             description: "Cancellation email dispatched to customer.",
           });
         } catch (err: any) {
-          toast.error("Failed to cancel order", { description: err?.data?.message });
+          toast.error("Failed to cancel order", {
+            description: err?.data?.message,
+          });
         }
       },
     },
@@ -197,7 +221,9 @@ export default function ShopOrderDetailPage() {
       toast.success("Order deleted permanently");
       navigate("/shop/orders");
     } catch (err: any) {
-      toast.error("Failed to delete order", { description: err?.data?.message });
+      toast.error("Failed to delete order", {
+        description: err?.data?.message,
+      });
     }
   };
 
@@ -214,13 +240,17 @@ export default function ShopOrderDetailPage() {
         itemIndex: selectedPreOrderItem.index,
       }).unwrap();
       toast.success("Pre-order stock allocated successfully", {
-        description: "Variant inventory stock decremented and arrival email sent to customer.",
+        description:
+          "Variant inventory stock decremented and arrival email sent to customer.",
       });
       setPreOrderModalOpen(false);
       setSelectedPreOrderItem(null);
     } catch (err: any) {
       toast.error("FIFO Pre-Order allocation failed", {
-        description: err?.data?.message || err?.message || "Stock check failed or older pre-order exists.",
+        description:
+          err?.data?.message ||
+          err?.message ||
+          "Stock check failed or older pre-order exists.",
       });
     }
   };
@@ -257,11 +287,17 @@ export default function ShopOrderDetailPage() {
           </Link>
           <div>
             <div className="flex items-center gap-2 text-xs text-mist-500">
-              <Link to="/shop/products" className="hover:text-emerald-700 hover:underline">
+              <Link
+                to="/shop/products"
+                className="hover:text-emerald-700 hover:underline"
+              >
                 Shop
               </Link>
               <span>/</span>
-              <Link to="/shop/orders" className="hover:text-emerald-700 hover:underline">
+              <Link
+                to="/shop/orders"
+                className="hover:text-emerald-700 hover:underline"
+              >
                 Orders
               </Link>
               <span>/</span>
@@ -273,10 +309,16 @@ export default function ShopOrderDetailPage() {
               <h1 className="font-display text-xl font-bold tracking-tight text-[#0B3D2E]">
                 Order {order.order_id}
               </h1>
-              <Tag color={statusConfig.color} className="rounded-full border-0 text-xs font-semibold">
+              <Tag
+                color={statusConfig.color}
+                className="rounded-full border-0 text-xs font-semibold"
+              >
                 {statusConfig.label}
               </Tag>
-              <Tag color={payConfig.color} className="rounded-full border-0 text-xs font-semibold">
+              <Tag
+                color={payConfig.color}
+                className="rounded-full border-0 text-xs font-semibold"
+              >
                 {payConfig.label}
               </Tag>
             </div>
@@ -286,9 +328,16 @@ export default function ShopOrderDetailPage() {
         {/* Top Actions */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Status Update Menu */}
-          <Dropdown menu={{ items: statusMenuItems }} trigger={["click"]} disabled={isUpdatingStatus}>
+          <Dropdown
+            menu={{ items: statusMenuItems }}
+            trigger={["click"]}
+            disabled={isUpdatingStatus}
+          >
             <Button className="rounded-xl border-navy-700/60 bg-white font-medium">
-              Update Status: <span className="font-bold text-emerald-800 ml-1">{statusConfig.label}</span>
+              Update Status:{" "}
+              <span className="font-bold text-emerald-800 ml-1">
+                {statusConfig.label}
+              </span>
               <MoreOutlined className="ml-1" />
             </Button>
           </Dropdown>
@@ -331,7 +380,10 @@ export default function ShopOrderDetailPage() {
             },
             {
               title: "Confirmed",
-              description: order.payment_status === "paid" ? "Paid via Stripe" : "Awaiting Payment",
+              description:
+                order.payment_status === "paid"
+                  ? "Paid via Stripe"
+                  : "Awaiting Payment",
             },
             {
               title: "Processing",
@@ -358,10 +410,13 @@ export default function ShopOrderDetailPage() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-display text-base font-bold text-cloud-100 flex items-center gap-2">
                 <ShoppingOutlined className="text-emerald-600" />
-                Purchased Apparel & Merchandise ({order.items.length} unique items)
+                Purchased Apparel & Merchandise ({order.items.length} unique
+                items)
               </h3>
               <span className="text-xs font-semibold text-mist-500">
-                Total Items: {order.total_items ?? order.items.reduce((s, i) => s + (i.quantity || 1), 0)}
+                Total Items:{" "}
+                {order.total_items ??
+                  order.items.reduce((s, i) => s + (i.quantity || 1), 0)}
               </span>
             </div>
 
@@ -369,7 +424,8 @@ export default function ShopOrderDetailPage() {
               {order.items.map((item, idx) => {
                 const imgUrl = item.image
                   ? toFileUrl(item.image)
-                  : typeof item.product === "object" && item.product?.images?.[0]
+                  : typeof item.product === "object" &&
+                      item.product?.images?.[0]
                     ? toFileUrl(item.product.images[0])
                     : undefined;
 
@@ -378,7 +434,10 @@ export default function ShopOrderDetailPage() {
                   : undefined;
 
                 return (
-                  <div key={idx} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div
+                    key={idx}
+                    className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  >
                     {/* Item Image & Description */}
                     <div className="flex items-center gap-3.5">
                       <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-navy-700/60 bg-navy-950/20">
@@ -401,13 +460,23 @@ export default function ShopOrderDetailPage() {
                         </div>
                         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-mist-600">
                           <span className="rounded-md bg-navy-950/30 px-2 py-0.5 font-medium">
-                            Size: <strong className="text-cloud-100">{item.size}</strong>
+                            Size:{" "}
+                            <strong className="text-cloud-100">
+                              {item.size}
+                            </strong>
                           </span>
                           <span className="rounded-md bg-navy-950/30 px-2 py-0.5 font-medium">
-                            Color: <strong className="text-cloud-100">{item.color}</strong>
+                            Color:{" "}
+                            <strong className="text-cloud-100">
+                              {item.color}
+                            </strong>
                           </span>
                           <span className="text-mist-500">
-                            Qty: <strong className="text-cloud-100">{item.quantity}</strong> × {formatPrice(item.price)}
+                            Qty:{" "}
+                            <strong className="text-cloud-100">
+                              {item.quantity}
+                            </strong>{" "}
+                            × {formatPrice(item.price)}
                           </span>
                         </div>
 
@@ -427,7 +496,10 @@ export default function ShopOrderDetailPage() {
                             )}
                             {item.expectedAvailableDate && (
                               <span className="text-[11px] text-mist-500">
-                                Expected: {formatOrderDate(String(item.expectedAvailableDate))}
+                                Expected:{" "}
+                                {formatOrderDate(
+                                  String(item.expectedAvailableDate),
+                                )}
                               </span>
                             )}
                           </div>
@@ -442,17 +514,18 @@ export default function ShopOrderDetailPage() {
                       </div>
 
                       {/* Action to Mark Ready if Confirmed Pre-Order */}
-                      {item.isPreOrder && item.preOrderStatus === "confirmed" && (
-                        <Button
-                          size="small"
-                          type="primary"
-                          icon={<ThunderboltOutlined />}
-                          onClick={() => handleOpenPreOrderModal(item, idx)}
-                          className="btn-linear rounded-lg text-xs font-semibold"
-                        >
-                          Mark Ready
-                        </Button>
-                      )}
+                      {item.isPreOrder &&
+                        item.preOrderStatus === "confirmed" && (
+                          <Button
+                            size="small"
+                            type="primary"
+                            icon={<ThunderboltOutlined />}
+                            onClick={() => handleOpenPreOrderModal(item, idx)}
+                            className="btn-linear rounded-lg text-xs font-semibold"
+                          >
+                            Mark Ready
+                          </Button>
+                        )}
                     </div>
                   </div>
                 );
@@ -484,7 +557,9 @@ export default function ShopOrderDetailPage() {
 
             <div className="rounded-xl border border-navy-700/50 bg-navy-950/20 p-4 space-y-2.5 text-xs">
               <div>
-                <span className="text-mist-500 block">Full Formatted Address:</span>
+                <span className="text-mist-500 block">
+                  Full Formatted Address:
+                </span>
                 <span className="font-semibold text-cloud-100 text-sm block mt-0.5">
                   {order.formatted_address}
                 </span>
@@ -494,19 +569,27 @@ export default function ShopOrderDetailPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-navy-700/40">
                   <div>
                     <span className="text-mist-500 block">Street:</span>
-                    <span className="font-medium text-cloud-100">{order.address_breakdown.street_address}</span>
+                    <span className="font-medium text-cloud-100">
+                      {order.address_breakdown.street_address}
+                    </span>
                   </div>
                   <div>
                     <span className="text-mist-500 block">City:</span>
-                    <span className="font-medium text-cloud-100">{order.address_breakdown.city}</span>
+                    <span className="font-medium text-cloud-100">
+                      {order.address_breakdown.city}
+                    </span>
                   </div>
                   <div>
                     <span className="text-mist-500 block">Postal Code:</span>
-                    <span className="font-medium text-cloud-100">{order.address_breakdown.postal_code}</span>
+                    <span className="font-medium text-cloud-100">
+                      {order.address_breakdown.postal_code}
+                    </span>
                   </div>
                   <div>
                     <span className="text-mist-500 block">Country:</span>
-                    <span className="font-medium text-cloud-100">{order.address_breakdown.country}</span>
+                    <span className="font-medium text-cloud-100">
+                      {order.address_breakdown.country}
+                    </span>
                   </div>
                 </div>
               )}
@@ -514,7 +597,9 @@ export default function ShopOrderDetailPage() {
               <div className="pt-2 border-t border-navy-700/40 flex items-center gap-2">
                 <PhoneOutlined className="text-emerald-600" />
                 <span className="text-mist-500">Contact Number:</span>
-                <span className="font-bold text-cloud-100">{order.contact_number || customer.contact || "—"}</span>
+                <span className="font-bold text-cloud-100">
+                  {order.contact_number || customer.contact || "—"}
+                </span>
               </div>
             </div>
           </GlassCard>
@@ -558,7 +643,10 @@ export default function ShopOrderDetailPage() {
             <div className="divide-y divide-navy-700/40 text-xs">
               <div className="py-2 flex items-center justify-between">
                 <span className="text-mist-500">Payment Status:</span>
-                <Tag color={payConfig.color} className="m-0 rounded-full border-0 font-semibold">
+                <Tag
+                  color={payConfig.color}
+                  className="m-0 rounded-full border-0 font-semibold"
+                >
                   {payConfig.label}
                 </Tag>
               </div>
@@ -589,7 +677,9 @@ export default function ShopOrderDetailPage() {
               {Boolean(order.price_breakdown?.discount_amount) && (
                 <div className="py-2 flex items-center justify-between text-emerald-600 font-semibold">
                   <span>Discount:</span>
-                  <span>-{formatPrice(order.price_breakdown.discount_amount)}</span>
+                  <span>
+                    -{formatPrice(order.price_breakdown.discount_amount)}
+                  </span>
                 </div>
               )}
 
@@ -608,13 +698,13 @@ export default function ShopOrderDetailPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-mist-500">Payment Intent:</span>
-                <span className="font-mono text-cloud-100 truncate max-w-[130px]">
+                <span className="font-mono text-cloud-100 truncate max-w-32.5">
                   {getPaymentIntentString(order.payment_intent_id)}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-mist-500">Transaction ID:</span>
-                <span className="font-mono text-cloud-100 truncate max-w-[130px]">
+                <span className="font-mono text-cloud-100 truncate max-w-32.5">
                   {getTransactionIdString(order.transaction_id)}
                 </span>
               </div>
@@ -622,7 +712,11 @@ export default function ShopOrderDetailPage() {
           </GlassCard>
 
           {/* Quick Back Button */}
-          <Button block onClick={() => navigate("/shop/orders")} className="rounded-xl">
+          <Button
+            block
+            onClick={() => navigate("/shop/orders")}
+            className="rounded-xl"
+          >
             Back to Orders List
           </Button>
         </div>

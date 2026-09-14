@@ -150,12 +150,12 @@ export function UserProfileModal({
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <StatusTag tone={subscriptionStatusToneMap[subscription.status] ?? "neutral"}>
-                  {subscription.status}
+                <StatusTag tone={(subscription.status && subscriptionStatusToneMap[subscription.status]) || "neutral"}>
+                  {subscription.status || "Active"}
                 </StatusTag>
                 <span className="font-display text-base font-semibold text-[#f5b544]">
-                  {formatCurrency(subscription.price)}
-                  <span className="text-xs font-normal text-mist-400">/{subscription.recuring}</span>
+                  {formatCurrency(subscription.price || 0)}
+                  <span className="text-xs font-normal text-mist-400">/{subscription.recuring || "month"}</span>
                 </span>
               </div>
             </div>
@@ -165,14 +165,14 @@ export function UserProfileModal({
                 <CalendarOutlined className="text-mist-600" />
                 <div>
                   <div className="text-[11px] text-mist-600">Starts</div>
-                  <div className="font-medium text-cloud-100">{formatDate(subscription.start_date)}</div>
+                  <div className="font-medium text-cloud-100">{subscription.start_date ? formatDate(subscription.start_date) : "—"}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-mist-300">
                 <CalendarOutlined className="text-mist-600" />
                 <div>
                   <div className="text-[11px] text-mist-600">Ends</div>
-                  <div className="font-medium text-cloud-100">{formatDate(subscription.end_date)}</div>
+                  <div className="font-medium text-cloud-100">{subscription.end_date ? formatDate(subscription.end_date) : "—"}</div>
                 </div>
               </div>
             </div>
@@ -183,7 +183,7 @@ export function UserProfileModal({
                   Plan features
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  {subscription.features.map((feature) => (
+                  {subscription.features.map((feature: string) => (
                     <StatusTag key={feature} tone="neutral">
                       {feature}
                     </StatusTag>
@@ -207,7 +207,7 @@ export function UserProfileModal({
           </div>
           <UserStatusSelect
             size="middle"
-            value={user.status}
+            value={(user.status as UserAccountStatus) || "active"}
             disabled={updating}
             onChange={onStatusChange}
           />
