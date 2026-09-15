@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {
-  Button,
-  Popconfirm,
-  Progress,
-  Spin,
-  Avatar,
-  Table,
-} from "antd";
+import { Button, Popconfirm, Progress, Spin, Avatar, Table } from "antd";
 import type { TableProps } from "antd";
 import {
   ArrowLeftOutlined,
@@ -45,7 +38,10 @@ import {
 } from "./statusMaps";
 
 export default function EventDetailPage() {
-  const { eventSlug, id: routeId } = useParams<{ eventSlug?: string; id?: string }>();
+  const { eventSlug, id: routeId } = useParams<{
+    eventSlug?: string;
+    id?: string;
+  }>();
   const eventId = routeId || eventSlug || "";
   const navigate = useNavigate();
 
@@ -59,10 +55,11 @@ export default function EventDetailPage() {
   const event = eventRes?.data;
 
   // Bookings for this event
-  const { data: bookingsRes, isLoading: isBookingsLoading } = useGetEventBookingsQuery(
-    { event: event?._id || eventId, limit: 10 },
-    { skip: !event?._id && !eventId },
-  );
+  const { data: bookingsRes, isLoading: isBookingsLoading } =
+    useGetEventBookingsQuery(
+      { event: event?._id || eventId, limit: 10 },
+      { skip: !event?._id && !eventId },
+    );
 
   const [deleteEvent, { isLoading: isDeleting }] = useDeleteEventMutation();
   const [checkInTicket] = useCheckInTicketMutation();
@@ -154,7 +151,13 @@ export default function EventDetailPage() {
             onClick={() => handleCopy(record.ticketCode)}
             className="text-slate-400 hover:text-slate-700 transition"
           >
-            <CopyOutlined className={copiedCode === record.ticketCode ? "text-emerald-600 text-xs" : "text-xs"} />
+            <CopyOutlined
+              className={
+                copiedCode === record.ticketCode
+                  ? "text-emerald-600 text-xs"
+                  : "text-xs"
+              }
+            />
           </button>
         </div>
       ),
@@ -167,7 +170,9 @@ export default function EventDetailPage() {
           <span className="font-semibold text-xs text-slate-800 block">
             {record.customerName}
           </span>
-          <span className="text-[11px] text-slate-500">{record.customerEmail}</span>
+          <span className="text-[11px] text-slate-500">
+            {record.customerEmail}
+          </span>
         </div>
       ),
     },
@@ -187,7 +192,9 @@ export default function EventDetailPage() {
       render: (_, record) => {
         const badge = getPaymentStatusBadge(record.paymentStatus);
         return (
-          <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badge.bgClass}`}>
+          <span
+            className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badge.bgClass}`}
+          >
             {badge.label}
           </span>
         );
@@ -248,11 +255,16 @@ export default function EventDetailPage() {
           </Link>
           <div>
             <div className="flex items-center gap-2 text-xs text-mist-500">
-              <Link to="/events" className="hover:text-emerald-700 hover:underline">
+              <Link
+                to="/events"
+                className="hover:text-emerald-700 hover:underline"
+              >
                 Events
               </Link>
               <span>/</span>
-              <span className="font-semibold text-slate-800">{event.title}</span>
+              <span className="font-semibold text-slate-800">
+                {event.title}
+              </span>
             </div>
             <h1 className="font-display text-2xl font-bold tracking-tight text-[#0B3D2E]">
               {event.title}
@@ -301,20 +313,26 @@ export default function EventDetailPage() {
       </div>
 
       {/* Hero Showcase Card */}
-      <GlassCard className="relative overflow-hidden p-6 sm:p-8 bg-gradient-to-br from-white via-white to-emerald-50/20 border border-slate-200/90 shadow-sm">
+      <GlassCard className="relative overflow-hidden p-6 sm:p-8 bg-linear-to-br from-white via-white to-emerald-50/20 border border-slate-200/90 shadow-sm">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Left / Top Details */}
           <div className="lg:col-span-8 space-y-4">
             {/* Badges Row */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${cat.bgClass}`}>
+              <span
+                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${cat.bgClass}`}
+              >
                 {cat.label}
               </span>
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${fmt.bgClass}`}>
+              <span
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${fmt.bgClass}`}
+              >
                 {formatIcon}
                 <span>{fmt.label}</span>
               </span>
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${st.bgClass}`}>
+              <span
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${st.bgClass}`}
+              >
                 <span className={`h-2 w-2 rounded-full ${st.dotClass}`} />
                 <span>{st.label}</span>
               </span>
@@ -339,7 +357,9 @@ export default function EventDetailPage() {
               <div className="flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/60 p-3">
                 <CalendarOutlined className="text-lg text-emerald-700" />
                 <div>
-                  <span className="text-[11px] text-slate-400 block font-medium">Schedule</span>
+                  <span className="text-[11px] text-slate-400 block font-medium">
+                    Schedule
+                  </span>
                   <span className="font-semibold text-slate-800">
                     {formatDateTime(event.startDate)}
                   </span>
@@ -349,7 +369,9 @@ export default function EventDetailPage() {
               <div className="flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/60 p-3">
                 <EnvironmentOutlined className="text-lg text-indigo-700" />
                 <div>
-                  <span className="text-[11px] text-slate-400 block font-medium">Location</span>
+                  <span className="text-[11px] text-slate-400 block font-medium">
+                    Location
+                  </span>
                   <span className="font-semibold text-slate-800">
                     {event.location}
                   </span>
@@ -360,7 +382,9 @@ export default function EventDetailPage() {
                 <div className="flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/60 p-3 sm:col-span-2">
                   <EnvironmentOutlined className="text-lg text-slate-500" />
                   <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">Physical Address</span>
+                    <span className="text-[11px] text-slate-400 block font-medium">
+                      Physical Address
+                    </span>
                     <span className="font-semibold text-slate-800">
                       {event.venueAddress}
                     </span>
@@ -372,7 +396,9 @@ export default function EventDetailPage() {
                 <div className="flex items-center gap-2.5 rounded-xl border border-indigo-200 bg-indigo-50/60 p-3 sm:col-span-2">
                   <LinkOutlined className="text-lg text-indigo-700" />
                   <div className="min-w-0 flex-1">
-                    <span className="text-[11px] text-indigo-600 block font-medium">Virtual Meeting Link</span>
+                    <span className="text-[11px] text-indigo-600 block font-medium">
+                      Virtual Meeting Link
+                    </span>
                     <a
                       href={event.virtualLink}
                       target="_blank"
@@ -433,7 +459,9 @@ export default function EventDetailPage() {
               {event.dressCode && (
                 <div className="flex items-center justify-between text-xs text-slate-600">
                   <span>Dress Code:</span>
-                  <span className="font-medium text-slate-800">{event.dressCode}</span>
+                  <span className="font-medium text-slate-800">
+                    {event.dressCode}
+                  </span>
                 </div>
               )}
             </div>
@@ -447,7 +475,9 @@ export default function EventDetailPage() {
           <div className="border-b border-slate-100 pb-3">
             <h3 className="font-display text-base font-bold text-slate-900 flex items-center gap-2">
               <TeamOutlined className="text-purple-600" />
-              <span>Distinguished Speakers & Panelists ({event.speakers.length})</span>
+              <span>
+                Distinguished Speakers & Panelists ({event.speakers.length})
+              </span>
             </h3>
           </div>
 
@@ -468,7 +498,9 @@ export default function EventDetailPage() {
                   <h4 className="font-display text-sm font-bold text-slate-900">
                     {sp.name}
                   </h4>
-                  <p className="text-xs text-slate-500">{sp.role || "Keynote Speaker"}</p>
+                  <p className="text-xs text-slate-500">
+                    {sp.role || "Keynote Speaker"}
+                  </p>
                 </div>
               </div>
             ))}
@@ -490,7 +522,11 @@ export default function EventDetailPage() {
           </div>
 
           <Link to={`/event-bookings?event=${event._id}`}>
-            <Button size="small" type="link" className="font-semibold text-emerald-800 p-0">
+            <Button
+              size="small"
+              type="link"
+              className="font-semibold text-emerald-800 p-0"
+            >
               Manage All Bookings &rarr;
             </Button>
           </Link>
