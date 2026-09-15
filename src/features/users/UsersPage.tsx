@@ -46,9 +46,7 @@ import type { ApiUser, UserRole } from "@/redux/features/users/users.types";
 import { getImageUrl } from "@/lib/getImageUrl";
 import { formatDate, getInitials } from "@/lib/utils";
 import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
-import {
-  userRoleBadgeClassMap,
-} from "./statusMaps";
+import { userRoleBadgeClassMap } from "./statusMaps";
 import { EditUserModal } from "./components/EditUserModal";
 
 export default function UsersPage() {
@@ -74,8 +72,7 @@ export default function UsersPage() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   // Queries
-  const { data: statsRes, refetch: refetchStats } =
-    useGetUserStatsQuery();
+  const { data: statsRes, refetch: refetchStats } = useGetUserStatsQuery();
 
   const queryParams = useMemo(() => {
     const params: {
@@ -156,7 +153,7 @@ export default function UsersPage() {
     try {
       await changeUserStatus({ id: record._id, status: nextStatus }).unwrap();
       toast.success(
-        `User ${record.name} is now ${nextStatus === "active" ? "activated" : "blocked"}.`
+        `User ${record.name} is now ${nextStatus === "active" ? "activated" : "blocked"}.`,
       );
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to change user status.");
@@ -226,7 +223,7 @@ export default function UsersPage() {
     link.setAttribute("href", encodedUri);
     link.setAttribute(
       "download",
-      `ifundayiti-users-${exportSelectedOnly ? "selected" : "export"}-${new Date().toISOString().slice(0, 10)}.csv`
+      `ifundayiti-users-${exportSelectedOnly ? "selected" : "export"}-${new Date().toISOString().slice(0, 10)}.csv`,
     );
     document.body.appendChild(link);
     link.click();
@@ -264,14 +261,14 @@ export default function UsersPage() {
                 <button
                   type="button"
                   onClick={() => navigate(`/users/${record._id}`)}
-                  className="font-semibold text-slate-900 hover:text-emerald-700 text-left truncate transition max-w-[180px]"
+                  className="font-semibold text-slate-900 hover:text-emerald-700 text-left truncate transition max-w-45"
                 >
                   {record.name}
                 </button>
               </div>
 
               <div className="group/email flex items-center gap-1 text-xs text-slate-500">
-                <span className="truncate max-w-[160px]">{record.email}</span>
+                <span className="truncate max-w-40">{record.email}</span>
                 <button
                   type="button"
                   onClick={(e) => {
@@ -417,7 +414,11 @@ export default function UsersPage() {
         ];
 
         return (
-          <Dropdown menu={{ items: actionItems }} trigger={["click"]} placement="bottomRight">
+          <Dropdown
+            menu={{ items: actionItems }}
+            trigger={["click"]}
+            placement="bottomRight"
+          >
             <Button
               type="text"
               size="small"
@@ -433,7 +434,7 @@ export default function UsersPage() {
   return (
     <div className="space-y-6 pb-16">
       {/* Page Header */}
-      <GlassCard className="relative overflow-hidden bg-gradient-to-br from-white via-white to-emerald-50/30">
+      <GlassCard className="relative overflow-hidden bg-linear-to-br from-white via-white to-emerald-50/30">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0B3D2E] text-white shadow-md shadow-emerald-950/20">
@@ -444,7 +445,8 @@ export default function UsersPage() {
                 User Management
               </h1>
               <p className="text-xs text-slate-500">
-                Oversee platform members, verified community accounts, and administrative access
+                Oversee platform members, verified community accounts, and
+                administrative access
               </p>
             </div>
           </div>
@@ -472,7 +474,9 @@ export default function UsersPage() {
           {/* Total Members */}
           <div className="rounded-xl border border-indigo-100/80 bg-indigo-50/40 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-indigo-900">Total Members</span>
+              <span className="text-xs font-semibold text-indigo-900">
+                Total Members
+              </span>
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
                 <TeamOutlined />
               </span>
@@ -488,7 +492,9 @@ export default function UsersPage() {
           {/* Active Accounts */}
           <div className="rounded-xl border border-emerald-100/80 bg-emerald-50/40 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-emerald-900">Active Accounts</span>
+              <span className="text-xs font-semibold text-emerald-900">
+                Active Accounts
+              </span>
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
                 <CheckCircleOutlined />
               </span>
@@ -506,7 +512,9 @@ export default function UsersPage() {
           {/* Verified Members */}
           <div className="rounded-xl border border-teal-100/80 bg-teal-50/40 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-teal-900">Verified Members</span>
+              <span className="text-xs font-semibold text-teal-900">
+                Verified Members
+              </span>
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-100 text-teal-600">
                 <CheckCircleFilled />
               </span>
@@ -522,7 +530,9 @@ export default function UsersPage() {
           {/* Blocked / Flagged */}
           <div className="rounded-xl border border-rose-100/80 bg-rose-50/40 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-rose-900">Blocked / Pending</span>
+              <span className="text-xs font-semibold text-rose-900">
+                Blocked / Pending
+              </span>
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-100 text-rose-600">
                 <StopOutlined />
               </span>
@@ -548,8 +558,14 @@ export default function UsersPage() {
               setPage(1);
             }}
             options={[
-              { label: `All Accounts (${stats?.totalUsers ?? pagination.total})`, value: "all" },
-              { label: `Regular Users (${stats?.regularUsers ?? 0})`, value: "USER" },
+              {
+                label: `All Accounts (${stats?.totalUsers ?? pagination.total})`,
+                value: "all",
+              },
+              {
+                label: `Regular Users (${stats?.regularUsers ?? 0})`,
+                value: "USER",
+              },
               { label: `Admins (${stats?.admins ?? 0})`, value: "ADMIN" },
             ]}
             className="p-1 rounded-xl bg-slate-200/70 text-xs font-medium w-full sm:w-auto overflow-x-auto"
@@ -633,7 +649,9 @@ export default function UsersPage() {
             emptyText: (
               <EmptyState
                 icon={<UserOutlined />}
-                title={searchTerm ? "No users matching search" : "No users found"}
+                title={
+                  searchTerm ? "No users matching search" : "No users found"
+                }
                 description={
                   searchTerm
                     ? `No user records matched "${searchTerm}".`
@@ -654,7 +672,8 @@ export default function UsersPage() {
           <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-100 p-4 sm:flex-row bg-slate-50/50">
             <span className="text-xs text-slate-500">
               Showing {(page - 1) * limit + 1} to{" "}
-              {Math.min(page * limit, pagination.total)} of {pagination.total} users
+              {Math.min(page * limit, pagination.total)} of {pagination.total}{" "}
+              users
             </span>
 
             <Pagination
