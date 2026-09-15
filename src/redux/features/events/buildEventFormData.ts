@@ -17,7 +17,7 @@ export function buildEventFormData(payload: EventFormPayload): FormData {
   formData.append("organization[designation]", payload.organization.designation.trim());
   formData.append("organization[email]", payload.organization.email.trim());
 
-  for (const tag of payload.tags.map((t) => t.trim()).filter(Boolean)) {
+  for (const tag of payload.tags.map((t: string) => t.trim()).filter(Boolean)) {
     formData.append("tags", tag);
   }
 

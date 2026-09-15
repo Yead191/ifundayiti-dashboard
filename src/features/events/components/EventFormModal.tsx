@@ -69,12 +69,12 @@ export function EventFormModal({
       form.setFieldsValue({
         title: initial.title,
         description: initial.description,
-        dateRange: [dayjs(initial.eventDate), dayjs(initial.endDate)],
+        dateRange: [dayjs(initial.eventDate || initial.startDate), dayjs(initial.endDate)],
         location: initial.location,
-        type: (EVENT_TYPE_OPTIONS.includes(initial.type as EventType)
+        type: ((EVENT_TYPE_OPTIONS as readonly string[]).includes(initial.type as string)
           ? initial.type
-          : EVENT_TYPE.OTHER) as EventType,
-        status: (EVENT_STATUS_OPTIONS.includes(initial.status as EventStatus)
+          : EVENT_TYPE.PHYSICAL) as EventType,
+        status: ((EVENT_STATUS_OPTIONS as readonly string[]).includes(initial.status as string)
           ? initial.status
           : EVENT_STATUS.DRAFT) as EventStatus,
         organizationName: initial.organization?.name ?? "",
@@ -96,7 +96,7 @@ export function EventFormModal({
           : []
       );
       setGalleryList(
-        (initial.images ?? []).map((src, index) => ({
+        (initial.images ?? []).map((src: string, index: number) => ({
           uid: `-gallery-${index}`,
           name: `gallery-${index + 1}`,
           status: "done" as const,
@@ -106,7 +106,7 @@ export function EventFormModal({
     } else {
       form.resetFields();
       form.setFieldsValue({
-        type: EVENT_TYPE.WORKSHOP,
+        type: EVENT_TYPE.PHYSICAL,
         status: EVENT_STATUS.DRAFT,
         tags: [],
         isFeatured: false,
@@ -233,9 +233,9 @@ export function EventFormModal({
             rules={[{ required: true, message: "Select a type" }]}
           >
             <Select
-              options={EVENT_TYPE_OPTIONS.map((type) => ({
+              options={EVENT_TYPE_OPTIONS.map((type: string) => ({
                 value: type,
-                label: eventTypeLabelMap[type],
+                label: eventTypeLabelMap[type] || type,
               }))}
             />
           </Form.Item>
@@ -245,9 +245,9 @@ export function EventFormModal({
             rules={[{ required: true, message: "Select a status" }]}
           >
             <Select
-              options={EVENT_STATUS_OPTIONS.map((status) => ({
+              options={EVENT_STATUS_OPTIONS.map((status: string) => ({
                 value: status,
-                label: eventStatusLabelMap[status],
+                label: eventStatusLabelMap[status] || status,
               }))}
             />
           </Form.Item>

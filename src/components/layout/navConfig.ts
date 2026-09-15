@@ -5,8 +5,6 @@ import {
   ShopOutlined,
   ShoppingOutlined,
   TagOutlined,
-  RollbackOutlined,
-  HistoryOutlined,
   TeamOutlined,
   ProjectOutlined,
   PictureOutlined,
@@ -18,8 +16,8 @@ import {
   EditOutlined,
   HeartOutlined,
   CreditCardOutlined,
-  BellOutlined,
   UserOutlined,
+  QrcodeOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -82,6 +80,32 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Gallery",
     path: "/gallery",
     icon: PictureOutlined,
+  },
+  {
+    key: "events",
+    label: "Events & Tickets",
+    path: "/events",
+    icon: CalendarOutlined,
+    children: [
+      {
+        key: "events-all",
+        label: "All Events",
+        path: "/events",
+        icon: CalendarOutlined,
+      },
+      {
+        key: "events-bookings",
+        label: "Bookings & Tickets",
+        path: "/event-bookings",
+        icon: TeamOutlined,
+      },
+      {
+        key: "events-checkin",
+        label: "Live Check-In",
+        path: "/event-checkin",
+        icon: QrcodeOutlined,
+      },
+    ],
   },
   {
     key: "blogs",

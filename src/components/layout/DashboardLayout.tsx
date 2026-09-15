@@ -54,9 +54,16 @@ const PAGE_META: { match: (path: string) => boolean; title: string; subtitle?: s
   { match: (p) => p.startsWith("/partners/") || p.startsWith("/partner/"), title: "Partner details", subtitle: "Review partner organization profile, collaboration status, and credentials" },
   { match: (p) => p === "/partners" || p === "/partner", title: "Partners", subtitle: "Manage verified partners, NGO collaborations, and institutional alliances" },
 
-  // Events
-  { match: (p) => p.startsWith("/events/"), title: "Event details", subtitle: "Review schedule, media, and organization details" },
-  { match: (p) => p === "/events", title: "Events", subtitle: "Publish and manage workshops, meetups, and conferences" },
+  // Events & Gatherings
+  { match: (p) => p === "/events/new", title: "Create New Event", subtitle: "Publish a gala, fundraiser, pitch night, or hybrid workshop" },
+  { match: (p) => p.endsWith("/edit") && p.startsWith("/events/"), title: "Edit Event", subtitle: "Update event narrative, ticketing parameters, and schedule" },
+  { match: (p) => p.startsWith("/events/"), title: "Event Details", subtitle: "Review schedule, speaker roster, capacity, and registered attendees" },
+  { match: (p) => p === "/events" || p === "/admin/events", title: "Events & Gatherings", subtitle: "Publish and manage community galas, fundraisers, and workshops" },
+
+  // Bookings & Door Check-In
+  { match: (p) => p.startsWith("/event-bookings/"), title: "Ticket Pass & Booking Details", subtitle: "Inspect reservation status, payment details, and official ticket pass" },
+  { match: (p) => p === "/event-bookings" || p === "/admin/event-bookings", title: "Attendee Bookings & Tickets", subtitle: "Audit guest registrations, payment receipts, and issue passes" },
+  { match: (p) => p === "/event-checkin" || p === "/admin/event-checkin", title: "Door Staff Live Check-In", subtitle: "Scan attendee QR code passes and verify admissions at the entrance" },
 
   // FAQ Management
   { match: (p) => p === "/faq" || p.startsWith("/faq"), title: "FAQ Management", subtitle: "Manage categorized questions and answers displayed across the storefront" },

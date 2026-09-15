@@ -44,7 +44,16 @@ const EXACT_PATH_MAP: Record<string, string> = {
   "/dashboard/coupons": "/store/coupons",
   "/events": "/events",
   "/event": "/events",
+  "/admin/events": "/events",
   "/dashboard/events": "/events",
+  "/event-bookings": "/event-bookings",
+  "/admin/event-bookings": "/event-bookings",
+  "/event-checkin": "/event-checkin",
+  "/admin/event-checkin": "/event-checkin",
+  "/booking": "/event-bookings",
+  "/bookings": "/event-bookings",
+  "/admin/bookings": "/event-bookings",
+  "/dashboard/bookings": "/event-bookings",
   "/blogs": "/blogs",
   "/blog": "/blogs",
   "/dashboard/blogs": "/blogs",
@@ -147,6 +156,12 @@ export function resolveNotificationPath(path?: string | null): string {
   const eventMatch = normalized.match(/^\/(?:events|event)\/([^/?#]+)/i);
   if (eventMatch) {
     return `/events/${eventMatch[1]}`;
+  }
+
+  // /bookings/:id or /booking/:id or /ticket/:id -> /event-bookings/:id
+  const bookingMatch = normalized.match(/^\/(?:event-bookings|bookings|booking|ticket)\/([^/?#]+)/i);
+  if (bookingMatch) {
+    return `/event-bookings/${bookingMatch[1]}`;
   }
 
   // /gallery/folder/:id or /gallery/:id -> /gallery/folder/:id

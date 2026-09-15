@@ -29,6 +29,17 @@ const RefundDetailPage = lazy(
 );
 const EventsPage = lazy(() => import("@/features/events/EventsPage"));
 const EventDetailPage = lazy(() => import("@/features/events/EventDetailPage"));
+const CreateEventPage = lazy(() => import("@/features/events/CreateEventPage"));
+const EditEventPage = lazy(() => import("@/features/events/EditEventPage"));
+const EventBookingsPage = lazy(
+  () => import("@/features/events/bookings/EventBookingsPage"),
+);
+const EventBookingDetailPage = lazy(
+  () => import("@/features/events/bookings/EventBookingDetailPage"),
+);
+const EventCheckInPage = lazy(
+  () => import("@/features/events/checkin/EventCheckInPage"),
+);
 const IFundAyitiOverviewPage = lazy(
   () => import("@/features/overview/OverviewPage"),
 );
@@ -106,8 +117,17 @@ export default function App() {
               path="store/refunds/:refundId"
               element={<RefundDetailPage />}
             />
+            {/* Events & Gatherings Module */}
             <Route path="events" element={<EventsPage />} />
-            <Route path="events/:eventSlug" element={<EventDetailPage />} />
+            <Route path="events/new" element={<CreateEventPage />} />
+            <Route path="events/:id" element={<EventDetailPage />} />
+            <Route path="events/:id/edit" element={<EditEventPage />} />
+            <Route path="event-bookings" element={<EventBookingsPage />} />
+            <Route path="event-bookings/:id" element={<EventBookingDetailPage />} />
+            <Route path="event-checkin" element={<EventCheckInPage />} />
+            <Route path="admin/events" element={<Navigate to="/events" replace />} />
+            <Route path="admin/event-bookings" element={<Navigate to="/event-bookings" replace />} />
+            <Route path="admin/event-checkin" element={<Navigate to="/event-checkin" replace />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route
               path="applications"
