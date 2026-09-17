@@ -16,10 +16,15 @@ interface EventStatsHeaderProps {
 
 export function EventStatsHeader({ stats, loading, upcomingCount = 0 }: EventStatsHeaderProps) {
   const totalEvents = stats?.totalEvents ?? 0;
-  const totalReserved = stats?.totalReservedSeats ?? 0;
-  const totalCapacity = stats?.totalCapacity ?? 0;
-  const totalRevenue = stats?.totalEstimatedRevenue ?? 0;
+  const totalReserved =
+    stats?.totalTicketsReserved ??
+    stats?.totalReservedSeats ??
+    stats?.totalBookings ??
+    0;
+  const totalRevenue = stats?.totalRevenue ?? stats?.totalEstimatedRevenue ?? 0;
+  const upcomingGatherings = stats?.upcomingEvents ?? upcomingCount ?? 0;
 
+  const totalCapacity = stats?.totalCapacity ?? 0;
   const occupancyRate = totalCapacity > 0 ? Math.round((totalReserved / totalCapacity) * 100) : 0;
 
   return (
@@ -39,7 +44,9 @@ export function EventStatsHeader({ stats, loading, upcomingCount = 0 }: EventSta
             {loading ? "…" : totalEvents}
           </h2>
           <p className="text-xs text-mist-500 mt-1">
-            {stats?.publishedEvents ?? 0} published • {stats?.draftEvents ?? 0} draft
+            {stats?.publishedEvents !== undefined
+              ? `${stats.publishedEvents} published • ${stats.draftEvents ?? 0} draft`
+              : "All gatherings in system"}
           </p>
         </div>
         <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-emerald-500/10 blur-xl" />
@@ -60,7 +67,11 @@ export function EventStatsHeader({ stats, loading, upcomingCount = 0 }: EventSta
             {loading ? "…" : totalReserved.toLocaleString()}
           </h2>
           <p className="text-xs text-mist-500 mt-1">
-            {occupancyRate}% overall seat occupancy ({totalCapacity.toLocaleString()} cap)
+            {stats?.totalCheckedIn !== undefined && stats.totalCheckedIn > 0
+              ? `${stats.totalCheckedIn} checked in • ${totalReserved} reserved`
+              : totalCapacity > 0
+              ? `${occupancyRate}% seat occupancy (${totalCapacity.toLocaleString()} cap)`
+              : "Total attendee reservations"}
           </p>
         </div>
         <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-indigo-500/10 blur-xl" />
@@ -81,7 +92,9 @@ export function EventStatsHeader({ stats, loading, upcomingCount = 0 }: EventSta
             {loading ? "…" : formatCurrency(totalRevenue)}
           </h2>
           <p className="text-xs text-mist-500 mt-1">
-            Gala tickets & paid hybrid workshops
+            {stats?.paidBookings !== undefined
+              ? `${stats.paidBookings} paid bookings`
+              : "Paid ticket reservations"}
           </p>
         </div>
         <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-amber-500/10 blur-xl" />
@@ -99,10 +112,12 @@ export function EventStatsHeader({ stats, loading, upcomingCount = 0 }: EventSta
         </div>
         <div>
           <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-teal-950">
-            {loading ? "…" : upcomingCount}
+            {loading ? "…" : upcomingGatherings}
           </h2>
           <p className="text-xs text-mist-500 mt-1">
-            Actively open for registration
+            {stats?.pastEvents !== undefined
+              ? `${stats.pastEvents} past gatherings completed`
+              : "Actively open for registration"}
           </p>
         </div>
         <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-teal-500/10 blur-xl" />

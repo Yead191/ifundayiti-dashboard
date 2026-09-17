@@ -80,7 +80,17 @@ export default function EditEventPage() {
         virtualLink: event.virtualLink,
         featured: Boolean(event.featured),
         status: (event.status || "published").toLowerCase(),
-        speakers: event.speakers && event.speakers.length > 0 ? event.speakers : [{ name: "", role: "", avatar: "" }],
+        speakers:
+          event.speakers && event.speakers.length > 0
+            ? event.speakers.map((sp) => ({
+                name: sp.name || "",
+                role: sp.role || "",
+                avatar: sp.avatar || "",
+                existingAvatarUrl: sp.avatar || "",
+                avatarPreviewUrl: sp.avatar ? toFileUrl(sp.avatar) || sp.avatar : null,
+                avatarFile: null,
+              }))
+            : [{ name: "", role: "", avatar: "", existingAvatarUrl: "", avatarPreviewUrl: null, avatarFile: null }],
       });
     }
   }, [event, form]);
@@ -95,17 +105,19 @@ export default function EditEventPage() {
       return Upload.LIST_IGNORE;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      const currentSpeakers = form.getFieldValue("speakers") || [];
-      const updated = [...currentSpeakers];
-      if (updated[index]) {
-        updated[index] = { ...updated[index], avatar: dataUrl };
-        form.setFieldsValue({ speakers: updated });
-      }
-    };
-    reader.readAsDataURL(file);
+    const previewUrl = URL.createObjectURL(file);
+    const currentSpeakers = form.getFieldValue("speakers") || [];
+    const updated = [...currentSpeakers];
+    if (updated[index]) {
+      updated[index] = {
+        ...updated[index],
+        avatarFile: file,
+        avatarPreviewUrl: previewUrl,
+        existingAvatarUrl: "",
+        avatar: "",
+      };
+      form.setFieldsValue({ speakers: updated });
+    }
     return false;
   };
 
@@ -113,7 +125,13 @@ export default function EditEventPage() {
     const currentSpeakers = form.getFieldValue("speakers") || [];
     const updated = [...currentSpeakers];
     if (updated[index]) {
-      updated[index] = { ...updated[index], avatar: "" };
+      updated[index] = {
+        ...updated[index],
+        avatarFile: null,
+        avatarPreviewUrl: null,
+        existingAvatarUrl: "",
+        avatar: "",
+      };
       form.setFieldsValue({ speakers: updated });
     }
   };
@@ -122,45 +140,74 @@ export default function EditEventPage() {
     try {
       const formData = new FormData();
 
-      formData.append("title", values.title?.trim() || "");
-      formData.append("description", values.description?.trim() || "");
-      formData.append("category", values.category || "gala");
-      formData.append("type", values.type || "physical");
-      formData.append("pricingType", values.pricingType || "paid");
-
       const resolvedPrice =
         values.pricingType === "free" || values.type === "virtual"
           ? 0
           : Number(values.price || 0);
-      formData.append("price", String(resolvedPrice));
-      formData.append("capacity", String(Number(values.capacity || 100)));
 
-      if (values.startDate) {
-        formData.append("startDate", values.startDate.toISOString());
+      const startDateIso = values.startDate
+        ? (typeof values.startDate.toISOString === "function"
+            ? values.startDate.toISOString()
+            : new Date(values.startDate).toISOString())
+        : (event?.startDate || new Date().toISOString());
+
+      const endDateIso = values.endDate
+        ? (typeof values.endDate.toISOString === "function"
+            ? values.endDate.toISOString()
+            : new Date(values.endDate).toISOString())
+        : undefined;
+
+      const rawSpeakers = values.speakers || [];
+      const validSpeakers = rawSpeakers.filter(
+        (sp: any) => sp && sp.name && sp.name.trim()
+      );
+
+      const eventData: Record<string, any> = {
+        title: values.title?.trim() || "",
+        description: values.description?.trim() || "",
+        category: values.category || "gala",
+        type: values.type || "physical",
+        pricingType: values.pricingType || "paid",
+        price: resolvedPrice,
+        capacity: Number(values.capacity || 100),
+        startDate: startDateIso,
+        location: values.location?.trim() || "",
+        featured: Boolean(values.featured),
+        status: values.status || "published",
+        speakers: validSpeakers.map((sp: any) => ({
+          name: sp.name?.trim(),
+          role: sp.role?.trim() || "Keynote Speaker",
+          // If editing an event and keeping an existing avatar URL:
+          ...(sp.existingAvatarUrl && !sp.avatarFile ? { avatar: sp.existingAvatarUrl } : {}),
+        })),
+      };
+
+      if (endDateIso) {
+        eventData.endDate = endDateIso;
       }
-      if (values.endDate) {
-        formData.append("endDate", values.endDate.toISOString());
+      if (values.venueAddress?.trim()) {
+        eventData.venueAddress = values.venueAddress.trim();
+      }
+      if (values.dressCode?.trim()) {
+        eventData.dressCode = values.dressCode.trim();
+      }
+      if (values.virtualLink?.trim()) {
+        eventData.virtualLink = values.virtualLink.trim();
       }
 
-      formData.append("location", values.location?.trim() || "");
-      if (values.venueAddress) formData.append("venueAddress", values.venueAddress.trim());
-      if (values.dressCode) formData.append("dressCode", values.dressCode.trim());
-      if (values.virtualLink) formData.append("virtualLink", values.virtualLink.trim());
-      formData.append("featured", String(Boolean(values.featured)));
-      formData.append("status", values.status || "published");
+      formData.append("data", JSON.stringify(eventData));
 
+      // Event Banner Image
       if (coverFile) {
         formData.append("image", coverFile);
-      } else if (event?.image && coverPreviewUrl) {
-        formData.append("image", event.image);
       }
 
-      const validSpeakers = (values.speakers || []).filter(
-        (s: any) => s && s.name && s.name.trim()
-      );
-      if (validSpeakers.length > 0) {
-        formData.append("speakers", JSON.stringify(validSpeakers));
-      }
+      // Append each speaker's avatar in the same order as the speakers array
+      validSpeakers.forEach((sp: any) => {
+        if (sp.avatarFile) {
+          formData.append("avatar", sp.avatarFile);
+        }
+      });
 
       await updateEvent({ id, body: formData }).unwrap();
       toast.success("Event updated successfully!");
@@ -558,7 +605,11 @@ export default function EditEventPage() {
               {(fields, { add, remove }) => (
                 <div className="space-y-3">
                   {fields.map(({ key, name, ...restField }, index) => {
-                    const speakerAvatar = watchedSpeakers?.[index]?.avatar;
+                    const sp = watchedSpeakers?.[index];
+                    const speakerAvatar =
+                      sp?.avatarPreviewUrl ||
+                      (sp?.existingAvatarUrl ? toFileUrl(sp.existingAvatarUrl) || sp.existingAvatarUrl : null) ||
+                      (sp?.avatar ? toFileUrl(sp.avatar) || sp.avatar : null);
 
                     return (
                       <div
@@ -569,7 +620,7 @@ export default function EditEventPage() {
                         <div className="flex items-center gap-2.5 shrink-0">
                           <Avatar
                             size={44}
-                            src={speakerAvatar ? toFileUrl(speakerAvatar) || speakerAvatar : undefined}
+                            src={speakerAvatar || undefined}
                             icon={<UserOutlined />}
                             className="shrink-0 bg-slate-200 ring-2 ring-emerald-600/20 text-slate-600 font-bold"
                           />
@@ -592,7 +643,7 @@ export default function EditEventPage() {
                               <button
                                 type="button"
                                 onClick={() => handleRemoveSpeakerAvatar(index)}
-                                className="text-[11px] text-red-500 hover:text-red-700 text-left font-medium"
+                                className="text-[11px] text-red-500 hover:text-red-700 text-left font-medium cursor-pointer"
                               >
                                 Remove Photo
                               </button>
@@ -600,10 +651,31 @@ export default function EditEventPage() {
                           </div>
                         </div>
 
-                        {/* Hidden form item to track avatar value */}
+                        {/* Hidden form items to track avatar files and URLs */}
                         <Form.Item
                           {...restField}
                           name={[name, "avatar"]}
+                          hidden
+                        >
+                          <Input />
+                        </Form.Item>
+                        <Form.Item
+                          {...restField}
+                          name={[name, "avatarFile"]}
+                          hidden
+                        >
+                          <Input />
+                        </Form.Item>
+                        <Form.Item
+                          {...restField}
+                          name={[name, "avatarPreviewUrl"]}
+                          hidden
+                        >
+                          <Input />
+                        </Form.Item>
+                        <Form.Item
+                          {...restField}
+                          name={[name, "existingAvatarUrl"]}
                           hidden
                         >
                           <Input />

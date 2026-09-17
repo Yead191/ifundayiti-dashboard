@@ -42,7 +42,8 @@ export default function EventCheckInPage() {
   const [lastResult, setLastResult] = useState<VerificationResult | null>(null);
   const [recentLogs, setRecentLogs] = useState<RecentCheckInLog[]>([]);
 
-  const [checkInTicket, { isLoading: isCheckingIn }] = useCheckInTicketMutation();
+  const [checkInTicket, { isLoading: isCheckingIn }] =
+    useCheckInTicketMutation();
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const isProcessingRef = useRef(false);
 
@@ -124,7 +125,9 @@ export default function EventCheckInPage() {
     } catch (err: any) {
       soundEffects.playError();
       const errorMsg =
-        err?.data?.message || err?.message || "Invalid ticket code or check-in denied.";
+        err?.data?.message ||
+        err?.message ||
+        "Invalid ticket code or check-in denied.";
       setLastResult({
         type: "error",
         message: errorMsg,
@@ -170,7 +173,8 @@ export default function EventCheckInPage() {
       setIsScanning(true);
     } catch (err: any) {
       setCameraError(
-        err?.message || "Unable to access device camera. Please check camera permissions or use manual code entry.",
+        err?.message ||
+          "Unable to access device camera. Please check camera permissions or use manual code entry.",
       );
       setIsScanning(false);
     }
@@ -203,11 +207,17 @@ export default function EventCheckInPage() {
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
           <div className="flex items-center gap-2 text-xs text-mist-500">
-            <Link to="/events" className="hover:text-emerald-700 hover:underline">
+            <Link
+              to="/events"
+              className="hover:text-emerald-700 hover:underline"
+            >
               Events
             </Link>
             <span>/</span>
-            <Link to="/event-bookings" className="hover:text-emerald-700 hover:underline">
+            <Link
+              to="/event-bookings"
+              className="hover:text-emerald-700 hover:underline"
+            >
               Bookings
             </Link>
             <span>/</span>
@@ -217,7 +227,8 @@ export default function EventCheckInPage() {
             Door Staff Live Check-In Scanner
           </h1>
           <p className="mt-0.5 text-xs text-mist-600">
-            Scan attendee QR code passes or type ticket codes for instant admission verification.
+            Scan attendee QR code passes or type ticket codes for instant
+            admission verification.
           </p>
         </div>
 
@@ -271,7 +282,7 @@ export default function EventCheckInPage() {
             </div>
 
             {/* Video Viewport */}
-            <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-950 flex flex-col items-center justify-center min-h-[280px]">
+            <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-950 flex flex-col items-center justify-center min-h-70">
               <div id="reader" className="w-full" />
 
               {!isScanning && (
@@ -284,7 +295,8 @@ export default function EventCheckInPage() {
                       Camera Scanner Inactive
                     </h3>
                     <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-                      Click &quot;Start Camera Feed&quot; above to enable camera scanning, or use the rapid code input below.
+                      Click &quot;Start Camera Feed&quot; above to enable camera
+                      scanning, or use the rapid code input below.
                     </p>
                   </div>
                   <Button
@@ -329,7 +341,8 @@ export default function EventCheckInPage() {
                 </Button>
               </div>
               <span className="text-[11px] text-slate-400 block">
-                Press Enter on keyboard or scan with USB barcode scanner to submit automatically.
+                Press Enter on keyboard or scan with USB barcode scanner to
+                submit automatically.
               </span>
             </form>
           </GlassCard>
@@ -337,7 +350,7 @@ export default function EventCheckInPage() {
 
         {/* Right Column: Instant Verification Display */}
         <div className="lg:col-span-5 space-y-4">
-          <GlassCard className="p-6 space-y-4 border border-slate-200 shadow-sm min-h-[380px] flex flex-col justify-between">
+          <GlassCard className="p-6 space-y-4 border border-slate-200 shadow-sm min-h-95 flex flex-col justify-between">
             <div>
               <h2 className="font-display text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
                 <ThunderboltOutlined className="text-amber-600" />
@@ -388,7 +401,8 @@ export default function EventCheckInPage() {
                         </p>
                       </div>
                       <div className="pt-2 border-t border-amber-200/80 text-xs text-amber-900 font-semibold">
-                        Guest: {lastResult.customerName} ({lastResult.ticketCode})
+                        Guest: {lastResult.customerName} (
+                        {lastResult.ticketCode})
                       </div>
                     </div>
                   )}
@@ -420,7 +434,8 @@ export default function EventCheckInPage() {
                 <div className="py-16 text-center text-slate-400 space-y-2">
                   <QrcodeOutlined className="text-4xl text-slate-300" />
                   <p className="text-xs">
-                    Ready to scan. Present an attendee QR code or enter ticket code.
+                    Ready to scan. Present an attendee QR code or enter ticket
+                    code.
                   </p>
                 </div>
               )}
@@ -428,7 +443,8 @@ export default function EventCheckInPage() {
 
             {/* Instruction footer */}
             <div className="text-[11px] text-slate-400 border-t border-slate-100 pt-3">
-              Door check-in automatically logs admission timestamp and updates attendee status in real-time.
+              Door check-in automatically logs admission timestamp and updates
+              attendee status in real-time.
             </div>
           </GlassCard>
         </div>
@@ -469,15 +485,23 @@ export default function EventCheckInPage() {
                 <div className="flex items-center gap-3">
                   <span
                     className={`flex h-6 w-6 items-center justify-center rounded-full text-white text-[11px] ${
-                      log.status === "success" ? "bg-emerald-500" : "bg-amber-500"
+                      log.status === "success"
+                        ? "bg-emerald-500"
+                        : "bg-amber-500"
                     }`}
                   >
                     {log.status === "success" ? "✓" : "!"}
                   </span>
                   <div>
-                    <span className="font-bold text-slate-900">{log.customerName}</span>
-                    <span className="text-slate-400 font-mono ml-2">({log.ticketCode})</span>
-                    <span className="text-slate-500 ml-2">• Admit {log.admitCount}</span>
+                    <span className="font-bold text-slate-900">
+                      {log.customerName}
+                    </span>
+                    <span className="text-slate-400 font-mono ml-2">
+                      ({log.ticketCode})
+                    </span>
+                    <span className="text-slate-500 ml-2">
+                      • Admit {log.admitCount}
+                    </span>
                   </div>
                 </div>
 

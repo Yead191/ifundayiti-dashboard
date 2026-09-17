@@ -75,7 +75,7 @@ export const eventsApi = baseApi.injectEndpoints({
 
     getEventStatsOverview: builder.query<EventStatsResponse, void>({
       query: () => ({
-        url: "/event/stats/overview",
+        url: "/event/stats",
         method: "GET",
       }),
       providesTags: [{ type: "Events", id: "STATS" }],

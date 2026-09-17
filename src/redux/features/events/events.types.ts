@@ -115,12 +115,20 @@ export interface EventMutationResponse {
 }
 
 export interface EventStatsOverview {
-  totalEvents: number;
-  publishedEvents: number;
-  draftEvents: number;
-  totalReservedSeats: number;
-  totalCapacity: number;
-  totalEstimatedRevenue: number;
+  totalEvents?: number;
+  publishedEvents?: number;
+  draftEvents?: number;
+  upcomingEvents?: number;
+  pastEvents?: number;
+  totalBookings?: number;
+  totalTicketsReserved?: number;
+  totalReservedSeats?: number;
+  totalCapacity?: number;
+  totalRevenue?: number;
+  totalEstimatedRevenue?: number;
+  totalCheckedIn?: number;
+  paidBookings?: number;
+  freeBookings?: number;
 }
 
 export interface EventStatsResponse {

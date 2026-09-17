@@ -38,14 +38,18 @@ export default function EventBookingDetailPage() {
     refetch,
   } = useGetEventBookingByIdQuery(id, { skip: !id });
 
-  const [checkInTicket, { isLoading: isCheckingIn }] = useCheckInTicketMutation();
+  const [checkInTicket, { isLoading: isCheckingIn }] =
+    useCheckInTicketMutation();
   const [updateBookingStatus, { isLoading: isCancelling }] =
     useUpdateEventBookingStatusMutation();
 
   const [copied, setCopied] = useState(false);
 
   const booking = bookingRes?.data;
-  const event = typeof booking?.event === "object" && booking?.event !== null ? (booking.event as any) : null;
+  const event =
+    typeof booking?.event === "object" && booking?.event !== null
+      ? (booking.event as any)
+      : null;
 
   const handleCopyCode = () => {
     if (!booking?.ticketCode) return;
@@ -62,7 +66,9 @@ export default function EventBookingDetailPage() {
   const handleManualCheckIn = async () => {
     if (!booking?.ticketCode) return;
     try {
-      const res = await checkInTicket({ ticketCode: booking.ticketCode }).unwrap();
+      const res = await checkInTicket({
+        ticketCode: booking.ticketCode,
+      }).unwrap();
       if (res.data?.alreadyCheckedIn) {
         toast.warning(res.message);
       } else {
@@ -103,7 +109,10 @@ export default function EventBookingDetailPage() {
         <p className="mt-2 text-sm text-slate-500">
           The requested ticket booking record could not be located.
         </p>
-        <Button onClick={() => navigate("/event-bookings")} className="mt-4 rounded-xl">
+        <Button
+          onClick={() => navigate("/event-bookings")}
+          className="mt-4 rounded-xl"
+        >
           Back to Bookings
         </Button>
       </div>
@@ -127,7 +136,10 @@ export default function EventBookingDetailPage() {
           </Link>
           <div>
             <div className="flex items-center gap-2 text-xs text-mist-500">
-              <Link to="/event-bookings" className="hover:text-emerald-700 hover:underline">
+              <Link
+                to="/event-bookings"
+                className="hover:text-emerald-700 hover:underline"
+              >
                 Bookings
               </Link>
               <span>/</span>
@@ -224,14 +236,20 @@ export default function EventBookingDetailPage() {
             {/* Event Details Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-1">
               <div>
-                <span className="text-slate-400 block font-medium">Date & Schedule</span>
+                <span className="text-slate-400 block font-medium">
+                  Date & Schedule
+                </span>
                 <span className="text-white font-semibold block text-sm mt-0.5">
-                  {event?.startDate ? formatDateTime(event.startDate) : "See Invitation"}
+                  {event?.startDate
+                    ? formatDateTime(event.startDate)
+                    : "See Invitation"}
                 </span>
               </div>
 
               <div>
-                <span className="text-slate-400 block font-medium">Venue Location</span>
+                <span className="text-slate-400 block font-medium">
+                  Venue Location
+                </span>
                 <span className="text-white font-semibold block text-sm mt-0.5">
                   {event?.location || "Private Venue"}
                 </span>
@@ -244,7 +262,9 @@ export default function EventBookingDetailPage() {
 
               {event?.dressCode && (
                 <div>
-                  <span className="text-slate-400 block font-medium">Dress Code</span>
+                  <span className="text-slate-400 block font-medium">
+                    Dress Code
+                  </span>
                   <span className="text-[#D4AF37] font-semibold block mt-0.5">
                     {event.dressCode}
                   </span>
@@ -252,9 +272,13 @@ export default function EventBookingDetailPage() {
               )}
 
               <div>
-                <span className="text-slate-400 block font-medium">Reserved Tier</span>
+                <span className="text-slate-400 block font-medium">
+                  Reserved Tier
+                </span>
                 <span className="text-white font-bold block mt-0.5">
-                  {booking.paymentStatus === "free" ? "Complimentary Guest" : "VIP Ticket Holder"}
+                  {booking.paymentStatus === "free"
+                    ? "Complimentary Guest"
+                    : "VIP Ticket Holder"}
                 </span>
               </div>
             </div>
@@ -272,7 +296,9 @@ export default function EventBookingDetailPage() {
 
               <div className="flex items-center gap-3">
                 <div className="text-right">
-                  <span className="text-[11px] font-medium text-slate-400 block">Admissions</span>
+                  <span className="text-[11px] font-medium text-slate-400 block">
+                    Admissions
+                  </span>
                   <span className="text-sm font-extrabold text-[#D4AF37]">
                     ADMIT {booking.quantity || 1}
                   </span>
@@ -295,7 +321,7 @@ export default function EventBookingDetailPage() {
           </div>
 
           {/* Right Ticket Stub */}
-          <div className="w-full lg:w-72 bg-gradient-to-b from-[#18181B] to-[#0E0E10] p-6 flex flex-col items-center justify-between text-center space-y-4">
+          <div className="w-full lg:w-72 bg-linear-to-b from-[#18181B] to-[#0E0E10] p-6 flex flex-col items-center justify-between text-center space-y-4">
             <div>
               <span className="text-[10px] font-bold tracking-widest text-[#D4AF37] uppercase block">
                 Entry Pass Stub
@@ -307,7 +333,13 @@ export default function EventBookingDetailPage() {
                 title="Click to copy ticket code"
               >
                 <span>{booking.ticketCode}</span>
-                <CopyOutlined className={copied ? "text-emerald-400 text-sm" : "text-slate-400 text-sm"} />
+                <CopyOutlined
+                  className={
+                    copied
+                      ? "text-emerald-400 text-sm"
+                      : "text-slate-400 text-sm"
+                  }
+                />
               </button>
             </div>
 
@@ -327,14 +359,17 @@ export default function EventBookingDetailPage() {
                 Scan at entrance for admission
               </span>
               <span className="text-[10px] text-slate-500 font-mono block">
-                Admit {booking.quantity || 1} • {booking.paymentStatus.toUpperCase()}
+                Admit {booking.quantity || 1} •{" "}
+                {booking.paymentStatus.toUpperCase()}
               </span>
             </div>
 
             {/* Stylized Barcode Graphic */}
             <div className="w-full pt-1">
               <div className="flex h-7 items-center justify-center gap-1 opacity-70">
-                {[3, 1, 4, 1, 2, 4, 2, 1, 3, 2, 4, 1, 2, 3, 1, 4, 2, 1, 3, 2].map((w, idx) => (
+                {[
+                  3, 1, 4, 1, 2, 4, 2, 1, 3, 2, 4, 1, 2, 3, 1, 4, 2, 1, 3, 2,
+                ].map((w, idx) => (
                   <div
                     key={idx}
                     className="bg-[#D4AF37] h-full"
@@ -358,7 +393,9 @@ export default function EventBookingDetailPage() {
 
           <div className="space-y-3 text-xs">
             <div>
-              <span className="text-slate-400 font-medium block">Full Name:</span>
+              <span className="text-slate-400 font-medium block">
+                Full Name:
+              </span>
               <span className="font-bold text-sm text-slate-900 block mt-0.5">
                 {booking.customerName}
               </span>
@@ -410,15 +447,23 @@ export default function EventBookingDetailPage() {
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-slate-500 font-medium">Reservation Status:</span>
-              <span className={`inline-flex px-2 py-0.5 rounded-md font-semibold border ${bookingBadge.bgClass}`}>
+              <span className="text-slate-500 font-medium">
+                Reservation Status:
+              </span>
+              <span
+                className={`inline-flex px-2 py-0.5 rounded-md font-semibold border ${bookingBadge.bgClass}`}
+              >
                 {bookingBadge.label}
               </span>
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-slate-500 font-medium">Payment Status:</span>
-              <span className={`inline-flex px-2 py-0.5 rounded-md font-semibold border ${paymentBadge.bgClass}`}>
+              <span className="text-slate-500 font-medium">
+                Payment Status:
+              </span>
+              <span
+                className={`inline-flex px-2 py-0.5 rounded-md font-semibold border ${paymentBadge.bgClass}`}
+              >
                 {paymentBadge.label}
               </span>
             </div>
@@ -426,7 +471,9 @@ export default function EventBookingDetailPage() {
             <div className="flex items-center justify-between">
               <span className="text-slate-500 font-medium">Total Paid:</span>
               <span className="font-display font-extrabold text-slate-900 text-sm">
-                {booking.paymentStatus === "free" ? "Complimentary" : formatCurrency(booking.price)}
+                {booking.paymentStatus === "free"
+                  ? "Complimentary"
+                  : formatCurrency(booking.price)}
               </span>
             </div>
 

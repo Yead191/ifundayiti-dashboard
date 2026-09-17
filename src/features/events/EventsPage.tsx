@@ -73,13 +73,16 @@ export default function EventsPage() {
 
   // Compute upcoming gatherings count
   const upcomingCount = useMemo(() => {
+    if (statsRes?.data?.upcomingEvents !== undefined) {
+      return statsRes.data.upcomingEvents;
+    }
     const now = new Date();
     return events.filter(
       (ev) =>
         (ev.status === "published" || !ev.status) &&
         new Date(ev.startDate) > now,
     ).length;
-  }, [events]);
+  }, [events, statsRes?.data?.upcomingEvents]);
 
   const handleRefresh = () => {
     refetchStats();
@@ -124,7 +127,8 @@ export default function EventsPage() {
             Events & Gatherings
           </h1>
           <p className="mt-1 text-sm text-mist-600">
-            Publish, manage and monitor galas, fundraisers, pitch nights, and hybrid community workshops.
+            Publish, manage and monitor galas, fundraisers, pitch nights, and
+            hybrid community workshops.
           </p>
         </div>
       </div>
@@ -177,7 +181,10 @@ export default function EventsPage() {
           icon={<CalendarOutlined className="text-5xl text-mist-400" />}
           title="No events found"
           description={
-            searchInput || category !== "all" || status !== "all" || formatType !== "all"
+            searchInput ||
+            category !== "all" ||
+            status !== "all" ||
+            formatType !== "all"
               ? "No events match your current filter criteria. Try clearing search or adjusting filters."
               : "No events have been created yet. Click '+ Create New Event' to publish your first gathering."
           }
