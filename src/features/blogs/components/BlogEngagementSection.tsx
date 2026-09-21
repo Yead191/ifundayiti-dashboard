@@ -366,7 +366,7 @@ export function BlogEngagementSection({
                 </p>
               </div>
             ) : (
-              <div className="space-y-2.5 max-h-[520px] overflow-y-auto pr-1">
+              <div className="space-y-2.5 max-h-130 overflow-y-auto pr-1">
                 {comments.map((comment) => {
                   const author = comment.author || ({} as any);
                   const authorName = author.name || "Community Member";
@@ -441,7 +441,7 @@ export function BlogEngagementSection({
                       </div>
 
                       {/* Comment Body */}
-                      <div className="text-xs text-gray-700 leading-relaxed pl-9 whitespace-pre-line break-words">
+                      <div className="text-xs text-gray-700 leading-relaxed pl-9 whitespace-pre-line wrap-break-word">
                         {comment.text}
                       </div>
                     </div>
@@ -486,7 +486,7 @@ export function BlogEngagementSection({
               </p>
             </div>
           ) : (
-            <div className="space-y-2 max-h-[520px] overflow-y-auto pr-1">
+            <div className="space-y-2 wrap-break-word overflow-y-auto pr-1">
               {likesList.map((item, idx) => {
                 const user = item.user || ({} as any);
                 const userName = user.name || "Community Supporter";
