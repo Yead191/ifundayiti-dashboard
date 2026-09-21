@@ -19,6 +19,8 @@ import {
   GlobalOutlined,
   ShareAltOutlined,
   TagOutlined,
+  HeartFilled,
+  MessageOutlined,
 } from "@ant-design/icons";
 import { toast } from "sonner";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -40,6 +42,7 @@ import {
   getAuthorInfo,
 } from "./blogHelpers";
 import { DeleteBlogModal } from "./components/DeleteBlogModal";
+import { BlogEngagementSection } from "./components/BlogEngagementSection";
 
 export default function BlogDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -243,20 +246,20 @@ export default function BlogDetailPage() {
           <GlassCard className="p-6 sm:p-8 space-y-6">
             {/* Badges Row */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-800">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
                 <FolderFilled className="text-emerald-700 text-xs" />
                 <span>{categoryName}</span>
               </span>
 
               <Tag
                 bordered={false}
-                className={`rounded-full px-3 py-1 text-xs font-semibold m-0 ${statusCfg.bg} ${statusCfg.text} border ${statusCfg.border}`}
+                className={`rounded-full px-3 py-1 text-xs font-semibold m-0 ${statusCfg.bg} ${statusCfg.text} border-0`}
               >
                 {statusCfg.label}
               </Tag>
 
               {blog.isFeatured && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-800 border border-amber-200">
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-800">
                   <StarFilled className="text-amber-500 text-xs" />
                   <span>Spotlight</span>
                 </span>
@@ -273,7 +276,7 @@ export default function BlogDetailPage() {
             </h1>
 
             {/* Author & Timestamp Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 py-3 border-y border-gray-150 text-xs text-gray-500">
+            <div className="flex flex-wrap items-center justify-between gap-4 py-2 text-xs text-gray-500">
               <div className="flex items-center gap-3">
                 {author.image ? (
                   <img
@@ -338,18 +341,18 @@ export default function BlogDetailPage() {
 
             {/* Tags Section */}
             {blog.tags && blog.tags.length > 0 && (
-              <div className="pt-6 border-t border-gray-150">
-                <div className="flex items-center gap-2 mb-2.5">
+              <div className="pt-5">
+                <div className="flex items-center gap-1.5 mb-2.5">
                   <TagOutlined className="text-emerald-700 text-xs" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
                     Article Tags
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-1.5">
                   {blog.tags.map((tag, idx) => (
                     <span
                       key={idx}
-                      className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                      className="rounded-lg bg-gray-50 hover:bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 transition-colors"
                     >
                       #{tag}
                     </span>
@@ -360,46 +363,46 @@ export default function BlogDetailPage() {
           </GlassCard>
         </div>
 
-        {/* Right Column: Metadata & Inspector Sidebar */}
+        {/* Right Column: Sidebar (Publishing Details, Engagement, Editorial Actions) */}
         <div className="lg:col-span-4 space-y-6">
           {/* Publication Specifications */}
           <GlassCard className="p-5 sm:p-6 space-y-4">
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-gray-400">
+            <h3 className="font-display text-xs font-bold uppercase tracking-wider text-gray-400">
               Publishing Details
             </h3>
 
-            <div className="space-y-3 text-xs">
-              <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+            <div className="space-y-2.5 text-xs">
+              <div className="flex items-center justify-between py-1">
                 <span className="text-gray-400">Status</span>
                 <Tag
                   bordered={false}
-                  className={`rounded-md px-2 py-0.5 text-xs font-semibold m-0 ${statusCfg.bg} ${statusCfg.text} border ${statusCfg.border}`}
+                  className={`rounded-md px-2 py-0.5 text-xs font-semibold m-0 ${statusCfg.bg} ${statusCfg.text} border-0`}
                 >
                   {statusCfg.label}
                 </Tag>
               </div>
 
-              <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+              <div className="flex items-center justify-between py-1">
                 <span className="text-gray-400">Category</span>
                 <span className="font-semibold text-gray-800">
                   {categoryName}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+              <div className="flex items-center justify-between py-1">
                 <span className="text-gray-400">Spotlight</span>
                 <span className="font-semibold text-gray-800">
-                  {blog.isFeatured ? "Featured ★" : "No"}
+                  {blog.isFeatured ? "Featured ★" : "Standard"}
                 </span>
               </div>
 
-              <div className="space-y-1.5 py-1.5 border-b border-gray-100">
+              <div className="space-y-1.5 py-1">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400">Article Slug</span>
                   <button
                     type="button"
                     onClick={handleCopySlug}
-                    className="flex items-center gap-1 text-[11px] text-emerald-700 hover:underline cursor-pointer"
+                    className="flex items-center gap-1 text-[11px] font-medium text-emerald-700 hover:text-emerald-900 cursor-pointer"
                   >
                     {copied ? (
                       <>
@@ -412,26 +415,26 @@ export default function BlogDetailPage() {
                     )}
                   </button>
                 </div>
-                <p className="font-mono text-[11px] bg-gray-50 border border-gray-150 p-2 rounded-lg text-gray-600 break-all select-all">
+                <p className="font-mono text-[11px] bg-gray-50/80 p-2 rounded-xl text-gray-600 break-all select-all">
                   /{blog.slug}
                 </p>
               </div>
 
-              <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
-                <span className="text-gray-400">Published Date</span>
+              <div className="flex items-center justify-between py-1">
+                <span className="text-gray-400">Published</span>
                 <span className="font-medium text-gray-700">
                   {formatBlogDateTime(blog.publishedAt)}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
-                <span className="text-gray-400">Created Date</span>
+              <div className="flex items-center justify-between py-1">
+                <span className="text-gray-400">Created</span>
                 <span className="font-medium text-gray-700">
                   {formatBlogDateTime(blog.createdAt)}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-1.5">
+              <div className="flex items-center justify-between py-1">
                 <span className="text-gray-400">Last Updated</span>
                 <span className="font-medium text-gray-700">
                   {formatBlogDateTime(blog.updatedAt)}
@@ -440,18 +443,37 @@ export default function BlogDetailPage() {
             </div>
           </GlassCard>
 
+          {/* Community Engagement & Discussion (Moved under Publishing Details) */}
+          <GlassCard className="p-5 sm:p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-sm font-bold text-gray-900 flex items-center gap-2">
+                <MessageOutlined className="text-emerald-700 text-sm" />
+                <span>Discussion & Engagement</span>
+              </h3>
+            </div>
+
+            <BlogEngagementSection
+              blogId={blog._id}
+              blogSlug={blog.slug}
+              totalLikes={blog.totalLikes}
+              totalComments={blog.totalComments}
+              isLikedByMe={blog.isLikedByMe}
+              embedded
+            />
+          </GlassCard>
+
           {/* Quick Actions Panel */}
           <GlassCard className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-gray-400">
+            <h3 className="font-display text-xs font-bold uppercase tracking-wider text-gray-400">
               Editorial Actions
             </h3>
 
-            <div className="space-y-2.5 pt-1">
+            <div className="space-y-2 pt-1">
               <Button
                 type="primary"
                 icon={<EditOutlined />}
                 onClick={() => navigate(`/blogs/edit/${blog._id}`)}
-                className="w-full h-10 rounded-xl bg-[#0B3D2E]! hover:bg-[#082e23]! text-white! font-semibold border-0 shadow-sm"
+                className="w-full h-10 rounded-xl bg-[#0B3D2E]! hover:bg-[#082e23]! text-white! font-semibold border-0 shadow-xs"
               >
                 Edit Story in Editor
               </Button>
@@ -459,7 +481,7 @@ export default function BlogDetailPage() {
               <Button
                 icon={<ShareAltOutlined />}
                 onClick={handleCopySlug}
-                className="w-full h-10 rounded-xl font-medium border-gray-200"
+                className="w-full h-10 rounded-xl font-medium border-0 bg-gray-50 hover:bg-gray-100 text-gray-700"
               >
                 Copy Story Slug URL
               </Button>
@@ -468,7 +490,7 @@ export default function BlogDetailPage() {
                 danger
                 icon={<DeleteOutlined />}
                 onClick={() => setDeleteModalOpen(true)}
-                className="w-full h-10 rounded-xl font-medium border-rose-200 bg-rose-50/60 text-rose-600 hover:bg-rose-100"
+                className="w-full h-10 rounded-xl font-medium border-0 bg-rose-50/70 text-rose-600 hover:bg-rose-100"
               >
                 Delete Article Permanently
               </Button>

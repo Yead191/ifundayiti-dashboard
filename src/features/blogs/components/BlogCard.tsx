@@ -14,6 +14,8 @@ import {
   CalendarOutlined,
   FileTextOutlined,
   UserOutlined,
+  HeartFilled,
+  MessageFilled,
 } from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { toFileUrl } from "@/config";
@@ -36,6 +38,7 @@ interface BlogCardProps {
     id: string,
     status: (typeof BLOG_STATUS)[keyof typeof BLOG_STATUS],
   ) => void;
+  onOpenEngagement?: (blog: IBlog, initialTab?: "comments" | "likes") => void;
 }
 
 export function BlogCard({
@@ -43,6 +46,7 @@ export function BlogCard({
   onDelete,
   onToggleFeatured,
   onChangeStatus,
+  onOpenEngagement,
 }: BlogCardProps) {
   const navigate = useNavigate();
   const coverUrl = blog.image ? toFileUrl(blog.image) : null;
@@ -109,6 +113,18 @@ export function BlogCard({
       label: "Edit Article",
       icon: <EditOutlined />,
       onClick: () => navigate(`/blogs/edit/${blog._id}`),
+    },
+    {
+      key: "comments",
+      label: `Manage Comments (${blog.totalComments ?? 0})`,
+      icon: <MessageFilled className="text-emerald-600" />,
+      onClick: () => onOpenEngagement?.(blog, "comments"),
+    },
+    {
+      key: "likes",
+      label: `View Likes (${blog.totalLikes ?? 0})`,
+      icon: <HeartFilled className="text-rose-500" />,
+      onClick: () => onOpenEngagement?.(blog, "likes"),
     },
     ...(onToggleFeatured
       ? [
@@ -269,14 +285,43 @@ export function BlogCard({
               {author.name.charAt(0).toUpperCase()}
             </div>
           )}
-          <span className="font-medium text-gray-700 truncate max-w-30">
+          <span className="font-medium text-gray-700 truncate max-w-24 sm:max-w-28">
             {author.name}
           </span>
         </div>
 
-        <div className="flex items-center gap-1 text-[11px] text-gray-400 shrink-0">
-          <CalendarOutlined className="text-[10px]" />
-          <span>{formatBlogDate(blog.publishedAt || blog.createdAt)}</span>
+        {/* Engagement Pills & Date */}
+        <div
+          className="flex items-center gap-2 shrink-0"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center gap-1">
+            <Tooltip title="View & manage comments">
+              <button
+                type="button"
+                onClick={() => onOpenEngagement?.(blog, "comments")}
+                className="inline-flex items-center gap-1 rounded-md bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-800 transition-colors cursor-pointer"
+              >
+                <MessageFilled className="text-[10px] text-emerald-600" />
+                <span>{blog.totalComments ?? 0}</span>
+              </button>
+            </Tooltip>
+
+            <Tooltip title="View likes">
+              <button
+                type="button"
+                onClick={() => onOpenEngagement?.(blog, "likes")}
+                className="inline-flex items-center gap-1 rounded-md bg-rose-50 hover:bg-rose-100 border border-rose-200/60 px-1.5 py-0.5 text-[11px] font-semibold text-rose-700 transition-colors cursor-pointer"
+              >
+                <HeartFilled className="text-[10px] text-rose-500" />
+                <span>{blog.totalLikes ?? 0}</span>
+              </button>
+            </Tooltip>
+          </div>
+
+          <span className="text-[11px] text-gray-400 hidden sm:inline">
+            {formatBlogDate(blog.publishedAt || blog.createdAt)}
+          </span>
         </div>
       </div>
     </GlassCard>

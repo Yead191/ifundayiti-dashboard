@@ -39,6 +39,9 @@ export interface IBlog {
   tags?: string[];
   status: BLOG_STATUS;
   isFeatured: boolean;
+  totalLikes?: number;
+  totalComments?: number;
+  isLikedByMe?: boolean;
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -107,3 +110,79 @@ export interface SingleBlogCategoryResponse {
   message?: string;
   data: IBlogCategory;
 }
+
+export interface IBlogCommentAuthor {
+  _id: string;
+  name: string;
+  email?: string;
+  image?: string;
+  role?: string;
+}
+
+export interface IBlogComment {
+  _id: string;
+  blog: string;
+  text: string;
+  author: IBlogCommentAuthor;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface IBlogLikeUser {
+  _id: string;
+  name: string;
+  email?: string;
+  image?: string;
+  role?: string;
+}
+
+export interface IBlogLike {
+  _id: string;
+  blog: string;
+  user: IBlogLikeUser;
+  createdAt: string;
+}
+
+export interface BlogCommentsResponse {
+  statusCode: number;
+  success: boolean;
+  message?: string;
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPage: number;
+  };
+  data: IBlogComment[];
+}
+
+export interface BlogLikesResponse {
+  statusCode: number;
+  success: boolean;
+  message?: string;
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPage: number;
+  };
+  data: (IBlogLikeUser | IBlogLike)[];
+}
+
+export interface ToggleLikeResponse {
+  statusCode: number;
+  success: boolean;
+  message?: string;
+  data: {
+    liked: boolean;
+    totalLikes: number;
+  };
+}
+
+export interface SingleBlogCommentResponse {
+  statusCode: number;
+  success: boolean;
+  message?: string;
+  data: IBlogComment;
+}
+

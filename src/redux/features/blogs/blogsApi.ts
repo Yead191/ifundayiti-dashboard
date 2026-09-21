@@ -8,6 +8,10 @@ import type {
   BlogCategoryListResponse,
   SingleBlogCategoryResponse,
   BLOG_STATUS,
+  BlogCommentsResponse,
+  BlogLikesResponse,
+  ToggleLikeResponse,
+  SingleBlogCommentResponse,
 } from "./blogs.types";
 
 export const blogsApi = baseApi.injectEndpoints({
@@ -231,6 +235,102 @@ export const blogsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "BlogCategories", id: "LIST" }],
     }),
+
+    // Blog Comments
+    getBlogComments: builder.query<
+      BlogCommentsResponse,
+      { blogIdOrSlug: string; page?: number; limit?: number }
+    >({
+      query: ({ blogIdOrSlug, page, limit }) => {
+        const queryParams = new URLSearchParams();
+        if (page) queryParams.append("page", String(page));
+        if (limit) queryParams.append("limit", String(limit));
+        const qs = queryParams.toString();
+        return {
+          url: `/comment/${blogIdOrSlug}${qs ? `?${qs}` : ""}`,
+          method: "GET",
+        };
+      },
+      providesTags: (_res, _err, { blogIdOrSlug }) => [
+        { type: "BlogComments" as const, id: blogIdOrSlug },
+        { type: "BlogComments" as const, id: "LIST" },
+      ],
+    }),
+
+    createBlogComment: builder.mutation<
+      SingleBlogCommentResponse,
+      { blogIdOrSlug: string; text: string }
+    >({
+      query: ({ blogIdOrSlug, text }) => ({
+        url: `/comment/${blogIdOrSlug}`,
+        method: "POST",
+        body: { text },
+      }),
+      invalidatesTags: (_res, _err, { blogIdOrSlug }) => [
+        { type: "BlogComments" as const, id: blogIdOrSlug },
+        { type: "BlogComments" as const, id: "LIST" },
+        { type: "Blogs" as const, id: blogIdOrSlug },
+        { type: "Blogs" as const, id: "LIST" },
+      ],
+    }),
+
+    deleteBlogComment: builder.mutation<
+      { success: boolean; message: string },
+      { commentId: string; blogIdOrSlug?: string }
+    >({
+      query: ({ commentId }) => ({
+        url: `/comment/${commentId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (_res, _err, { blogIdOrSlug }) => [
+        { type: "BlogComments" as const, id: "LIST" },
+        ...(blogIdOrSlug
+          ? [
+              { type: "BlogComments" as const, id: blogIdOrSlug },
+              { type: "Blogs" as const, id: blogIdOrSlug },
+            ]
+          : []),
+        { type: "Blogs" as const, id: "LIST" },
+      ],
+    }),
+
+    // Blog Likes
+    getBlogLikes: builder.query<
+      BlogLikesResponse,
+      { blogIdOrSlug: string; page?: number; limit?: number }
+    >({
+      query: ({ blogIdOrSlug, page, limit }) => {
+        const queryParams = new URLSearchParams();
+        if (page) queryParams.append("page", String(page));
+        if (limit) queryParams.append("limit", String(limit));
+        const qs = queryParams.toString();
+        return {
+          url: `/like/${blogIdOrSlug}${qs ? `?${qs}` : ""}`,
+          method: "GET",
+        };
+      },
+      providesTags: (_res, _err, { blogIdOrSlug }) => [
+        { type: "BlogLikes" as const, id: blogIdOrSlug },
+        { type: "BlogLikes" as const, id: "LIST" },
+      ],
+    }),
+
+    toggleBlogLike: builder.mutation<
+      ToggleLikeResponse,
+      { blogIdOrSlug: string }
+    >({
+      query: ({ blogIdOrSlug }) => ({
+        url: `/like/${blogIdOrSlug}`,
+        method: "POST",
+        body: {},
+      }),
+      invalidatesTags: (_res, _err, { blogIdOrSlug }) => [
+        { type: "BlogLikes" as const, id: blogIdOrSlug },
+        { type: "BlogLikes" as const, id: "LIST" },
+        { type: "Blogs" as const, id: blogIdOrSlug },
+        { type: "Blogs" as const, id: "LIST" },
+      ],
+    }),
   }),
   overrideExisting: true,
 });
@@ -249,4 +349,9 @@ export const {
   useCreateBlogCategoryMutation,
   useUpdateBlogCategoryMutation,
   useDeleteBlogCategoryMutation,
+  useGetBlogCommentsQuery,
+  useCreateBlogCommentMutation,
+  useDeleteBlogCommentMutation,
+  useGetBlogLikesQuery,
+  useToggleBlogLikeMutation,
 } = blogsApi;

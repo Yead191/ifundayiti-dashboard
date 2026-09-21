@@ -12,6 +12,8 @@ import {
   ClockCircleFilled,
   InboxOutlined,
   PictureOutlined,
+  HeartFilled,
+  MessageFilled,
 } from "@ant-design/icons";
 import { toFileUrl } from "@/config";
 import type { IBlog } from "@/redux/features/blogs/blogs.types";
@@ -29,6 +31,7 @@ interface BlogTableProps {
   onDelete: (blog: IBlog) => void;
   onToggleFeatured?: (id: string) => void;
   onChangeStatus?: (id: string, status: (typeof BLOG_STATUS)[keyof typeof BLOG_STATUS]) => void;
+  onOpenEngagement?: (blog: IBlog, initialTab?: "comments" | "likes") => void;
 }
 
 export function BlogTable({
@@ -37,6 +40,7 @@ export function BlogTable({
   onDelete,
   onToggleFeatured,
   onChangeStatus,
+  onOpenEngagement,
 }: BlogTableProps) {
   const navigate = useNavigate();
 
@@ -88,6 +92,18 @@ export function BlogTable({
       label: "Edit Article",
       icon: <EditOutlined />,
       onClick: () => navigate(`/blogs/edit/${blog._id}`),
+    },
+    {
+      key: "comments",
+      label: `Manage Comments (${blog.totalComments ?? 0})`,
+      icon: <MessageFilled className="text-emerald-600" />,
+      onClick: () => onOpenEngagement?.(blog, "comments"),
+    },
+    {
+      key: "likes",
+      label: `View Likes (${blog.totalLikes ?? 0})`,
+      icon: <HeartFilled className="text-rose-500" />,
+      onClick: () => onOpenEngagement?.(blog, "likes"),
     },
     ...(onToggleFeatured
       ? [
@@ -169,7 +185,7 @@ export function BlogTable({
     {
       title: "Category",
       key: "category",
-      width: 160,
+      width: 150,
       render: (_, blog) => {
         const categoryName = getCategoryName(blog.category);
         return (
@@ -178,6 +194,42 @@ export function BlogTable({
           </span>
         );
       },
+    },
+    {
+      title: "Engagement",
+      key: "engagement",
+      width: 145,
+      render: (_, blog) => (
+        <div className="flex items-center gap-1.5">
+          <Tooltip title="View & manage comments">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenEngagement?.(blog, "comments");
+              }}
+              className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/70 px-2 py-0.5 text-xs font-semibold text-emerald-800 transition-colors cursor-pointer"
+            >
+              <MessageFilled className="text-[11px] text-emerald-600" />
+              <span>{blog.totalComments ?? 0}</span>
+            </button>
+          </Tooltip>
+
+          <Tooltip title="View article likes">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenEngagement?.(blog, "likes");
+              }}
+              className="inline-flex items-center gap-1 rounded-lg bg-rose-50 hover:bg-rose-100 border border-rose-200/70 px-2 py-0.5 text-xs font-semibold text-rose-700 transition-colors cursor-pointer"
+            >
+              <HeartFilled className="text-[11px] text-rose-500" />
+              <span>{blog.totalLikes ?? 0}</span>
+            </button>
+          </Tooltip>
+        </div>
+      ),
     },
     {
       title: "Status",

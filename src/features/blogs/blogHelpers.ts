@@ -87,3 +87,19 @@ export function stripHtml(html: string): string {
     .replace(/\s+/g, " ")
     .trim();
 }
+
+export function formatRelativeTime(dateStr?: string | null): string {
+  if (!dateStr) return "";
+  const now = dayjs();
+  const date = dayjs(dateStr);
+  const diffSec = now.diff(date, "second");
+  if (diffSec < 60) return "Just now";
+  const diffMin = now.diff(date, "minute");
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHours = now.diff(date, "hour");
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = now.diff(date, "day");
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.format("MMM D, YYYY");
+}
+

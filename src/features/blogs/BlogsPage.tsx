@@ -37,6 +37,7 @@ import type { IBlog, BLOG_STATUS } from "@/redux/features/blogs/blogs.types";
 import { BlogCard } from "./components/BlogCard";
 import { BlogTable } from "./components/BlogTable";
 import { DeleteBlogModal } from "./components/DeleteBlogModal";
+import { BlogEngagementDrawer } from "./components/BlogEngagementDrawer";
 
 export default function BlogsPage() {
   const navigate = useNavigate();
@@ -52,6 +53,12 @@ export default function BlogsPage() {
 
   // Deletion modal state
   const [deletingBlog, setDeletingBlog] = useState<IBlog | null>(null);
+
+  // Engagement drawer state (comments & likes)
+  const [activeEngagement, setActiveEngagement] = useState<{
+    blog: IBlog;
+    initialTab: "comments" | "likes";
+  } | null>(null);
 
   // Queries & Mutations
   const { data: statsRes, isLoading: isLoadingStats } = useGetBlogStatsQuery();
@@ -383,6 +390,9 @@ export default function BlogsPage() {
               onDelete={setDeletingBlog}
               onToggleFeatured={handleToggleFeatured}
               onChangeStatus={handleChangeStatus}
+              onOpenEngagement={(b, tab) =>
+                setActiveEngagement({ blog: b, initialTab: tab || "comments" })
+              }
             />
           ))}
         </div>
@@ -393,6 +403,9 @@ export default function BlogsPage() {
           onDelete={setDeletingBlog}
           onToggleFeatured={handleToggleFeatured}
           onChangeStatus={handleChangeStatus}
+          onOpenEngagement={(b, tab) =>
+            setActiveEngagement({ blog: b, initialTab: tab || "comments" })
+          }
         />
       )}
 
@@ -412,6 +425,14 @@ export default function BlogsPage() {
           />
         </div>
       )}
+
+      {/* Blog Engagement Drawer (Likes & Comments management) */}
+      <BlogEngagementDrawer
+        open={Boolean(activeEngagement)}
+        blog={activeEngagement?.blog || null}
+        initialTab={activeEngagement?.initialTab || "comments"}
+        onClose={() => setActiveEngagement(null)}
+      />
 
       {/* Delete Confirmation Modal */}
       <DeleteBlogModal
