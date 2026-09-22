@@ -96,6 +96,15 @@ const NotificationsPage = lazy(
 );
 const UsersPage = lazy(() => import("@/features/users/UsersPage"));
 const UserDetailPage = lazy(() => import("@/features/users/UserDetailPage"));
+const CommunityForumPage = lazy(
+  () => import("@/features/community/CommunityForumPage"),
+);
+const CommunityPostEditorPage = lazy(
+  () => import("@/features/community/CommunityPostEditorPage"),
+);
+const CommunityPostDetailPage = lazy(
+  () => import("@/features/community/CommunityPostDetailPage"),
+);
 
 export default function App() {
   return (
@@ -218,6 +227,19 @@ export default function App() {
             <Route path="blog/create" element={<Navigate to="/blogs/create" replace />} />
             <Route path="blog/categories" element={<Navigate to="/blogs/categories" replace />} />
             <Route path="blog/:id" element={<BlogDetailPage />} />
+
+            {/* Community Forum & Announcements Module */}
+            <Route path="community" element={<CommunityForumPage />} />
+            <Route path="community/create" element={<CommunityPostEditorPage />} />
+            <Route path="community/edit/:id" element={<CommunityPostEditorPage />} />
+            <Route path="community/:id" element={<CommunityPostDetailPage />} />
+
+            {/* Backward compatibility and aliases */}
+            <Route path="admin/community" element={<Navigate to="/community" replace />} />
+            <Route path="admin/community/create" element={<Navigate to="/community/create" replace />} />
+            <Route path="admin/community/edit/:id" element={<CommunityPostEditorPage />} />
+            <Route path="admin/community/:id" element={<CommunityPostDetailPage />} />
+            <Route path="forum" element={<Navigate to="/community" replace />} />
 
             <Route path="disclaimer/:type" element={<DisclaimerEditorPage />} />
           </Route>

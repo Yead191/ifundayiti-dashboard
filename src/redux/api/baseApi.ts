@@ -58,6 +58,9 @@ export const baseApi = createApi({
     "BlogStats",
     "BlogComments",
     "BlogLikes",
+    "Community",
+    "CommunityComments",
+    "CommunityLikes",
   ],
   endpoints: () => ({}),
 });

@@ -34,6 +34,12 @@ const PAGE_META: { match: (path: string) => boolean; title: string; subtitle?: s
   { match: (p) => p.startsWith("/blogs/") && p !== "/blogs", title: "Article Details", subtitle: "Preview story layout, reading metrics, and editorial settings" },
   { match: (p) => p === "/blogs" || p === "/blog", title: "Editorial & Blogs", subtitle: "Publish and moderate field stories, dispatches, and updates" },
 
+  // Community Forum
+  { match: (p) => p === "/community/create" || p === "/admin/community/create", title: "New Announcement", subtitle: "Draft and broadcast an official announcement to all verified members" },
+  { match: (p) => p.startsWith("/community/edit/") || p.startsWith("/admin/community/edit/"), title: "Edit Announcement", subtitle: "Update announcement content, media attachments, and publishing status" },
+  { match: (p) => (p.startsWith("/community/") && p !== "/community") || (p.startsWith("/admin/community/") && p !== "/admin/community"), title: "Announcement Discussion", subtitle: "Inspect full discussion, member reactions, and moderate comments & replies" },
+  { match: (p) => p === "/community" || p === "/admin/community", title: "Community Forum", subtitle: "Broadcast official announcements and moderate member discussions" },
+
   // Shop & Merchandise
   { match: (p) => p.startsWith("/shop/orders/"), title: "Order details", subtitle: "Inspect items, customer delivery destination, and fulfillment" },
   { match: (p) => p === "/shop/orders" || p === "/store/orders", title: "Store Orders", subtitle: "Monitor customer purchases, payment receipts, and pre-order batches" },

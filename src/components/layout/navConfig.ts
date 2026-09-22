@@ -18,6 +18,7 @@ import {
   CreditCardOutlined,
   UserOutlined,
   QrcodeOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -130,6 +131,26 @@ export const NAV_ITEMS: NavItem[] = [
         label: "Categories",
         path: "/blogs/categories",
         icon: TagOutlined,
+      },
+    ],
+  },
+  {
+    key: "community",
+    label: "Community Forum",
+    path: "/community",
+    icon: MessageOutlined,
+    children: [
+      {
+        key: "community-all",
+        label: "Discussions & Feed",
+        path: "/community",
+        icon: MessageOutlined,
+      },
+      {
+        key: "community-create",
+        label: "New Announcement",
+        path: "/community/create",
+        icon: EditOutlined,
       },
     ],
   },
