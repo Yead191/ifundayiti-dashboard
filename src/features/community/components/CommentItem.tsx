@@ -33,6 +33,8 @@ interface CommentItemProps {
   currentUserId?: string;
   isAdmin?: boolean;
   isChild?: boolean;
+  parentCommentId?: string;
+  onDeleted?: () => void;
 }
 
 export function CommentItem({
@@ -42,6 +44,8 @@ export function CommentItem({
   currentUserId,
   isAdmin = true,
   isChild = false,
+  parentCommentId,
+  onDeleted,
 }: CommentItemProps) {
   // Optimistic like state
   const [isLiked, setIsLiked] = useState<boolean>(Boolean(comment.isLikedByMe));
@@ -73,6 +77,7 @@ export function CommentItem({
     data: repliesRes,
     isLoading: isLoadingReplies,
     isFetching: isFetchingReplies,
+    refetch: refetchReplies,
   } = useGetCommunityCommentRepliesQuery(
     { commentId: comment._id },
     { skip: isChild || !showReplies },
@@ -113,6 +118,8 @@ export function CommentItem({
       setReplyText("");
       setShowReplyInput(false);
       setShowReplies(true);
+      refetchReplies();
+      onDeleted?.();
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to post reply");
     }
@@ -136,11 +143,19 @@ export function CommentItem({
 
   const handleDelete = async () => {
     try {
+      const parentId =
+        parentCommentId ||
+        (typeof comment.parentComment === "string"
+          ? comment.parentComment
+          : (comment.parentComment as any)?._id);
+
       await deleteComment({
         commentId: comment._id,
         postId,
+        parentCommentId: parentId,
       }).unwrap();
       toast.success("Comment removed");
+      onDeleted?.();
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete comment");
     }
@@ -152,8 +167,6 @@ export function CommentItem({
   const canDelete = isAdmin || isAuthor;
   const userRole = (comment.author?.role || "").toUpperCase();
   const isAdminUser = userRole === "SUPER_ADMIN" || userRole === "ADMIN";
-
-  console.log(comment);
 
   return (
     <div
@@ -403,6 +416,11 @@ export function CommentItem({
                     currentUserId={currentUserId}
                     isAdmin={isAdmin}
                     isChild={true}
+                    parentCommentId={comment._id}
+                    onDeleted={() => {
+                      refetchReplies();
+                      onDeleted?.();
+                    }}
                   />
                 ))
               )}

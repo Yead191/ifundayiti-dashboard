@@ -19,18 +19,22 @@ export const communityApi = baseApi.injectEndpoints({
     >({
       query: (params) => {
         const queryParams: Record<string, any> = {
-          page: params?.page ?? 1,
-          limit: params?.limit ?? 10,
+          page: 1,
+          limit: 10,
         };
 
-        if (params?.searchTerm) queryParams.searchTerm = params.searchTerm;
-        if (params?.status && params.status !== "all")
-          queryParams.status = params.status;
-        if (typeof params?.isPinned === "boolean")
-          queryParams.isPinned = params.isPinned;
-        if (typeof params?.isLocked === "boolean")
-          queryParams.isLocked = params.isLocked;
-        if (params?.sortBy) queryParams.sortBy = params.sortBy;
+        if (params) {
+          if (params.page !== undefined) queryParams.page = params.page;
+          if (params.limit !== undefined) queryParams.limit = params.limit;
+          if (params.searchTerm) queryParams.searchTerm = params.searchTerm;
+          if (params.status && params.status !== "all")
+            queryParams.status = params.status;
+          if (typeof params.isPinned === "boolean")
+            queryParams.isPinned = params.isPinned;
+          if (typeof params.isLocked === "boolean")
+            queryParams.isLocked = params.isLocked;
+          if (params.sortBy) queryParams.sortBy = params.sortBy;
+        }
 
         return {
           url: "/community",
@@ -133,9 +137,20 @@ export const communityApi = baseApi.injectEndpoints({
         method: "GET",
         params: { page, limit },
       }),
-      providesTags: (_result, _error, { postId }) => [
-        { type: "CommunityComments", id: postId },
-      ],
+      providesTags: (result, _error, { postId }) =>
+        result?.data
+          ? [
+              ...result.data.map((comment) => ({
+                type: "CommunityComments" as const,
+                id: comment._id,
+              })),
+              { type: "CommunityComments" as const, id: postId },
+              { type: "CommunityComments" as const, id: "LIST" },
+            ]
+          : [
+              { type: "CommunityComments" as const, id: postId },
+              { type: "CommunityComments" as const, id: "LIST" },
+            ],
     }),
 
     createCommunityComment: builder.mutation<
@@ -148,9 +163,10 @@ export const communityApi = baseApi.injectEndpoints({
         body: { text: comment, comment },
       }),
       invalidatesTags: (_result, _error, { postId }) => [
-        { type: "CommunityComments", id: postId },
-        { type: "Community", id: postId },
-        { type: "Community", id: "LIST" },
+        { type: "CommunityComments" as const },
+        { type: "CommunityComments" as const, id: postId },
+        { type: "Community" as const, id: postId },
+        { type: "Community" as const, id: "LIST" },
       ],
     }),
 
@@ -164,10 +180,11 @@ export const communityApi = baseApi.injectEndpoints({
         body: { text: comment, comment },
       }),
       invalidatesTags: (_result, _error, { postId, parentCommentId }) => [
-        { type: "CommunityComments", id: postId },
-        { type: "CommunityComments", id: parentCommentId },
-        { type: "Community", id: postId },
-        { type: "Community", id: "LIST" },
+        { type: "CommunityComments" as const },
+        { type: "CommunityComments" as const, id: postId },
+        { type: "CommunityComments" as const, id: parentCommentId },
+        { type: "Community" as const, id: postId },
+        { type: "Community" as const, id: "LIST" },
       ],
     }),
 
@@ -180,9 +197,16 @@ export const communityApi = baseApi.injectEndpoints({
         method: "GET",
         params: { page, limit },
       }),
-      providesTags: (_result, _error, { commentId }) => [
-        { type: "CommunityComments", id: commentId },
-      ],
+      providesTags: (result, _error, { commentId }) =>
+        result?.data
+          ? [
+              ...result.data.map((reply) => ({
+                type: "CommunityComments" as const,
+                id: reply._id,
+              })),
+              { type: "CommunityComments" as const, id: commentId },
+            ]
+          : [{ type: "CommunityComments" as const, id: commentId }],
     }),
 
     toggleCommunityCommentLike: builder.mutation<
@@ -208,21 +232,24 @@ export const communityApi = baseApi.injectEndpoints({
         body: { comment },
       }),
       invalidatesTags: (_result, _error, { commentId, postId }) => [
-        { type: "CommunityComments", id: commentId },
+        { type: "CommunityComments" as const },
+        { type: "CommunityComments" as const, id: commentId },
         ...(postId ? [{ type: "CommunityComments" as const, id: postId }] : []),
       ],
     }),
 
     deleteCommunityComment: builder.mutation<
       { success: boolean; message: string },
-      { commentId: string; postId?: string }
+      { commentId: string; postId?: string; parentCommentId?: string }
     >({
       query: ({ commentId }) => ({
         url: `/community-comment/${commentId}`,
         method: "DELETE",
       }),
-      invalidatesTags: (_result, _error, { commentId, postId }) => [
-        { type: "CommunityComments", id: commentId },
+      invalidatesTags: (_result, _error, { commentId, postId, parentCommentId }) => [
+        { type: "CommunityComments" as const },
+        { type: "CommunityComments" as const, id: "LIST" },
+        { type: "CommunityComments" as const, id: commentId },
         ...(postId
           ? [
               { type: "CommunityComments" as const, id: postId },
@@ -230,6 +257,10 @@ export const communityApi = baseApi.injectEndpoints({
               { type: "Community" as const, id: "LIST" },
             ]
           : []),
+        ...(parentCommentId
+          ? [{ type: "CommunityComments" as const, id: parentCommentId }]
+          : []),
+        { type: "Community" as const, id: "LIST" },
       ],
     }),
   }),

@@ -194,6 +194,7 @@ export function CommunityDiscussionSection({
                 isPostLocked={isLocked}
                 currentUserId={currentUserId}
                 isAdmin={isAdmin}
+                onDeleted={() => refetch()}
               />
             ))}
           </div>
