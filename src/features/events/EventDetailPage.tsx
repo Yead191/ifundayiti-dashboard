@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Button, Popconfirm, Progress, Spin, Avatar, Table } from "antd";
+import { Button, Popconfirm, Progress, Spin, Avatar, Table, Tooltip } from "antd";
 import type { TableProps } from "antd";
 import {
   ArrowLeftOutlined,
@@ -28,6 +28,7 @@ import {
 import {
   useGetEventBookingsQuery,
   useCheckInTicketMutation,
+  useDeleteEventBookingMutation,
 } from "@/redux/features/eventBookings/eventBookingsApi";
 import type { IEventBooking } from "@/redux/features/eventBookings/eventBookings.types";
 import {
@@ -63,6 +64,7 @@ export default function EventDetailPage() {
 
   const [deleteEvent, { isLoading: isDeleting }] = useDeleteEventMutation();
   const [checkInTicket] = useCheckInTicketMutation();
+  const [deleteBooking, { isLoading: isDeletingBooking }] = useDeleteEventBookingMutation();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const attendees = bookingsRes?.data || [];
@@ -85,6 +87,15 @@ export default function EventDetailPage() {
       }
     } catch (err: any) {
       toast.error(err?.data?.message || "Check-in failed");
+    }
+  };
+
+  const handleDeleteBooking = async (bookingId: string) => {
+    try {
+      await deleteBooking(bookingId).unwrap();
+      toast.success("Booking deleted successfully.");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to delete booking");
     }
   };
 
@@ -237,6 +248,24 @@ export default function EventDetailPage() {
               View Ticket
             </Button>
           </Link>
+          <Tooltip title="Delete booking">
+            <Popconfirm
+              title="Delete Booking"
+              description="Are you sure you want to permanently delete this attendee booking?"
+              okText="Yes, Delete"
+              cancelText="Cancel"
+              okButtonProps={{ danger: true }}
+              onConfirm={() => handleDeleteBooking(record._id)}
+            >
+              <Button
+                size="small"
+                type="text"
+                danger
+                icon={<DeleteOutlined className="text-rose-500 hover:text-rose-700" />}
+                className="h-7 w-7 rounded-md hover:bg-rose-50"
+              />
+            </Popconfirm>
+          </Tooltip>
         </div>
       ),
     },

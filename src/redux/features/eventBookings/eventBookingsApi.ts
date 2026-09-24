@@ -87,6 +87,7 @@ export const eventBookingsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [
         { type: "Bookings", id: "LIST" },
+        { type: "Events" },
         { type: "Events", id: "LIST" },
         { type: "Events", id: "STATS" },
       ],

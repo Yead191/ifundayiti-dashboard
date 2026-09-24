@@ -20,6 +20,7 @@ import {
   StopOutlined,
   CalendarOutlined,
   PrinterOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { toast } from "sonner";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -31,6 +32,7 @@ import {
   useGetEventBookingsQuery,
   useCheckInTicketMutation,
   useUpdateEventBookingStatusMutation,
+  useDeleteEventBookingMutation,
 } from "@/redux/features/eventBookings/eventBookingsApi";
 import type { IEventBooking } from "@/redux/features/eventBookings/eventBookings.types";
 import {
@@ -92,6 +94,7 @@ export default function EventBookingsPage() {
 
   const [checkInTicket] = useCheckInTicketMutation();
   const [updateBookingStatus] = useUpdateEventBookingStatusMutation();
+  const [deleteBooking, { isLoading: isDeletingBooking }] = useDeleteEventBookingMutation();
 
   const bookings = bookingsRes?.data || [];
   const pagination = bookingsRes?.pagination || {
@@ -130,6 +133,16 @@ export default function EventBookingsPage() {
       toast.success("Booking cancelled and seat capacity restored.");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to cancel booking");
+    }
+  };
+
+  const handleDeleteBooking = async (id: string) => {
+    try {
+      await deleteBooking(id).unwrap();
+      toast.success("Booking deleted successfully.");
+      refetch();
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to delete booking");
     }
   };
 
@@ -306,7 +319,7 @@ export default function EventBookingsPage() {
     {
       title: "Actions",
       key: "actions",
-      width: 160,
+      width: 180,
       align: "right",
       render: (_, record) => (
         <div className="flex items-center justify-end gap-1">
@@ -355,6 +368,26 @@ export default function EventBookingsPage() {
               </Popconfirm>
             </Tooltip>
           )}
+
+          {/* Delete Booking Permanently */}
+          <Tooltip title="Delete booking record">
+            <Popconfirm
+              title="Delete Booking"
+              description="Are you sure you want to permanently delete this booking record? This action cannot be undone."
+              okText="Yes, Delete"
+              cancelText="Cancel"
+              okButtonProps={{ danger: true }}
+              onConfirm={() => handleDeleteBooking(record._id)}
+            >
+              <Button
+                type="text"
+                size="small"
+                danger
+                icon={<DeleteOutlined className="text-rose-600" />}
+                className="h-8 w-8 rounded-lg hover:bg-rose-50"
+              />
+            </Popconfirm>
+          </Tooltip>
         </div>
       ),
     },
