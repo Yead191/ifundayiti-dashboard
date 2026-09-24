@@ -123,6 +123,8 @@ export interface EventStatsOverview {
   totalBookings?: number;
   totalTicketsReserved?: number;
   totalReservedSeats?: number;
+  paidReservedSeats?: number;
+  freeReservedSeats?: number;
   totalCapacity?: number;
   totalRevenue?: number;
   totalEstimatedRevenue?: number;
