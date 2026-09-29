@@ -38,12 +38,14 @@ export function DonationDetailModal({
   if (!donation) return null;
 
   const isDonation = donation.type === "donation";
+  const isFundRaising = donation.type === "fund_raising";
+  const isGrant = donation.type === "grant";
 
   const handleCopyTransactionId = () => {
-    if (!donation.transactionId) return;
-    navigator.clipboard.writeText(donation.transactionId);
+    if (!donation.transactionId && !donation._id) return;
+    navigator.clipboard.writeText(donation.transactionId || donation._id);
     setCopiedId(true);
-    toast.success("Transaction ID copied to clipboard");
+    toast.success("Transaction reference copied to clipboard");
     setTimeout(() => setCopiedId(false), 2000);
   };
 
@@ -55,6 +57,25 @@ export function DonationDetailModal({
   const applicantName = applicant?.personal
     ? `${applicant.personal.firstName || ""} ${applicant.personal.lastName || ""}`.trim()
     : null;
+
+  const getPaymentMethodLabel = (method?: string) => {
+    switch (method) {
+      case "cash":
+        return "💵 Cash Payment";
+      case "bank_transfer":
+        return "🏦 Bank Transfer / ACH";
+      case "direct":
+        return "💳 Direct Wire";
+      case "stripe":
+        return "⚡ Stripe Checkout / POS";
+      case "other":
+        return "📋 Cheque / Other";
+      default:
+        return donation.transactionId?.startsWith("cs_")
+          ? "⚡ Stripe Checkout"
+          : "Internal System";
+    }
+  };
 
   return (
     <Modal
@@ -83,10 +104,16 @@ export function DonationDetailModal({
               className={`rounded-full text-xs font-semibold px-2.5 py-0.5 m-0 ${
                 isDonation
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                  : "bg-amber-50 text-amber-700 border border-amber-200"
+                  : isFundRaising
+                    ? "bg-purple-50 text-purple-700 border border-purple-200"
+                    : "bg-amber-50 text-amber-700 border border-amber-200"
               }`}
             >
-              {isDonation ? "Donation Inflow" : "Grant Outflow"}
+              {isDonation
+                ? "Donation Inflow"
+                : isFundRaising
+                  ? "Fundraising Sale"
+                  : "Grant Outflow"}
             </Tag>
           </div>
         </div>
@@ -101,11 +128,19 @@ export function DonationDetailModal({
             style={{
               backgroundColor: isDonation
                 ? "rgba(11, 61, 46, 0.1)"
-                : "rgba(217, 119, 6, 0.1)",
-              color: isDonation ? "#0B3D2E" : "#d97706",
+                : isFundRaising
+                  ? "rgba(126, 34, 206, 0.1)"
+                  : "rgba(217, 119, 6, 0.1)",
+              color: isDonation
+                ? "#0B3D2E"
+                : isFundRaising
+                  ? "#7e22ce"
+                  : "#d97706",
             }}
           >
             {isDonation ? (
+              <ArrowDownOutlined className="text-xl" />
+            ) : isFundRaising ? (
               <ArrowDownOutlined className="text-xl" />
             ) : (
               <ArrowUpOutlined className="text-xl" />
@@ -113,15 +148,23 @@ export function DonationDetailModal({
           </div>
 
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-            {isDonation ? "Received Contribution Amount" : "Awarded Grant Outflow"}
+            {isDonation
+              ? "Received Contribution Amount"
+              : isFundRaising
+                ? "Fundraising / Store Sale"
+                : "Awarded Grant Outflow"}
           </p>
 
           <h2
             className={`font-display text-3xl sm:text-4xl font-extrabold tracking-tight ${
-              isDonation ? "text-[#0B3D2E]" : "text-amber-600"
+              isDonation
+                ? "text-[#0B3D2E]"
+                : isFundRaising
+                  ? "text-purple-900"
+                  : "text-amber-600"
             }`}
           >
-            {isDonation ? "+" : "-"}
+            {isGrant ? "-" : "+"}
             {formatCurrency(donation.amount)}
           </h2>
 
@@ -137,38 +180,48 @@ export function DonationDetailModal({
             <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
               Transaction Reference
             </span>
-            {donation.transactionId && (
-              <button
-                type="button"
-                onClick={handleCopyTransactionId}
-                className="flex items-center gap-1 text-xs font-medium text-emerald-800 hover:text-emerald-950 transition-colors cursor-pointer"
-              >
-                {copiedId ? (
-                  <>
-                    <CheckOutlined className="text-emerald-600" />
-                    <span>Copied</span>
-                  </>
-                ) : (
-                  <>
-                    <CopyOutlined />
-                    <span>Copy ID</span>
-                  </>
-                )}
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={handleCopyTransactionId}
+              className="flex items-center gap-1 text-xs font-medium text-emerald-800 hover:text-emerald-950 transition-colors cursor-pointer"
+            >
+              {copiedId ? (
+                <>
+                  <CheckOutlined className="text-emerald-600" />
+                  <span>Copied</span>
+                </>
+              ) : (
+                <>
+                  <CopyOutlined />
+                  <span>Copy</span>
+                </>
+              )}
+            </button>
           </div>
 
-          <div className="p-2.5 bg-gray-50 rounded-xl border border-gray-150">
+          <div className="p-2.5 bg-gray-50 rounded-xl ">
             <p className="font-mono text-xs text-gray-700 break-all select-all font-semibold">
-              {donation.transactionId || donation._id}
+              {donation.transactionId || donation.reference || donation._id}
             </p>
           </div>
+          {donation.reference && donation.transactionId && (
+            <p className="text-[11px] text-gray-400">
+              Internal Ref:{" "}
+              <span className="font-mono text-gray-600">
+                {donation.reference}
+              </span>
+            </p>
+          )}
         </div>
 
-        {/* Donor / Sender Information */}
+        {/* Donor / Contributor / Sender Information */}
         <div className="rounded-2xl border border-gray-200/80 bg-white p-4 space-y-3 shadow-2xs">
           <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
-            {isDonation ? "Donor Information" : "Disbursed By"}
+            {isDonation
+              ? "Donor Information"
+              : isFundRaising
+                ? "Contributor / Buyer"
+                : "Disbursed By"}
           </span>
 
           <div className="space-y-2.5 text-xs">
@@ -186,20 +239,46 @@ export function DonationDetailModal({
                 <MailOutlined /> Email
               </span>
               <span className="font-medium text-gray-700">
-                {donation.email || "No email recorded"}
+                {donation.email || "No email provided"}
               </span>
             </div>
 
-            <div className="flex items-center justify-between py-1">
+            <div className="flex items-center justify-between py-1 border-b border-gray-100">
               <span className="text-gray-400 flex items-center gap-1.5">
                 <BankOutlined /> Payment Channel
               </span>
               <span className="font-semibold text-gray-700">
-                {donation.transactionId ? "Stripe Checkout" : "Internal System"}
+                {getPaymentMethodLabel(donation.payment_method)}
               </span>
             </div>
+
+            {donation.recordedBy && (
+              <div className="flex items-center justify-between py-1">
+                <span className="text-gray-400 flex items-center gap-1.5">
+                  👤 Recorded By
+                </span>
+                <Tag
+                  bordered={false}
+                  className="bg-emerald-50 text-emerald-800 font-semibold m-0 text-xs"
+                >
+                  {donation.recordedBy.name || "Admin"}
+                </Tag>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Internal Notes */}
+        {donation.notes && (
+          <div className="rounded-2xl border border-gray-200/80 bg-white p-4 space-y-1.5 shadow-2xs">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+              Internal Memo / Notes
+            </span>
+            <p className="text-xs text-gray-600 bg-gray-50 p-2.5 rounded-xl leading-relaxed whitespace-pre-wrap">
+              {donation.notes}
+            </p>
+          </div>
+        )}
 
         {/* Grant Details (If Grant) */}
         {applicant && (
@@ -211,7 +290,9 @@ export function DonationDetailModal({
             <div className="space-y-2 text-xs">
               {applicant.projectTitle && (
                 <div>
-                  <span className="text-gray-400 text-[11px]">Project Title</span>
+                  <span className="text-gray-400 text-[11px]">
+                    Project Title
+                  </span>
                   <h4 className="font-bold text-gray-900 text-sm mt-0.5">
                     {applicant.projectTitle}
                   </h4>
@@ -238,7 +319,9 @@ export function DonationDetailModal({
 
               {applicant.quote && (
                 <div className="pt-2 border-t border-amber-200/50">
-                  <span className="text-gray-400 text-[11px]">Grantee Quote</span>
+                  <span className="text-gray-400 text-[11px]">
+                    Grantee Quote
+                  </span>
                   <p className="text-xs text-gray-700 italic mt-1 bg-white/70 p-2.5 rounded-xl border border-amber-200/60 leading-relaxed">
                     &ldquo;{applicant.quote}&rdquo;
                   </p>

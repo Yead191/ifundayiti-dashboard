@@ -1,3 +1,14 @@
+export type DONATION_PAYMENT_METHOD =
+  | "cash"
+  | "bank_transfer"
+  | "direct"
+  | "stripe"
+  | "other";
+
+export type DONATION_PAYMENT_STATUS = "pending" | "paid" | "failed" | "refunded";
+
+export type DONATION_TYPE = "donation" | "grant" | "fund_raising";
+
 export interface IDonationApplicant {
   _id: string;
   projectTitle?: string;
@@ -25,19 +36,32 @@ export interface IDonation {
   email: string;
   amount: number;
   transactionId?: string;
-  type: "donation" | "grant";
+  type: DONATION_TYPE;
+  payment_status?: DONATION_PAYMENT_STATUS;
+  payment_method?: DONATION_PAYMENT_METHOD;
+  reference?: string;
+  notes?: string;
+  recordedBy?: {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
   applicant?: IDonationApplicant;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface IFundStats {
-  balance: number;
-  programFundBalance: number;
+  totalBalance: number;
+  balance?: number; // for backward compatibility
+  programFundBalance?: number;
   totalDonations: number;
   totalGrants: number;
+  totalFundRaised: number; // Combines offline fundraising + paid store order revenues
   donationCount: number;
   grantCount: number;
+  fundRaisedCount: number; // Combines offline fundraising entries + completed paid store orders
   totalCount: number;
 }
 
@@ -45,8 +69,25 @@ export interface DonationListParams {
   page?: number;
   limit?: number;
   searchTerm?: string;
-  type?: "donation" | "grant";
+  type?: DONATION_TYPE;
   sort?: string;
+}
+
+export interface CreateManualDonationPayload {
+  name: string;
+  email?: string;
+  amount: number;
+  type: "donation" | "fund_raising";
+  payment_method: DONATION_PAYMENT_METHOD;
+  reference?: string;
+  notes?: string;
+}
+
+export interface CreateManualDonationResponse {
+  statusCode: number;
+  success: boolean;
+  message?: string;
+  data: IDonation;
 }
 
 export interface DonationListResponse {

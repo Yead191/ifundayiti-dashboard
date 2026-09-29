@@ -16,15 +16,15 @@ import {
   DeleteOutlined,
   EyeOutlined,
   WalletOutlined,
-  RiseOutlined,
   GiftOutlined,
   SwapOutlined,
   CopyOutlined,
   CheckOutlined,
-  ArrowDownOutlined,
-  ArrowUpOutlined,
   UserOutlined,
   ProjectOutlined,
+  PlusOutlined,
+  HeartOutlined,
+  ShopOutlined,
 } from "@ant-design/icons";
 import { toast } from "sonner";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -39,19 +39,21 @@ import {
 import type { IDonation } from "@/redux/features/donations/donations.types";
 import { DonationDetailModal } from "./components/DonationDetailModal";
 import { DeleteDonationModal } from "./components/DeleteDonationModal";
+import { RecordManualDonationModal } from "./components/RecordManualDonationModal";
 
 export default function DonationsPage() {
   // Query & Filter state
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState<"all" | "donation" | "grant">("all");
+  const [typeFilter, setTypeFilter] = useState<"all" | "donation" | "fund_raising" | "grant">("all");
 
   // Selection & Modal states
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [inspectingDonation, setInspectingDonation] = useState<IDonation | null>(null);
   const [deletingDonation, setDeletingDonation] = useState<IDonation | null>(null);
   const [batchDeleteModalOpen, setBatchDeleteModalOpen] = useState(false);
+  const [manualModalOpen, setManualModalOpen] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Queries & Mutations
@@ -76,11 +78,14 @@ export default function DonationsPage() {
   const [deleteMultiple, { isLoading: isDeletingMultiple }] = useDeleteMultipleDonationsMutation();
 
   const stats = statsRes?.data || {
+    totalBalance: 0,
     balance: 0,
     programFundBalance: 0,
     totalDonations: 0,
+    totalFundRaised: 0,
     totalGrants: 0,
     donationCount: 0,
+    fundRaisedCount: 0,
     grantCount: 0,
     totalCount: 0,
   };
@@ -134,19 +139,27 @@ export default function DonationsPage() {
     const headers = [
       "Transaction ID",
       "Type",
-      "Donor / Recipient",
+      "Contributor / Recipient",
       "Email",
       "Amount ($)",
+      "Payment Method",
+      "Payment Status",
+      "Reference",
+      "Recorded By",
       "Project Title",
       "Created Date",
     ];
 
     const rows = donations.map((d) => [
-      `"${d.transactionId || d._id}"`,
+      `"${d.transactionId || d.reference || d._id}"`,
       `"${d.type}"`,
       `"${d.name || ""}"`,
       `"${d.email || ""}"`,
       d.amount,
+      `"${d.payment_method || "stripe"}"`,
+      `"${d.payment_status || "paid"}"`,
+      `"${d.reference || ""}"`,
+      `"${d.recordedBy?.name || "Online System"}"`,
       `"${d.applicant?.projectTitle || ""}"`,
       `"${new Date(d.createdAt).toISOString()}"`,
     ]);
@@ -169,9 +182,9 @@ export default function DonationsPage() {
     {
       title: "Transaction Ref",
       key: "transactionId",
-      width: 220,
+      width: 190,
       render: (_, record) => {
-        const refId = record.transactionId || record._id;
+        const refId = record.transactionId || record.reference || record._id;
         const isCopied = copiedId === refId;
         return (
           <div
@@ -180,7 +193,7 @@ export default function DonationsPage() {
             title="Click to copy reference ID"
           >
             <span className="font-mono text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-emerald-50 hover:text-[#0B3D2E] border border-gray-200/80 px-2 py-0.5 rounded-lg transition-colors">
-              {refId.length > 20 ? `${refId.slice(0, 10)}...${refId.slice(-6)}` : refId}
+              {refId.length > 18 ? `${refId.slice(0, 8)}...${refId.slice(-6)}` : refId}
             </span>
             <button
               type="button"
@@ -195,41 +208,101 @@ export default function DonationsPage() {
     {
       title: "Type",
       key: "type",
-      width: 140,
+      width: 130,
       render: (_, record) => {
-        const isDonation = record.type === "donation";
+        if (record.type === "donation") {
+          return (
+            <Tag
+              bordered={false}
+              className="rounded-full px-2.5 py-0.5 text-xs font-semibold m-0 flex items-center gap-1 max-w-fit bg-emerald-50 text-emerald-800 border border-emerald-200/80"
+            >
+              <HeartOutlined className="text-emerald-600 text-[10px]" />
+              <span>Donation</span>
+            </Tag>
+          );
+        }
+        if (record.type === "fund_raising") {
+          return (
+            <Tag
+              bordered={false}
+              className="rounded-full px-2.5 py-0.5 text-xs font-semibold m-0 flex items-center gap-1 max-w-fit bg-purple-50 text-purple-800 border border-purple-200/80"
+            >
+              <ShopOutlined className="text-purple-600 text-[10px]" />
+              <span>Fund Raising</span>
+            </Tag>
+          );
+        }
         return (
           <Tag
             bordered={false}
-            className={`rounded-full px-2.5 py-0.5 text-xs font-semibold m-0 flex items-center gap-1 max-w-fit ${
-              isDonation
-                ? "bg-emerald-50 text-emerald-800 border border-emerald-200/80"
-                : "bg-amber-50 text-amber-800 border border-amber-200/80"
-            }`}
+            className="rounded-full px-2.5 py-0.5 text-xs font-semibold m-0 flex items-center gap-1 max-w-fit bg-amber-50 text-amber-800 border border-amber-200/80"
           >
-            {isDonation ? (
-              <>
-                <ArrowDownOutlined className="text-emerald-600 text-[10px]" />
-                <span>Donation</span>
-              </>
-            ) : (
-              <>
-                <ArrowUpOutlined className="text-amber-600 text-[10px]" />
-                <span>Grant</span>
-              </>
-            )}
+            <GiftOutlined className="text-amber-600 text-[10px]" />
+            <span>Grant</span>
           </Tag>
         );
       },
     },
     {
-      title: "Donor / Recipient",
+      title: "Payment",
+      key: "payment",
+      width: 130,
+      render: (_, record) => {
+        const method = record.payment_method || "stripe";
+        const methodLabels: Record<string, string> = {
+          cash: "Cash",
+          bank_transfer: "Bank Transfer",
+          direct: "Direct Wire",
+          stripe: "Stripe",
+          other: "Other",
+        };
+        const status = record.payment_status || "paid";
+
+        return (
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xs font-medium text-gray-700 capitalize">
+              {methodLabels[method] || method}
+            </span>
+            <span
+              className={`text-[10px] font-semibold uppercase tracking-wider ${
+                status === "paid"
+                  ? "text-emerald-600"
+                  : status === "pending"
+                  ? "text-amber-600"
+                  : "text-rose-600"
+              }`}
+            >
+              ● {status}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Contributor / Recipient",
       key: "party",
       render: (_, record) => {
-        const isDonation = record.type === "donation";
         const applicant = record.applicant;
 
-        if (isDonation) {
+        if (record.type === "fund_raising") {
+          return (
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-800 font-bold text-xs">
+                <ShopOutlined />
+              </div>
+              <div className="min-w-0">
+                <p className="font-semibold text-xs text-gray-900 truncate">
+                  {record.name || "Merchandise / Offline Sale"}
+                </p>
+                <p className="text-[11px] text-gray-400 truncate">
+                  {record.reference ? `Ref: ${record.reference}` : record.email || "Offline Fundraiser"}
+                </p>
+              </div>
+            </div>
+          );
+        }
+
+        if (record.type === "donation") {
           return (
             <div className="flex items-center gap-2.5">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100/80 text-emerald-800 font-bold text-xs">
@@ -267,19 +340,39 @@ export default function DonationsPage() {
       },
     },
     {
+      title: "Recorded By",
+      key: "recordedBy",
+      width: 140,
+      render: (_, record) => {
+        if (record.recordedBy?.name) {
+          return (
+            <Tag bordered={false} className="bg-slate-100 text-slate-700 rounded-md text-[11px] font-medium py-0.5 px-2">
+              {record.recordedBy.name}
+            </Tag>
+          );
+        }
+        return <span className="text-[11px] text-gray-400">Online System</span>;
+      },
+    },
+    {
       title: "Amount",
       key: "amount",
-      width: 140,
+      width: 130,
       sorter: (a, b) => a.amount - b.amount,
       render: (_, record) => {
-        const isDonation = record.type === "donation";
+        const isGrant = record.type === "grant";
+        const isFundRaising = record.type === "fund_raising";
         return (
           <span
             className={`font-display text-sm font-bold ${
-              isDonation ? "text-emerald-700" : "text-amber-600"
+              isGrant
+                ? "text-amber-600"
+                : isFundRaising
+                ? "text-purple-700"
+                : "text-emerald-700"
             }`}
           >
-            {isDonation ? "+" : "-"}
+            {isGrant ? "-" : "+"}
             {formatCurrency(record.amount)}
           </span>
         );
@@ -288,7 +381,7 @@ export default function DonationsPage() {
     {
       title: "Date & Time",
       key: "createdAt",
-      width: 180,
+      width: 170,
       render: (_, record) => (
         <span className="text-xs text-gray-500">
           {formatDateTime(record.createdAt)}
@@ -298,7 +391,7 @@ export default function DonationsPage() {
     {
       title: "Actions",
       key: "actions",
-      width: 110,
+      width: 100,
       align: "right",
       render: (_, record) => (
         <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
@@ -336,11 +429,20 @@ export default function DonationsPage() {
             Fund & Received Donations
           </h1>
           <p className="text-xs sm:text-sm text-mist-600 mt-1">
-            Monitor incoming donor contributions, grant award disbursements, and available liquidity.
+            Monitor incoming donor contributions, merchandise fundraising sales, grant disbursements, and available liquidity.
           </p>
         </div>
 
         <div className="flex items-center gap-2.5">
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setManualModalOpen(true)}
+            className="h-10 rounded-xl font-semibold bg-[#0B3D2E]! hover:bg-[#082e23]! text-white! shadow-sm border-0"
+          >
+            Record Offline Entry
+          </Button>
+
           <Button
             icon={<DownloadOutlined />}
             onClick={handleExportCSV}
@@ -359,90 +461,111 @@ export default function DonationsPage() {
         </div>
       </div>
 
-      {/* 4 Top-Tier Metric Widgets */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* 5 Top-Tier Metric Widgets */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 2xl:gap-4">
         {/* Net Available Fund Balance */}
-        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
+        <GlassCard className="p-3.5 2xl:p-5 flex flex-col justify-between space-y-2.5 2xl:space-y-3 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-mist-500">
+            <span className="text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-mist-500">
               Net Available Fund
             </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-[#0B3D2E] ring-1 ring-emerald-200/50">
-              <WalletOutlined className="text-lg" />
+            <div className="flex h-8 w-8 2xl:h-10 2xl:w-10 items-center justify-center rounded-xl 2xl:rounded-2xl bg-emerald-50 text-[#0B3D2E] ring-1 ring-emerald-200/50">
+              <WalletOutlined className="text-base 2xl:text-lg" />
             </div>
           </div>
           <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#0B3D2E]">
-              {isLoadingStats ? "…" : formatCurrency(stats.balance)}
+            <h2 className="font-display text-lg lg:text-base xl:text-xl 2xl:text-2xl font-extrabold text-[#0B3D2E] tracking-tight">
+              {isLoadingStats ? "…" : formatCurrency(stats.totalBalance ?? stats.balance ?? 0)}
             </h2>
-            <p className="text-xs text-mist-500 mt-1">
-              Current liquidity available for disbursement
+            <p className="text-[11px] 2xl:text-xs text-mist-500 mt-0.5 2xl:mt-1 truncate" title="Inflows minus grants disbursed">
+              Net liquidity after disbursements
             </p>
           </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-emerald-500/10 blur-xl" />
+          <div className="pointer-events-none absolute -bottom-6 -right-6 h-20 w-20 2xl:h-24 2xl:w-24 rounded-full bg-emerald-500/10 blur-xl" />
         </GlassCard>
 
         {/* Total Donations Received */}
-        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
+        <GlassCard className="p-3.5 2xl:p-5 flex flex-col justify-between space-y-2.5 2xl:space-y-3 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-sky-700">
+            <span className="text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-sky-700">
               Donations Received
             </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-50 text-sky-700 ring-1 ring-sky-200/50">
-              <RiseOutlined className="text-lg" />
+            <div className="flex h-8 w-8 2xl:h-10 2xl:w-10 items-center justify-center rounded-xl 2xl:rounded-2xl bg-sky-50 text-sky-700 ring-1 ring-sky-200/50">
+              <HeartOutlined className="text-base 2xl:text-lg" />
             </div>
           </div>
           <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-sky-900">
-              {isLoadingStats ? "…" : formatCurrency(stats.totalDonations)}
+            <h2 className="font-display text-lg lg:text-base xl:text-xl 2xl:text-2xl font-extrabold text-sky-900 tracking-tight">
+              {isLoadingStats ? "…" : formatCurrency(stats.totalDonations ?? 0)}
             </h2>
-            <p className="text-xs text-mist-500 mt-1">
-              {stats.donationCount} contributions from global donors
+            <p className="text-[11px] 2xl:text-xs text-mist-500 mt-0.5 2xl:mt-1 truncate" title={`${stats.donationCount} philanthropic contributions`}>
+              {stats.donationCount} philanthropic gifts
             </p>
           </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-sky-500/10 blur-xl" />
+          <div className="pointer-events-none absolute -bottom-6 -right-6 h-20 w-20 2xl:h-24 2xl:w-24 rounded-full bg-sky-500/10 blur-xl" />
+        </GlassCard>
+
+        {/* Total Funds Raised (Store & Offline) */}
+        <GlassCard className="p-3.5 2xl:p-5 flex flex-col justify-between space-y-2.5 2xl:space-y-3 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-purple-700">
+              Funds Raised (Store)
+            </span>
+            <div className="flex h-8 w-8 2xl:h-10 2xl:w-10 items-center justify-center rounded-xl 2xl:rounded-2xl bg-purple-50 text-purple-700 ring-1 ring-purple-200/50">
+              <ShopOutlined className="text-base 2xl:text-lg" />
+            </div>
+          </div>
+          <div>
+            <h2 className="font-display text-lg lg:text-base xl:text-xl 2xl:text-2xl font-extrabold text-purple-900 tracking-tight">
+              {isLoadingStats ? "…" : formatCurrency(stats.totalFundRaised ?? 0)}
+            </h2>
+            <p className="text-[11px] 2xl:text-xs text-mist-500 mt-0.5 2xl:mt-1 truncate" title={`${stats.fundRaisedCount ?? 0} store orders & offline sales`}>
+              {stats.fundRaisedCount ?? 0} orders & offline sales
+            </p>
+          </div>
+          <div className="pointer-events-none absolute -bottom-6 -right-6 h-20 w-20 2xl:h-24 2xl:w-24 rounded-full bg-purple-500/10 blur-xl" />
         </GlassCard>
 
         {/* Total Grants Disbursed */}
-        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
+        <GlassCard className="p-3.5 2xl:p-5 flex flex-col justify-between space-y-2.5 2xl:space-y-3 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
+            <span className="text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-amber-700">
               Grants Disbursed
             </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 ring-1 ring-amber-200/50">
-              <GiftOutlined className="text-lg" />
+            <div className="flex h-8 w-8 2xl:h-10 2xl:w-10 items-center justify-center rounded-xl 2xl:rounded-2xl bg-amber-50 text-amber-600 ring-1 ring-amber-200/50">
+              <GiftOutlined className="text-base 2xl:text-lg" />
             </div>
           </div>
           <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-amber-700">
-              {isLoadingStats ? "…" : formatCurrency(stats.totalGrants)}
+            <h2 className="font-display text-lg lg:text-base xl:text-xl 2xl:text-2xl font-extrabold text-amber-700 tracking-tight">
+              {isLoadingStats ? "…" : formatCurrency(stats.totalGrants ?? 0)}
             </h2>
-            <p className="text-xs text-mist-500 mt-1">
-              {stats.grantCount} grants awarded to local projects
+            <p className="text-[11px] 2xl:text-xs text-mist-500 mt-0.5 2xl:mt-1 truncate" title={`${stats.grantCount} grants awarded to local projects`}>
+              {stats.grantCount} grants awarded
             </p>
           </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-amber-500/10 blur-xl" />
+          <div className="pointer-events-none absolute -bottom-6 -right-6 h-20 w-20 2xl:h-24 2xl:w-24 rounded-full bg-amber-500/10 blur-xl" />
         </GlassCard>
 
         {/* Total Transaction Volume */}
-        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
+        <GlassCard className="p-3.5 2xl:p-5 flex flex-col justify-between space-y-2.5 2xl:space-y-3 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-700">
-              Transaction Volume
+            <span className="text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-indigo-700">
+              Total Records
             </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200/50">
-              <SwapOutlined className="text-lg" />
+            <div className="flex h-8 w-8 2xl:h-10 2xl:w-10 items-center justify-center rounded-xl 2xl:rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200/50">
+              <SwapOutlined className="text-base 2xl:text-lg" />
             </div>
           </div>
           <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-indigo-950">
-              {isLoadingStats ? "…" : `${stats.totalCount} records`}
+            <h2 className="font-display text-lg lg:text-base xl:text-xl 2xl:text-2xl font-extrabold text-indigo-950 tracking-tight">
+              {isLoadingStats ? "…" : `${stats.totalCount ?? 0} txns`}
             </h2>
-            <p className="text-xs text-mist-500 mt-1">
-              Combined donation inflows and grant outflows
+            <p className="text-[11px] 2xl:text-xs text-mist-500 mt-0.5 2xl:mt-1 truncate" title="Combined donations, sales & grants">
+              Combined inflows & outflows
             </p>
           </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-indigo-500/10 blur-xl" />
+          <div className="pointer-events-none absolute -bottom-6 -right-6 h-20 w-20 2xl:h-24 2xl:w-24 rounded-full bg-indigo-500/10 blur-xl" />
         </GlassCard>
       </div>
 
@@ -453,7 +576,7 @@ export default function DonationsPage() {
           <div className="relative w-full lg:max-w-xs">
             <Input
               prefix={<SearchOutlined className="text-mist-400 mr-1" />}
-              placeholder="Search donor, email, or Stripe ID..."
+              placeholder="Search donor, email, reference..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -479,8 +602,17 @@ export default function DonationsPage() {
                   value: "donation",
                   label: (
                     <span className="flex items-center gap-1.5">
-                      <ArrowDownOutlined className="text-emerald-600 text-xs" />
-                      <span>Donations Inflow</span>
+                      <HeartOutlined className="text-emerald-600 text-xs" />
+                      <span>Donations</span>
+                    </span>
+                  ),
+                },
+                {
+                  value: "fund_raising",
+                  label: (
+                    <span className="flex items-center gap-1.5">
+                      <ShopOutlined className="text-purple-600 text-xs" />
+                      <span>Fundraising Sales</span>
                     </span>
                   ),
                 },
@@ -488,7 +620,7 @@ export default function DonationsPage() {
                   value: "grant",
                   label: (
                     <span className="flex items-center gap-1.5">
-                      <ArrowUpOutlined className="text-amber-600 text-xs" />
+                      <GiftOutlined className="text-amber-600 text-xs" />
                       <span>Grants Outflow</span>
                     </span>
                   ),
@@ -520,8 +652,8 @@ export default function DonationsPage() {
             title={searchTerm || typeFilter !== "all" ? "No Matching Transactions" : "No Transactions Recorded"}
             description={
               searchTerm || typeFilter !== "all"
-                ? "No donation or grant records match your search or filter criteria. Try resetting your query."
-                : "Incoming public donations from Stripe and grant disbursements will appear here."
+                ? "No donation, fundraising sale, or grant records match your search or filter criteria. Try resetting your query."
+                : "Incoming public donations from Stripe, offline entries, and grant disbursements will appear here."
             }
             actionLabel={searchTerm || typeFilter !== "all" ? "Reset Filters" : undefined}
             onAction={() => {
@@ -577,6 +709,13 @@ export default function DonationsPage() {
         onDelete={(donation) => setDeletingDonation(donation)}
       />
 
+      {/* Record Manual / Offline Donation or Sale Modal */}
+      <RecordManualDonationModal
+        open={manualModalOpen}
+        onClose={() => setManualModalOpen(false)}
+        onSuccess={() => refetch()}
+      />
+
       {/* Single Record Delete Confirmation Modal */}
       <DeleteDonationModal
         open={Boolean(deletingDonation)}
@@ -597,3 +736,4 @@ export default function DonationsPage() {
     </div>
   );
 }
+

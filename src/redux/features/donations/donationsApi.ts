@@ -5,6 +5,8 @@ import type {
   SingleDonationResponse,
   FundStatsResponse,
   DeleteMultipleDonationsResponse,
+  CreateManualDonationPayload,
+  CreateManualDonationResponse,
 } from "./donations.types";
 
 export const donationsApi = baseApi.injectEndpoints({
@@ -59,6 +61,21 @@ export const donationsApi = baseApi.injectEndpoints({
       providesTags: (_res, _err, id) => [{ type: "Donations", id }],
     }),
 
+    createManualDonation: builder.mutation<
+      CreateManualDonationResponse,
+      CreateManualDonationPayload
+    >({
+      query: (body) => ({
+        url: "/donation/manual",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [
+        { type: "Donations", id: "LIST" },
+        { type: "Donations", id: "STATS" },
+      ],
+    }),
+
     deleteDonation: builder.mutation<
       { success: boolean; message: string },
       string
@@ -95,6 +112,7 @@ export const {
   useGetFundStatsQuery,
   useGetDonationsQuery,
   useGetDonationByIdQuery,
+  useCreateManualDonationMutation,
   useDeleteDonationMutation,
   useDeleteMultipleDonationsMutation,
 } = donationsApi;
