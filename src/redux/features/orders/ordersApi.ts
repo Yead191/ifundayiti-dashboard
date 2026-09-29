@@ -3,6 +3,7 @@ import type {
   GetOrdersParams,
   IOrder,
   OrdersListResponse,
+  OrderStatsResponse,
   SingleOrderResponse,
   UpdateOrderStatusPayload,
 } from "./orders.types";
@@ -49,6 +50,14 @@ export const ordersApi = baseApi.injectEndpoints({
           : [{ type: "Orders", id: "LIST" }],
     }),
 
+    getOrderStats: builder.query<OrderStatsResponse, void>({
+      query: () => ({
+        url: "/order/stats",
+        method: "GET",
+      }),
+      providesTags: [{ type: "Orders", id: "STATS" }],
+    }),
+
     getOrderById: builder.query<SingleOrderResponse, string>({
       query: (id) => ({
         url: `/order/${id}`,
@@ -69,6 +78,7 @@ export const ordersApi = baseApi.injectEndpoints({
       invalidatesTags: (_res, _err, { id }) => [
         { type: "Orders", id },
         { type: "Orders", id: "LIST" },
+        { type: "Orders", id: "STATS" },
       ],
     }),
 
@@ -83,16 +93,23 @@ export const ordersApi = baseApi.injectEndpoints({
       invalidatesTags: (_res, _err, { orderId }) => [
         { type: "Orders", id: orderId },
         { type: "Orders", id: "LIST" },
+        { type: "Orders", id: "STATS" },
         "Products", // Stock inventory changed atomically
       ],
     }),
 
-    deleteOrder: builder.mutation<{ success: boolean; message: string; data?: IOrder }, string>({
+    deleteOrder: builder.mutation<
+      { success: boolean; message: string; data?: IOrder },
+      string
+    >({
       query: (id) => ({
         url: `/order/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "Orders", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Orders", id: "LIST" },
+        { type: "Orders", id: "STATS" },
+      ],
     }),
   }),
   overrideExisting: false,
@@ -100,6 +117,7 @@ export const ordersApi = baseApi.injectEndpoints({
 
 export const {
   useGetOrdersQuery,
+  useGetOrderStatsQuery,
   useGetOrderByIdQuery,
   useUpdateOrderStatusMutation,
   useMarkPreOrderReadyMutation,

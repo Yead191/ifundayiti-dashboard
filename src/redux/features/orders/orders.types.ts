@@ -156,13 +156,45 @@ export interface UpdateOrderStatusPayload {
   status: "processing" | "shipped" | "delivered" | "cancelled";
 }
 
-// Order Statistics for Header
-export interface OrderStats {
+// Full Order Statistics from GET /order/stats
+export interface IOrderStats {
   totalOrders: number;
+  pendingOrders: number;
+  confirmedOrders: number;
+  processingOrders: number;
+  shippedOrders: number;
+  deliveredOrders: number;
+  cancelledOrders: number;
+  paidOrders: number;
+  pendingPaymentOrders: number;
+  failedOrders: number;
+  refundedOrders: number;
   totalRevenue: number;
-  inFulfillmentCount: number; // confirmed + processing
-  deliveredCount: number;
+  totalSubtotal: number;
+  totalDeliveryCharges: number;
+  totalTaxCollected: number;
+  totalDiscountAmount: number;
+  totalItemsSold: number;
+  todayRevenue: number;
+  thisMonthRevenue: number;
+  todayOrders: number;
+  thisMonthOrders: number;
+  totalPreOrderItems: number;
+  confirmedPreOrders: number;
+  readyPreOrders: number;
+  completedPreOrders: number;
 }
+
+export interface OrderStatsResponse {
+  statusCode?: number;
+  success: boolean;
+  message: string;
+  data: IOrderStats;
+}
+
+// Backward compatibility alias for stats
+export type OrderStats = IOrderStats;
+
 
 // Backward compatibility aliases
 export const ORDER_STATUS_OPTIONS = ORDER_STATUS_LIST;

@@ -6,12 +6,12 @@ import { toast } from "sonner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
   useGetOrdersQuery,
+  useGetOrderStatsQuery,
   useUpdateOrderStatusMutation,
   useDeleteOrderMutation,
 } from "@/redux/features/orders/ordersApi";
 import type {
   IOrder,
-  OrderStats,
   PaymentStatus,
 } from "@/redux/features/orders/orders.types";
 import { OrderStatsHeader } from "./components/OrderStatsHeader";
@@ -29,7 +29,9 @@ export default function ShopOrdersPage() {
 
   // Filter and pagination states
   const [activeStatus, setActiveStatus] = useState<string>("all");
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | "all" | "">("all");
+  const [paymentStatus, setPaymentStatus] = useState<
+    PaymentStatus | "all" | ""
+  >("all");
   const [searchTerm, setSearchTerm] = useState<string>(urlSearchTerm);
   const [debouncedSearch, setDebouncedSearch] = useState<string>(urlSearchTerm);
   const [page, setPage] = useState<number>(1);
@@ -48,30 +50,41 @@ export default function ShopOrdersPage() {
 
   // Debounce search input & sync to URL query params
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-      setPage(1);
+    const handler = setTimeout(
+      () => {
+        setDebouncedSearch(searchTerm);
+        setPage(1);
 
-      const currentParam = searchParams.get("searchTerm") || "";
-      const trimmed = searchTerm.trim();
-      if (trimmed !== currentParam) {
-        lastProcessedUrlQuery.current = trimmed;
-        setSearchParams(
-          (prev) => {
-            const next = new URLSearchParams(prev);
-            if (trimmed) {
-              next.set("searchTerm", trimmed);
-            } else {
-              next.delete("searchTerm");
-            }
-            return next;
-          },
-          { replace: true }
-        );
-      }
-    }, searchTerm ? 350 : 50);
+        const currentParam = searchParams.get("searchTerm") || "";
+        const trimmed = searchTerm.trim();
+        if (trimmed !== currentParam) {
+          lastProcessedUrlQuery.current = trimmed;
+          setSearchParams(
+            (prev) => {
+              const next = new URLSearchParams(prev);
+              if (trimmed) {
+                next.set("searchTerm", trimmed);
+              } else {
+                next.delete("searchTerm");
+              }
+              return next;
+            },
+            { replace: true },
+          );
+        }
+      },
+      searchTerm ? 350 : 50,
+    );
     return () => clearTimeout(handler);
   }, [searchTerm, searchParams, setSearchParams]);
+
+  // Real backend statistics query (/order/stats)
+  const {
+    data: statsResponse,
+    isLoading: isLoadingStats,
+    refetch: refetchStats,
+  } = useGetOrderStatsQuery();
+  const stats = statsResponse?.data;
 
   // Main paginated query
   const {
@@ -89,11 +102,15 @@ export default function ShopOrdersPage() {
   });
 
   // Mutations
-  const [updateOrderStatus, { isLoading: isUpdatingStatus }] = useUpdateOrderStatusMutation();
+  const [updateOrderStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateOrderStatusMutation();
   const [deleteOrder] = useDeleteOrderMutation();
 
   // Extracted data
-  const orders = useMemo(() => ordersResponse?.data ?? [], [ordersResponse?.data]);
+  const orders = useMemo(
+    () => ordersResponse?.data ?? [],
+    [ordersResponse?.data],
+  );
   const pagination = ordersResponse?.pagination ?? {
     page: 1,
     limit: pageSize,
@@ -101,34 +118,6 @@ export default function ShopOrdersPage() {
     totalPage: 1,
   };
 
-  // Compute lightweight KPI stats from query response
-  const stats: OrderStats = useMemo(() => {
-    let totalRevenue = 0;
-    let inFulfillment = 0;
-    let delivered = 0;
-
-    orders.forEach((ord) => {
-      if (typeof ord.price_breakdown?.total_price === "number") {
-        totalRevenue += ord.price_breakdown.total_price;
-      }
-      if (ord.status === "confirmed" || ord.status === "processing") {
-        inFulfillment++;
-      }
-      if (ord.status === "delivered") {
-        delivered++;
-      }
-    });
-
-    return {
-      totalOrders: pagination.total,
-      totalRevenue,
-      inFulfillmentCount:
-        activeStatus === "processing" || activeStatus === "confirmed"
-          ? pagination.total
-          : inFulfillment,
-      deliveredCount: activeStatus === "delivered" ? pagination.total : delivered,
-    };
-  }, [orders, pagination.total, activeStatus]);
 
   // Handlers
   const handleStatusTabChange = (status: string) => {
@@ -152,7 +141,7 @@ export default function ShopOrdersPage() {
 
   const handleChangeStatus = async (
     id: string,
-    status: "processing" | "shipped" | "delivered" | "cancelled"
+    status: "processing" | "shipped" | "delivered" | "cancelled",
   ) => {
     try {
       await updateOrderStatus({ id, body: { status } }).unwrap();
@@ -186,7 +175,8 @@ export default function ShopOrdersPage() {
             Store Orders
           </h1>
           <p className="mt-1 text-sm text-mist-600">
-            Monitor and fulfill customer merchandise purchases, payment receipts, and pre-order batches.
+            Monitor and fulfill customer merchandise purchases, payment
+            receipts, and pre-order batches.
           </p>
         </div>
       </div>
@@ -194,9 +184,11 @@ export default function ShopOrdersPage() {
       {/* KPI Stats Cards */}
       <OrderStatsHeader
         stats={stats}
-        loading={isLoadingOrders}
+        loading={isLoadingStats}
         activeStatusFilter={activeStatus}
         onSelectStatus={handleStatusTabChange}
+        activePaymentFilter={paymentStatus}
+        onSelectPaymentStatus={handlePaymentStatusChange}
       />
 
       {/* Filter Bar */}
@@ -208,7 +200,10 @@ export default function ShopOrdersPage() {
         paymentStatus={paymentStatus}
         onPaymentStatusChange={handlePaymentStatusChange}
         totalCount={pagination.total}
-        onRefresh={() => refetchOrders()}
+        onRefresh={() => {
+          refetchOrders();
+          refetchStats();
+        }}
         isFetching={isFetchingOrders}
       />
 
@@ -219,7 +214,9 @@ export default function ShopOrdersPage() {
             <UserOutlined className="text-emerald-700" />
             <span>
               Filtering orders for Customer ID:{" "}
-              <span className="font-mono font-bold text-emerald-950">{userParam}</span>
+              <span className="font-mono font-bold text-emerald-950">
+                {userParam}
+              </span>
             </span>
           </div>
           <button
@@ -231,7 +228,7 @@ export default function ShopOrdersPage() {
                   next.delete("user");
                   return next;
                 },
-                { replace: true }
+                { replace: true },
               );
               setPage(1);
             }}
@@ -252,7 +249,10 @@ export default function ShopOrdersPage() {
           icon={<ShoppingOutlined className="text-5xl text-mist-400" />}
           title="No orders found"
           description={
-            searchTerm || activeStatus !== "all" || paymentStatus !== "all" || userParam
+            searchTerm ||
+            activeStatus !== "all" ||
+            paymentStatus !== "all" ||
+            userParam
               ? "No orders match your current filter parameters. Try clearing the search, user, or status filters."
               : "No customer orders have been received in the store yet."
           }
