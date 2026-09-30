@@ -16,9 +16,16 @@ export interface DashboardOverviewResponse {
 }
 
 export interface FundStats {
-  balance: number;
+  totalBalance: number;
+  balance?: number;
+  programFundBalance?: number;
   totalDonations: number;
   totalGrants: number;
+  totalFundRaised: number;
+  donationCount: number;
+  grantCount: number;
+  fundRaisedCount: number;
+  totalCount: number;
 }
 
 export interface FundStatsResponse {

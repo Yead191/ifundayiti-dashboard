@@ -2,13 +2,8 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, Button, Skeleton } from "antd";
 import {
-  FileTextOutlined,
-  HeartOutlined,
-  GiftOutlined,
-  WalletOutlined,
   ArrowRightOutlined,
   PlusOutlined,
-  RiseOutlined,
 } from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -22,6 +17,7 @@ import {
 import type { ApplicationStatus } from "@/features/core/types";
 import { BarChart } from "./components/charts/BarChart";
 import { DonutChart } from "./components/charts/DonutChart";
+import { OverviewMetrics } from "./components/OverviewMetrics";
 import {
   useGetDashboardOverviewQuery,
   useGetFundStatsQuery,
@@ -129,115 +125,12 @@ export default function OverviewPage() {
       </div>
 
       {/* Grid of Key Metrics */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Metric 1: Total Applications */}
-        <div className="group relative overflow-hidden rounded-2xl border border-navy-700 bg-white p-6 shadow-xs transition-all duration-350 hover:-translate-y-0.5 hover:shadow-md hover:shadow-green-950/2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-mist-500">
-              Total Applications
-            </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0B3D2E]/5 text-[#0B3D2E] transition-colors duration-300 group-hover:bg-[#0B3D2E] group-hover:text-white shadow-xs">
-              <FileTextOutlined className="text-lg" />
-            </div>
-          </div>
-          <div className="mt-4">
-            {isOverviewLoading ? (
-              <Skeleton active paragraph={{ rows: 1 }} title={false} />
-            ) : (
-              <>
-                <h3 className="font-display text-3xl font-bold text-[#0B3D2E]">
-                  {overview?.totalApplication ?? 0}
-                </h3>
-                <p className="mt-1 flex items-center gap-1 text-xs text-mist-500">
-                  <RiseOutlined className="text-emerald-600 animate-pulse" />
-                  <span>Received overall</span>
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Metric 2: Total Donations */}
-        <div className="group relative overflow-hidden rounded-2xl border border-navy-700 bg-white p-6 shadow-xs transition-all duration-350 hover:-translate-y-0.5 hover:shadow-md hover:shadow-green-950/2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-mist-500">
-              Total Donations
-            </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 transition-colors duration-300 group-hover:bg-emerald-600 group-hover:text-white shadow-xs">
-              <HeartOutlined className="text-lg" />
-            </div>
-          </div>
-          <div className="mt-4">
-            {isFundStatsLoading ? (
-              <Skeleton active paragraph={{ rows: 1 }} title={false} />
-            ) : (
-              <>
-                <h3 className="font-display text-3xl font-bold text-[#0B3D2E]">
-                  {formatCurrency(fundStats?.totalDonations ?? 0)}
-                </h3>
-                <p className="mt-1 flex items-center gap-1 text-xs text-mist-500">
-                  <span className="font-medium text-emerald-600">Funded</span>
-                  <span>by supporters</span>
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Metric 3: Awarded Grants */}
-        <div className="group relative overflow-hidden rounded-2xl border border-navy-700 bg-white p-6 shadow-xs transition-all duration-350 hover:-translate-y-0.5 hover:shadow-md hover:shadow-green-950/2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-mist-500">
-              Awarded Grants
-            </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition-colors duration-300 group-hover:bg-amber-500 group-hover:text-white shadow-xs">
-              <GiftOutlined className="text-lg" />
-            </div>
-          </div>
-          <div className="mt-4">
-            {isFundStatsLoading ? (
-              <Skeleton active paragraph={{ rows: 1 }} title={false} />
-            ) : (
-              <>
-                <h3 className="font-display text-3xl font-bold text-[#0B3D2E]">
-                  {formatCurrency(fundStats?.totalGrants ?? 0)}
-                </h3>
-                <p className="mt-1 flex items-center gap-1 text-xs text-mist-500">
-                  <span className="font-medium text-amber-600">Disbursed</span>
-                  <span>to winner projects</span>
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Metric 4: Program Fund */}
-        <div className="group relative overflow-hidden rounded-2xl border border-navy-700 bg-white p-6 shadow-xs transition-all duration-350 hover:-translate-y-0.5 hover:shadow-md hover:shadow-green-950/2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-mist-500">
-              Program Fund
-            </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-600 transition-colors duration-300 group-hover:bg-sky-500 group-hover:text-white shadow-xs">
-              <WalletOutlined className="text-lg" />
-            </div>
-          </div>
-          <div className="mt-4">
-            {isFundStatsLoading ? (
-              <Skeleton active paragraph={{ rows: 1 }} title={false} />
-            ) : (
-              <>
-                <h3 className="font-display text-3xl font-bold text-[#0B3D2E]">
-                  {formatCurrency(fundStats?.balance ?? 0)}
-                </h3>
-                <p className="mt-1 flex items-center gap-1 text-xs text-mist-500">
-                  <span className="font-medium text-sky-600">Available</span>
-                  <span>for program support</span>
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+      <OverviewMetrics
+        overview={overview}
+        fundStats={fundStats}
+        isOverviewLoading={isOverviewLoading}
+        isFundStatsLoading={isFundStatsLoading}
+      />
 
       {/* Pipeline Progression Stage */}
       <GlassCard className="relative overflow-hidden border border-navy-700 p-6 shadow-xs bg-white">
