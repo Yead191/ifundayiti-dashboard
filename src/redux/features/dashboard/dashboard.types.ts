@@ -22,9 +22,11 @@ export interface FundStats {
   totalDonations: number;
   totalGrants: number;
   totalFundRaised: number;
+  totalPaidExpenses?: number;
   donationCount: number;
   grantCount: number;
   fundRaisedCount: number;
+  paidExpenseCount?: number;
   totalCount: number;
 }
 

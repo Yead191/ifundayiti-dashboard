@@ -1,10 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, Button, Skeleton } from "antd";
-import {
-  ArrowRightOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { ArrowRightOutlined, PlusOutlined } from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency, cn } from "@/lib/utils";

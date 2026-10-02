@@ -59,9 +59,11 @@ export interface IFundStats {
   totalDonations: number;
   totalGrants: number;
   totalFundRaised: number; // Combines offline fundraising + paid store order revenues
+  totalPaidExpenses?: number; // Total operational expenses paid
   donationCount: number;
   grantCount: number;
   fundRaisedCount: number; // Combines offline fundraising entries + completed paid store orders
+  paidExpenseCount?: number; // Count of paid operational expenses
   totalCount: number;
 }
 

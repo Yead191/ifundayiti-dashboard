@@ -15,9 +15,7 @@ import {
   DownloadOutlined,
   DeleteOutlined,
   EyeOutlined,
-  WalletOutlined,
   GiftOutlined,
-  SwapOutlined,
   CopyOutlined,
   CheckOutlined,
   UserOutlined,
@@ -25,6 +23,7 @@ import {
   PlusOutlined,
   HeartOutlined,
   ShopOutlined,
+  WalletOutlined,
 } from "@ant-design/icons";
 import { toast } from "sonner";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -40,18 +39,24 @@ import type { IDonation } from "@/redux/features/donations/donations.types";
 import { DonationDetailModal } from "./components/DonationDetailModal";
 import { DeleteDonationModal } from "./components/DeleteDonationModal";
 import { RecordManualDonationModal } from "./components/RecordManualDonationModal";
+import { DonationStatsCards } from "./components/DonationStatsCards";
 
 export default function DonationsPage() {
   // Query & Filter state
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState<"all" | "donation" | "fund_raising" | "grant">("all");
+  const [typeFilter, setTypeFilter] = useState<
+    "all" | "donation" | "fund_raising" | "grant"
+  >("all");
 
   // Selection & Modal states
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [inspectingDonation, setInspectingDonation] = useState<IDonation | null>(null);
-  const [deletingDonation, setDeletingDonation] = useState<IDonation | null>(null);
+  const [inspectingDonation, setInspectingDonation] =
+    useState<IDonation | null>(null);
+  const [deletingDonation, setDeletingDonation] = useState<IDonation | null>(
+    null,
+  );
   const [batchDeleteModalOpen, setBatchDeleteModalOpen] = useState(false);
   const [manualModalOpen, setManualModalOpen] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -59,13 +64,16 @@ export default function DonationsPage() {
   // Queries & Mutations
   const { data: statsRes, isLoading: isLoadingStats } = useGetFundStatsQuery();
 
-  const queryParams = useMemo(() => ({
-    page,
-    limit: pageSize,
-    searchTerm: searchTerm.trim() || undefined,
-    type: typeFilter !== "all" ? typeFilter : undefined,
-    sort: "-createdAt",
-  }), [page, pageSize, searchTerm, typeFilter]);
+  const queryParams = useMemo(
+    () => ({
+      page,
+      limit: pageSize,
+      searchTerm: searchTerm.trim() || undefined,
+      type: typeFilter !== "all" ? typeFilter : undefined,
+      sort: "-createdAt",
+    }),
+    [page, pageSize, searchTerm, typeFilter],
+  );
 
   const {
     data: donationsRes,
@@ -74,8 +82,10 @@ export default function DonationsPage() {
     refetch,
   } = useGetDonationsQuery(queryParams);
 
-  const [deleteDonation, { isLoading: isDeletingSingle }] = useDeleteDonationMutation();
-  const [deleteMultiple, { isLoading: isDeletingMultiple }] = useDeleteMultipleDonationsMutation();
+  const [deleteDonation, { isLoading: isDeletingSingle }] =
+    useDeleteDonationMutation();
+  const [deleteMultiple, { isLoading: isDeletingMultiple }] =
+    useDeleteMultipleDonationsMutation();
 
   const stats = statsRes?.data || {
     totalBalance: 0,
@@ -83,9 +93,11 @@ export default function DonationsPage() {
     programFundBalance: 0,
     totalDonations: 0,
     totalFundRaised: 0,
+    totalPaidExpenses: 0,
     totalGrants: 0,
     donationCount: 0,
     fundRaisedCount: 0,
+    paidExpenseCount: 0,
     grantCount: 0,
     totalCount: 0,
   };
@@ -121,7 +133,9 @@ export default function DonationsPage() {
     try {
       const ids = selectedRowKeys.map(String);
       const res = await deleteMultiple({ ids }).unwrap();
-      toast.success(`${res.data?.deletedCount || ids.length} records deleted successfully`);
+      toast.success(
+        `${res.data?.deletedCount || ids.length} records deleted successfully`,
+      );
       setSelectedRowKeys([]);
       setBatchDeleteModalOpen(false);
     } catch (err: any) {
@@ -164,12 +178,18 @@ export default function DonationsPage() {
       `"${new Date(d.createdAt).toISOString()}"`,
     ]);
 
-    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((r) => r.join(",")),
+    ].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `IFundAyiti_Transactions_${new Date().toISOString().split("T")[0]}.csv`);
+    link.setAttribute(
+      "download",
+      `IFundAyiti_Transactions_${new Date().toISOString().split("T")[0]}.csv`,
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -193,13 +213,19 @@ export default function DonationsPage() {
             title="Click to copy reference ID"
           >
             <span className="font-mono text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-emerald-50 hover:text-[#0B3D2E] border border-gray-200/80 px-2 py-0.5 rounded-lg transition-colors">
-              {refId.length > 18 ? `${refId.slice(0, 8)}...${refId.slice(-6)}` : refId}
+              {refId.length > 18
+                ? `${refId.slice(0, 8)}...${refId.slice(-6)}`
+                : refId}
             </span>
             <button
               type="button"
               className="text-gray-400 hover:text-emerald-700 transition-colors text-xs"
             >
-              {isCopied ? <CheckOutlined className="text-emerald-600" /> : <CopyOutlined className="opacity-0 group-hover:opacity-100 transition-opacity" />}
+              {isCopied ? (
+                <CheckOutlined className="text-emerald-600" />
+              ) : (
+                <CopyOutlined className="opacity-0 group-hover:opacity-100 transition-opacity" />
+              )}
             </button>
           </div>
         );
@@ -268,8 +294,8 @@ export default function DonationsPage() {
                 status === "paid"
                   ? "text-emerald-600"
                   : status === "pending"
-                  ? "text-amber-600"
-                  : "text-rose-600"
+                    ? "text-amber-600"
+                    : "text-rose-600"
               }`}
             >
               ● {status}
@@ -295,7 +321,9 @@ export default function DonationsPage() {
                   {record.name || "Merchandise / Offline Sale"}
                 </p>
                 <p className="text-[11px] text-gray-400 truncate">
-                  {record.reference ? `Ref: ${record.reference}` : record.email || "Offline Fundraiser"}
+                  {record.reference
+                    ? `Ref: ${record.reference}`
+                    : record.email || "Offline Fundraiser"}
                 </p>
               </div>
             </div>
@@ -306,14 +334,20 @@ export default function DonationsPage() {
           return (
             <div className="flex items-center gap-2.5">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100/80 text-emerald-800 font-bold text-xs">
-                {record.name ? record.name.charAt(0).toUpperCase() : <UserOutlined />}
+                {record.name ? (
+                  record.name.charAt(0).toUpperCase()
+                ) : (
+                  <UserOutlined />
+                )}
               </div>
               <div className="min-w-0">
                 <p className="font-semibold text-xs text-gray-900 truncate">
                   {record.name || "Anonymous Donor"}
                 </p>
                 {record.email && (
-                  <p className="text-[11px] text-gray-400 truncate">{record.email}</p>
+                  <p className="text-[11px] text-gray-400 truncate">
+                    {record.email}
+                  </p>
                 )}
               </div>
             </div>
@@ -346,7 +380,10 @@ export default function DonationsPage() {
       render: (_, record) => {
         if (record.recordedBy?.name) {
           return (
-            <Tag bordered={false} className="bg-slate-100 text-slate-700 rounded-md text-[11px] font-medium py-0.5 px-2">
+            <Tag
+              bordered={false}
+              className="bg-slate-100 text-slate-700 rounded-md text-[11px] font-medium py-0.5 px-2"
+            >
               {record.recordedBy.name}
             </Tag>
           );
@@ -368,8 +405,8 @@ export default function DonationsPage() {
               isGrant
                 ? "text-amber-600"
                 : isFundRaising
-                ? "text-purple-700"
-                : "text-emerald-700"
+                  ? "text-purple-700"
+                  : "text-emerald-700"
             }`}
           >
             {isGrant ? "-" : "+"}
@@ -394,7 +431,10 @@ export default function DonationsPage() {
       width: 100,
       align: "right",
       render: (_, record) => (
-        <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="flex items-center justify-end gap-1.5"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Tooltip title="View Receipt Details">
             <Button
               type="text"
@@ -429,7 +469,8 @@ export default function DonationsPage() {
             Fund & Received Donations
           </h1>
           <p className="text-xs sm:text-sm text-mist-600 mt-1">
-            Monitor incoming donor contributions, merchandise fundraising sales, grant disbursements, and available liquidity.
+            Monitor incoming donor contributions, merchandise fundraising sales,
+            grant disbursements, and available liquidity.
           </p>
         </div>
 
@@ -453,7 +494,9 @@ export default function DonationsPage() {
 
           <Tooltip title="Refresh fund balances and records">
             <Button
-              icon={<ReloadOutlined className={isFetching ? "animate-spin" : ""} />}
+              icon={
+                <ReloadOutlined className={isFetching ? "animate-spin" : ""} />
+              }
               onClick={() => refetch()}
               className="h-10 w-10 rounded-xl"
             />
@@ -461,113 +504,8 @@ export default function DonationsPage() {
         </div>
       </div>
 
-      {/* 5 Top-Tier Metric Widgets */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 2xl:gap-4">
-        {/* Net Available Fund Balance */}
-        <GlassCard className="p-3.5 2xl:p-5 flex flex-col justify-between space-y-2.5 2xl:space-y-3 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-mist-500">
-              Net Available Fund
-            </span>
-            <div className="flex h-8 w-8 2xl:h-10 2xl:w-10 items-center justify-center rounded-xl 2xl:rounded-2xl bg-emerald-50 text-[#0B3D2E] ring-1 ring-emerald-200/50">
-              <WalletOutlined className="text-base 2xl:text-lg" />
-            </div>
-          </div>
-          <div>
-            <h2 className="font-display text-lg lg:text-base xl:text-xl 2xl:text-2xl font-extrabold text-[#0B3D2E] tracking-tight">
-              {isLoadingStats ? "…" : formatCurrency(stats.totalBalance ?? stats.balance ?? 0)}
-            </h2>
-            <p className="text-[11px] 2xl:text-xs text-mist-500 mt-0.5 2xl:mt-1 truncate" title="Inflows minus grants disbursed">
-              Net liquidity after disbursements
-            </p>
-          </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-20 w-20 2xl:h-24 2xl:w-24 rounded-full bg-emerald-500/10 blur-xl" />
-        </GlassCard>
-
-        {/* Total Donations Received */}
-        <GlassCard className="p-3.5 2xl:p-5 flex flex-col justify-between space-y-2.5 2xl:space-y-3 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-sky-700">
-              Donations Received
-            </span>
-            <div className="flex h-8 w-8 2xl:h-10 2xl:w-10 items-center justify-center rounded-xl 2xl:rounded-2xl bg-sky-50 text-sky-700 ring-1 ring-sky-200/50">
-              <HeartOutlined className="text-base 2xl:text-lg" />
-            </div>
-          </div>
-          <div>
-            <h2 className="font-display text-lg lg:text-base xl:text-xl 2xl:text-2xl font-extrabold text-sky-900 tracking-tight">
-              {isLoadingStats ? "…" : formatCurrency(stats.totalDonations ?? 0)}
-            </h2>
-            <p className="text-[11px] 2xl:text-xs text-mist-500 mt-0.5 2xl:mt-1 truncate" title={`${stats.donationCount} philanthropic contributions`}>
-              {stats.donationCount} philanthropic gifts
-            </p>
-          </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-20 w-20 2xl:h-24 2xl:w-24 rounded-full bg-sky-500/10 blur-xl" />
-        </GlassCard>
-
-        {/* Total Funds Raised (Store & Offline) */}
-        <GlassCard className="p-3.5 2xl:p-5 flex flex-col justify-between space-y-2.5 2xl:space-y-3 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-purple-700">
-              Funds Raised (Store)
-            </span>
-            <div className="flex h-8 w-8 2xl:h-10 2xl:w-10 items-center justify-center rounded-xl 2xl:rounded-2xl bg-purple-50 text-purple-700 ring-1 ring-purple-200/50">
-              <ShopOutlined className="text-base 2xl:text-lg" />
-            </div>
-          </div>
-          <div>
-            <h2 className="font-display text-lg lg:text-base xl:text-xl 2xl:text-2xl font-extrabold text-purple-900 tracking-tight">
-              {isLoadingStats ? "…" : formatCurrency(stats.totalFundRaised ?? 0)}
-            </h2>
-            <p className="text-[11px] 2xl:text-xs text-mist-500 mt-0.5 2xl:mt-1 truncate" title={`${stats.fundRaisedCount ?? 0} store orders & offline sales`}>
-              {stats.fundRaisedCount ?? 0} orders & offline sales
-            </p>
-          </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-20 w-20 2xl:h-24 2xl:w-24 rounded-full bg-purple-500/10 blur-xl" />
-        </GlassCard>
-
-        {/* Total Grants Disbursed */}
-        <GlassCard className="p-3.5 2xl:p-5 flex flex-col justify-between space-y-2.5 2xl:space-y-3 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-amber-700">
-              Grants Disbursed
-            </span>
-            <div className="flex h-8 w-8 2xl:h-10 2xl:w-10 items-center justify-center rounded-xl 2xl:rounded-2xl bg-amber-50 text-amber-600 ring-1 ring-amber-200/50">
-              <GiftOutlined className="text-base 2xl:text-lg" />
-            </div>
-          </div>
-          <div>
-            <h2 className="font-display text-lg lg:text-base xl:text-xl 2xl:text-2xl font-extrabold text-amber-700 tracking-tight">
-              {isLoadingStats ? "…" : formatCurrency(stats.totalGrants ?? 0)}
-            </h2>
-            <p className="text-[11px] 2xl:text-xs text-mist-500 mt-0.5 2xl:mt-1 truncate" title={`${stats.grantCount} grants awarded to local projects`}>
-              {stats.grantCount} grants awarded
-            </p>
-          </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-20 w-20 2xl:h-24 2xl:w-24 rounded-full bg-amber-500/10 blur-xl" />
-        </GlassCard>
-
-        {/* Total Transaction Volume */}
-        <GlassCard className="p-3.5 2xl:p-5 flex flex-col justify-between space-y-2.5 2xl:space-y-3 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-indigo-700">
-              Total Records
-            </span>
-            <div className="flex h-8 w-8 2xl:h-10 2xl:w-10 items-center justify-center rounded-xl 2xl:rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200/50">
-              <SwapOutlined className="text-base 2xl:text-lg" />
-            </div>
-          </div>
-          <div>
-            <h2 className="font-display text-lg lg:text-base xl:text-xl 2xl:text-2xl font-extrabold text-indigo-950 tracking-tight">
-              {isLoadingStats ? "…" : `${stats.totalCount ?? 0} txns`}
-            </h2>
-            <p className="text-[11px] 2xl:text-xs text-mist-500 mt-0.5 2xl:mt-1 truncate" title="Combined donations, sales & grants">
-              Combined inflows & outflows
-            </p>
-          </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-20 w-20 2xl:h-24 2xl:w-24 rounded-full bg-indigo-500/10 blur-xl" />
-        </GlassCard>
-      </div>
+      {/* Top-Tier Fund Activity Metric Cards */}
+      <DonationStatsCards stats={stats} loading={isLoadingStats} />
 
       {/* Filter & Action Toolbar */}
       <GlassCard className="p-4 sm:p-5">
@@ -649,13 +587,19 @@ export default function DonationsPage() {
         <GlassCard className="p-12 text-center">
           <EmptyState
             icon={<WalletOutlined className="text-4xl text-[#0B3D2E]" />}
-            title={searchTerm || typeFilter !== "all" ? "No Matching Transactions" : "No Transactions Recorded"}
+            title={
+              searchTerm || typeFilter !== "all"
+                ? "No Matching Transactions"
+                : "No Transactions Recorded"
+            }
             description={
               searchTerm || typeFilter !== "all"
                 ? "No donation, fundraising sale, or grant records match your search or filter criteria. Try resetting your query."
                 : "Incoming public donations from Stripe, offline entries, and grant disbursements will appear here."
             }
-            actionLabel={searchTerm || typeFilter !== "all" ? "Reset Filters" : undefined}
+            actionLabel={
+              searchTerm || typeFilter !== "all" ? "Reset Filters" : undefined
+            }
             onAction={() => {
               setSearchTerm("");
               setTypeFilter("all");
@@ -677,7 +621,8 @@ export default function DonationsPage() {
             }}
             onRow={(record) => ({
               onClick: () => setInspectingDonation(record),
-              className: "cursor-pointer hover:bg-emerald-50/20 transition-colors",
+              className:
+                "cursor-pointer hover:bg-emerald-50/20 transition-colors",
             })}
             className="custom-admin-table"
           />
@@ -736,4 +681,3 @@ export default function DonationsPage() {
     </div>
   );
 }
-
