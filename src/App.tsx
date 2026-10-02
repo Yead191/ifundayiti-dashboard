@@ -91,6 +91,10 @@ const BlogEditorPage = lazy(() => import("@/features/blogs/BlogEditorPage"));
 const BlogCategoriesPage = lazy(
   () => import("@/features/blogs/BlogCategoriesPage"),
 );
+const ExpensesPage = lazy(() => import("@/features/expenses/ExpensesPage"));
+const ExpenseDetailPage = lazy(
+  () => import("@/features/expenses/ExpenseDetailPage"),
+);
 const NotificationsPage = lazy(
   () => import("@/features/notifications/NotificationsPage"),
 );
@@ -150,6 +154,10 @@ export default function App() {
             <Route path="donations" element={<IFundAyitiDonationsPage />} />
             <Route path="fund-transactions" element={<Navigate to="/donations" replace />} />
             <Route path="admin/donations" element={<Navigate to="/donations" replace />} />
+            <Route path="expenses" element={<ExpensesPage />} />
+            <Route path="expenses/:id" element={<ExpenseDetailPage />} />
+            <Route path="admin/expenses" element={<Navigate to="/expenses" replace />} />
+            <Route path="admin/expenses/:id" element={<ExpenseDetailPage />} />
             <Route path="transactions" element={<TransactionsPage />} />
             <Route path="admin/transactions" element={<RedirectWithSearch to="/transactions" />} />
             <Route path="admin/financials" element={<RedirectWithSearch to="/transactions" />} />

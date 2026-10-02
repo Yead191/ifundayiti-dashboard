@@ -16,6 +16,10 @@ const PAGE_META: { match: (path: string) => boolean; title: string; subtitle?: s
   // Donations
   { match: (p) => p === "/donations" || p === "/admin/donations" || p === "/fund-transactions", title: "Fund & Received Donations", subtitle: "Monitor live program fund liquidity, global donor contributions, and awarded grants" },
 
+  // Operational Expenses
+  { match: (p) => p.startsWith("/expenses/") || p.startsWith("/admin/expenses/"), title: "Expense Voucher Details", subtitle: "Inspect operational expense voucher, tax receipts, and payment status" },
+  { match: (p) => p === "/expenses" || p === "/admin/expenses", title: "Operational Expenses", subtitle: "Record, categorize, and audit platform operational expenditures and automated fund deductions" },
+
   // Financial Transactions
   { match: (p) => p === "/transactions" || p === "/admin/transactions" || p === "/admin/financials", title: "Financial Transactions", subtitle: "Audit Stripe checkout payments, membership subscriptions, store orders, and ledger events" },
 

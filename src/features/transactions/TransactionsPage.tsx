@@ -30,6 +30,8 @@ import {
   CloseCircleOutlined,
   ArrowRightOutlined,
   AppstoreOutlined,
+  HeartOutlined,
+  AccountBookOutlined,
 } from "@ant-design/icons";
 import { toast } from "sonner";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -343,27 +345,33 @@ export default function TransactionsPage() {
       width: 140,
       render: (_, record) => {
         const cat = String(record.category || "Shop");
-        const isShop = cat.toLowerCase() === "shop";
-        const isMembership = cat.toLowerCase() === "membership";
+        const lower = cat.toLowerCase();
+        const isShop = lower === "shop";
+        const isDonation = lower === "donation";
+        const isExpense = lower === "expense";
 
         return (
           <Tag
             bordered={false}
             className={`rounded-full text-xs font-semibold px-2.5 py-0.5 m-0 border ${
-              isMembership
-                ? "bg-amber-50 text-amber-700 border-amber-200"
-                : isShop
-                  ? "bg-indigo-50 text-indigo-700 border-indigo-200"
-                  : "bg-teal-50 text-teal-700 border-teal-200"
+              isDonation
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                : isExpense
+                  ? "bg-rose-50 text-rose-700 border-rose-200"
+                  : isShop
+                    ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                    : "bg-slate-50 text-slate-700 border-slate-200"
             }`}
           >
             <span className="flex items-center gap-1">
-              {isMembership ? (
-                <CrownOutlined />
+              {isDonation ? (
+                <HeartOutlined className="text-[10px]" />
+              ) : isExpense ? (
+                <AccountBookOutlined className="text-[10px]" />
               ) : isShop ? (
-                <ShoppingOutlined />
+                <ShoppingOutlined className="text-[10px]" />
               ) : (
-                <AppstoreOutlined />
+                <CreditCardOutlined className="text-[10px]" />
               )}
               <span>{cat}</span>
             </span>
@@ -400,11 +408,11 @@ export default function TransactionsPage() {
             <div className="cursor-help">
               <span
                 className={`font-display text-sm font-bold ${
-                  isCredit ? "text-emerald-700" : "text-gray-900"
+                  isCredit ? "text-emerald-700" : "text-rose-600"
                 }`}
               >
                 {isCredit ? "+" : "-"}
-                {formatCurrency(price)}
+                {formatCurrency(Math.abs(price))}
               </span>
               {discount > 0 && (
                 <div className="text-[11px] text-amber-600 font-medium">
@@ -690,20 +698,20 @@ export default function TransactionsPage() {
                   ),
                 },
                 {
-                  value: "Membership",
+                  value: "Donation",
                   label: (
                     <span className="flex items-center gap-1.5">
-                      <CrownOutlined className="text-amber-600 text-xs" />
-                      <span>Membership</span>
+                      <HeartOutlined className="text-emerald-600 text-xs" />
+                      <span>Donation</span>
                     </span>
                   ),
                 },
                 {
-                  value: "Service",
+                  value: "Expense",
                   label: (
                     <span className="flex items-center gap-1.5">
-                      <AppstoreOutlined className="text-teal-600 text-xs" />
-                      <span>Service</span>
+                      <AccountBookOutlined className="text-rose-600 text-xs" />
+                      <span>Expense</span>
                     </span>
                   ),
                 },

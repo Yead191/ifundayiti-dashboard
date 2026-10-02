@@ -12,13 +12,13 @@ export const TRANSACTION_STATUS = {
 export type TRANSACTION_STATUS = (typeof TRANSACTION_STATUS)[keyof typeof TRANSACTION_STATUS];
 
 export const TRANSACTION_CATEGORY = {
-  MEMBERSHIP: "Membership",
   SHOP: "Shop",
-  SERVICE: "Service",
+  DONATION: "Donation",
+  EXPENSE: "Expense",
 } as const;
 export type TRANSACTION_CATEGORY = (typeof TRANSACTION_CATEGORY)[keyof typeof TRANSACTION_CATEGORY];
 
-export type TransactionCategory = TRANSACTION_CATEGORY | "Membership" | "Shop" | "Service" | string;
+export type TransactionCategory = TRANSACTION_CATEGORY | "Shop" | "Donation" | "Expense" | string;
 export type TransactionStatus = TRANSACTION_STATUS | "Success" | "Failed" | "Pending" | string;
 export type TransactionType = TRANSACTION_TYPE | "Credit" | "Debit" | string;
 

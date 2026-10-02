@@ -16,6 +16,8 @@ import {
   ArrowRightOutlined,
   CalendarOutlined,
   SafetyCertificateOutlined,
+  HeartOutlined,
+  AccountBookOutlined,
 } from "@ant-design/icons";
 import { toast } from "sonner";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
@@ -79,21 +81,28 @@ export function TransactionDetailModal({
   const category = String(tx.category || "Shop");
   const status = String(tx.status || "Success");
 
-  const categoryColor =
-    category.toLowerCase() === "membership"
-      ? "text-amber-700 bg-amber-50 border-amber-200"
-      : category.toLowerCase() === "shop"
-        ? "text-indigo-700 bg-indigo-50 border-indigo-200"
-        : "text-teal-700 bg-teal-50 border-teal-200";
+  const lowerCat = category.toLowerCase();
+  const isDonation = lowerCat === "donation";
+  const isExpense = lowerCat === "expense";
+  const isShop = lowerCat === "shop";
 
-  const categoryIcon =
-    category.toLowerCase() === "membership" ? (
-      <CrownOutlined />
-    ) : category.toLowerCase() === "shop" ? (
-      <ShoppingOutlined />
-    ) : (
-      <AppstoreOutlined />
-    );
+  const categoryColor = isDonation
+    ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+    : isExpense
+      ? "text-rose-700 bg-rose-50 border-rose-200"
+      : isShop
+        ? "text-indigo-700 bg-indigo-50 border-indigo-200"
+        : "text-slate-700 bg-slate-50 border-slate-200";
+
+  const categoryIcon = isDonation ? (
+    <HeartOutlined />
+  ) : isExpense ? (
+    <AccountBookOutlined />
+  ) : isShop ? (
+    <ShoppingOutlined />
+  ) : (
+    <CreditCardOutlined />
+  );
 
   const statusColor =
     status.toLowerCase() === "success"
@@ -159,11 +168,11 @@ export function TransactionDetailModal({
 
           <h2
             className={`font-display text-3xl sm:text-4xl font-extrabold tracking-tight ${
-              isCredit ? "text-[#0B3D2E]" : "text-gray-900"
+              isCredit ? "text-[#0B3D2E]" : "text-rose-600"
             }`}
           >
             {isCredit ? "+" : "-"}
-            {formatCurrency(totalPrice)}
+            {formatCurrency(Math.abs(totalPrice))}
           </h2>
 
           <div className="flex items-center justify-center gap-2 text-xs text-gray-500">

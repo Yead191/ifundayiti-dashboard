@@ -19,6 +19,8 @@ import {
   UserOutlined,
   QrcodeOutlined,
   MessageOutlined,
+  WalletOutlined,
+  AccountBookOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
@@ -59,16 +61,30 @@ export const NAV_ITEMS: NavItem[] = [
     icon: BookOutlined,
   },
   {
-    key: "donations",
-    label: "Donations & Fund",
+    key: "finance",
+    label: "Finance & Fund",
     path: "/donations",
-    icon: HeartOutlined,
-  },
-  {
-    key: "transactions",
-    label: "Transactions",
-    path: "/transactions",
-    icon: CreditCardOutlined,
+    icon: WalletOutlined,
+    children: [
+      {
+        key: "finance-donations",
+        label: "Donations & Fund",
+        path: "/donations",
+        icon: HeartOutlined,
+      },
+      {
+        key: "finance-expenses",
+        label: "Expenses",
+        path: "/expenses",
+        icon: AccountBookOutlined,
+      },
+      {
+        key: "finance-transactions",
+        label: "Transactions",
+        path: "/transactions",
+        icon: CreditCardOutlined,
+      },
+    ],
   },
   {
     key: "projects",

@@ -35,10 +35,14 @@ export const transactionCategoryToneMap: Record<string, StatusTone> = {
 };
 
 export const transactionCategoryLabelMap: Record<string, string> = {
-  Membership: "Membership",
-  MEMBERSHIP: "Membership",
   Shop: "Shop",
   SHOP: "Shop",
+  Donation: "Donation",
+  DONATION: "Donation",
+  Expense: "Expense",
+  EXPENSE: "Expense",
+  Membership: "Membership",
+  MEMBERSHIP: "Membership",
   Service: "Service",
   SERVICE: "Service",
 };
@@ -50,12 +54,20 @@ export function formatTransactionLabel(value?: string | null) {
   return spaced.replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-export function isMembershipCategory(category: TransactionCategory | string) {
-  return category.toLowerCase() === "membership";
+export function isDonationCategory(category: TransactionCategory | string) {
+  return category.toLowerCase() === "donation";
+}
+
+export function isExpenseCategory(category: TransactionCategory | string) {
+  return category.toLowerCase() === "expense";
 }
 
 export function isShopCategory(category: TransactionCategory | string) {
   return category.toLowerCase() === "shop";
+}
+
+export function isMembershipCategory(category: TransactionCategory | string) {
+  return category.toLowerCase() === "membership";
 }
 
 export function isServiceCategory(category: TransactionCategory | string) {
