@@ -19,10 +19,7 @@ import {
   EyeOutlined,
   CopyOutlined,
   CheckOutlined,
-  DollarCircleOutlined,
   ShoppingOutlined,
-  CrownOutlined,
-  SafetyCertificateOutlined,
   UserOutlined,
   CreditCardOutlined,
   CheckCircleOutlined,
@@ -52,6 +49,7 @@ import type {
 } from "@/redux/features/transactions/transactions.types";
 import { TransactionDetailModal } from "./components/TransactionDetailModal";
 import { DeleteTransactionModal } from "./components/DeleteTransactionModal";
+import { TransactionStatsCards } from "./components/TransactionStatsCards";
 
 export default function TransactionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -113,11 +111,16 @@ export default function TransactionsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Stats query
+  const [statsDates, setStatsDates] = useState<{
+    startDate?: string;
+    endDate?: string;
+  } | null>(null);
+
   const {
     data: statsRes,
     isLoading: isLoadingStats,
     refetch: refetchStats,
-  } = useGetTransactionStatsQuery();
+  } = useGetTransactionStatsQuery(statsDates || undefined);
 
   // Transactions query
   const queryParams = useMemo(
@@ -151,14 +154,24 @@ export default function TransactionsPage() {
 
   const stats = statsRes?.data || {
     totalRevenue: 0,
+    totalInflow: 0,
+    totalOutflow: 0,
+    netBalance: 0,
     shopRevenue: 0,
+    donationRevenue: 0,
+    eventRevenue: 0,
+    expenseAmount: 0,
     membershipRevenue: 0,
+    todayRevenue: 0,
+    thisMonthRevenue: 0,
     totalTransactions: 0,
     successfulTransactions: 0,
     pendingTransactions: 0,
     failedTransactions: 0,
     creditTransactions: 0,
     debitTransactions: 0,
+    todayTransactions: 0,
+    thisMonthTransactions: 0,
   };
 
   const handleRefresh = () => {
@@ -570,93 +583,12 @@ export default function TransactionsPage() {
         </div>
       </div>
 
-      {/* 4 Top-Tier Metric Widgets (GlassCards) */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Total Gross Revenue */}
-        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#0B3D2E]">
-              Total Gross Revenue
-            </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-[#0B3D2E] ring-1 ring-emerald-200/50">
-              <DollarCircleOutlined className="text-lg" />
-            </div>
-          </div>
-          <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#0B3D2E]">
-              {isLoadingStats ? "…" : formatCurrency(stats.totalRevenue)}
-            </h2>
-            <p className="text-xs text-mist-500 mt-1">
-              {stats.successfulTransactions} successful payments
-            </p>
-          </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-emerald-500/10 blur-xl" />
-        </GlassCard>
-
-        {/* Shop / Merchandise Revenue */}
-        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-700">
-              Shop / Store Revenue
-            </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200/50">
-              <ShoppingOutlined className="text-lg" />
-            </div>
-          </div>
-          <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-indigo-950">
-              {isLoadingStats ? "…" : formatCurrency(stats.shopRevenue)}
-            </h2>
-            <p className="text-xs text-mist-500 mt-1">
-              Direct merchandise & store sales
-            </p>
-          </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-indigo-500/10 blur-xl" />
-        </GlassCard>
-
-        {/* Membership Subscriptions */}
-        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
-              Membership Subscriptions
-            </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 ring-1 ring-amber-200/50">
-              <CrownOutlined className="text-lg" />
-            </div>
-          </div>
-          <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-amber-700">
-              {isLoadingStats ? "…" : formatCurrency(stats.membershipRevenue)}
-            </h2>
-            <p className="text-xs text-mist-500 mt-1">
-              Recurring membership contributions
-            </p>
-          </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-amber-500/10 blur-xl" />
-        </GlassCard>
-
-        {/* Transaction Health & Volume */}
-        <GlassCard className="p-5 flex flex-col justify-between space-y-3 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-teal-700">
-              Transaction Health & Volume
-            </span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 ring-1 ring-teal-200/50">
-              <SafetyCertificateOutlined className="text-lg" />
-            </div>
-          </div>
-          <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-teal-950">
-              {isLoadingStats ? "…" : `${stats.totalTransactions} events`}
-            </h2>
-            <p className="text-xs text-mist-500 mt-1">
-              {stats.pendingTransactions} Pending • {stats.failedTransactions}{" "}
-              Failed
-            </p>
-          </div>
-          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-teal-500/10 blur-xl" />
-        </GlassCard>
-      </div>
+      {/* Top-Tier Transaction Statistics & Activity Cards */}
+      <TransactionStatsCards
+        stats={stats}
+        loading={isLoadingStats}
+        onDateChange={setStatsDates}
+      />
 
       {/* Filter & Action Toolbar */}
       <GlassCard className="p-4 sm:p-5">

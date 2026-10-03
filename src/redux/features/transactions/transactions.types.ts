@@ -76,16 +76,34 @@ export interface ITransaction {
 
 export type ApiTransaction = ITransaction;
 
+export interface TransactionStatsParams {
+  startDate?: string;
+  endDate?: string;
+  from?: string;
+  to?: string;
+}
+
 export interface ITransactionStats {
   totalRevenue: number;
+  totalInflow?: number;
+  totalOutflow?: number;
+  netBalance?: number;
   shopRevenue: number;
-  membershipRevenue: number;
+  donationRevenue?: number;
+  eventRevenue?: number;
+  serviceRevenue?: number;
+  expenseAmount?: number;
+  membershipRevenue?: number;
+  todayRevenue?: number;
+  thisMonthRevenue?: number;
   totalTransactions: number;
   successfulTransactions: number;
   pendingTransactions: number;
   failedTransactions: number;
   creditTransactions: number;
   debitTransactions: number;
+  todayTransactions?: number;
+  thisMonthTransactions?: number;
 }
 
 export interface PaginationMeta {

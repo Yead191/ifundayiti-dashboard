@@ -4,6 +4,7 @@ import type {
   DeleteTransactionResponse,
   GetTransactionsParams,
   SingleTransactionResponse,
+  TransactionStatsParams,
   TransactionStatsResponse,
   TransactionsListResponse,
 } from "./transactions.types";
@@ -44,11 +45,25 @@ export const transactionsApi = baseApi.injectEndpoints({
           : [{ type: "Transactions", id: "LIST" }],
     }),
 
-    getTransactionStats: builder.query<TransactionStatsResponse, void>({
-      query: () => ({
-        url: "/transaction/stats",
-        method: "GET",
-      }),
+    getTransactionStats: builder.query<
+      TransactionStatsResponse,
+      TransactionStatsParams | void
+    >({
+      query: (params) => {
+        const queryParams: Record<string, any> = {};
+        if (params) {
+          if (params.startDate) queryParams.startDate = params.startDate;
+          if (params.endDate) queryParams.endDate = params.endDate;
+          if (params.from) queryParams.from = params.from;
+          if (params.to) queryParams.to = params.to;
+        }
+
+        return {
+          url: "/transaction/stats",
+          method: "GET",
+          params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
+        };
+      },
       providesTags: [{ type: "Transactions", id: "STATS" }],
     }),
 
