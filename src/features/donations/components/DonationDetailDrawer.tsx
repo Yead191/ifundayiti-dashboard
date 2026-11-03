@@ -60,15 +60,15 @@ export function DonationDetailDrawer({
   const getPaymentMethodLabel = (method?: string) => {
     switch (method) {
       case "cash":
-        return "💵 Cash Payment";
+        return "Cash Payment";
       case "bank_transfer":
-        return "🏦 Bank Transfer / ACH";
+        return "Bank Transfer / ACH";
       case "direct":
-        return "💳 Direct Wire";
+        return "Direct Wire";
       case "stripe":
-        return "⚡ Stripe Checkout / POS";
+        return "Stripe Checkout / POS";
       case "other":
-        return "📋 Cheque / Other";
+        return "Cheque / Other";
       default:
         return donation.transactionId?.startsWith("cs_")
           ? "⚡ Stripe Checkout"
@@ -101,15 +101,15 @@ export function DonationDetailDrawer({
                 isDonation
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : isFundRaising
-                  ? "bg-purple-50 text-purple-700 border border-purple-200"
-                  : "bg-amber-50 text-amber-700 border border-amber-200"
+                    ? "bg-purple-50 text-purple-700 border border-purple-200"
+                    : "bg-amber-50 text-amber-700 border border-amber-200"
               }`}
             >
               {isDonation
                 ? "Donation Inflow"
                 : isFundRaising
-                ? "Fundraising Sale"
-                : "Grant Outflow"}
+                  ? "Fundraising Sale"
+                  : "Grant Outflow"}
             </Tag>
           </div>
 
@@ -132,13 +132,13 @@ export function DonationDetailDrawer({
                 backgroundColor: isDonation
                   ? "rgba(11, 61, 46, 0.1)"
                   : isFundRaising
-                  ? "rgba(126, 34, 206, 0.1)"
-                  : "rgba(217, 119, 6, 0.1)",
+                    ? "rgba(126, 34, 206, 0.1)"
+                    : "rgba(217, 119, 6, 0.1)",
                 color: isDonation
                   ? "#0B3D2E"
                   : isFundRaising
-                  ? "#7e22ce"
-                  : "#d97706",
+                    ? "#7e22ce"
+                    : "#d97706",
               }}
             >
               {isDonation ? (
@@ -154,8 +154,8 @@ export function DonationDetailDrawer({
               {isDonation
                 ? "Philanthropic Contribution"
                 : isFundRaising
-                ? "Fundraising / Store Sale"
-                : "Grant Disbursement"}
+                  ? "Fundraising / Store Sale"
+                  : "Grant Disbursement"}
             </p>
 
             <h2
@@ -163,8 +163,8 @@ export function DonationDetailDrawer({
                 isDonation
                   ? "text-[#0B3D2E]"
                   : isFundRaising
-                  ? "text-purple-900"
-                  : "text-amber-600"
+                    ? "text-purple-900"
+                    : "text-amber-600"
               }`}
             >
               {isGrant ? "-" : "+"}
@@ -209,7 +209,10 @@ export function DonationDetailDrawer({
             </div>
             {donation.reference && donation.transactionId && (
               <p className="text-[11px] text-gray-400">
-                Internal Ref: <span className="font-mono text-gray-600">{donation.reference}</span>
+                Internal Ref:{" "}
+                <span className="font-mono text-gray-600">
+                  {donation.reference}
+                </span>
               </p>
             )}
           </div>
@@ -220,8 +223,8 @@ export function DonationDetailDrawer({
               {isDonation
                 ? "Donor Information"
                 : isFundRaising
-                ? "Contributor / Buyer"
-                : "Disbursed By"}
+                  ? "Contributor / Buyer"
+                  : "Disbursed By"}
             </span>
 
             <div className="space-y-2.5 text-xs">
@@ -257,7 +260,10 @@ export function DonationDetailDrawer({
                   <span className="text-gray-400 flex items-center gap-1.5">
                     👤 Recorded By
                   </span>
-                  <Tag bordered={false} className="bg-emerald-50 text-emerald-800 font-semibold m-0 text-xs">
+                  <Tag
+                    bordered={false}
+                    className="bg-emerald-50 text-emerald-800 font-semibold m-0 text-xs"
+                  >
                     {donation.recordedBy.name || "Admin"}
                   </Tag>
                 </div>
@@ -287,7 +293,9 @@ export function DonationDetailDrawer({
               <div className="space-y-2.5 text-xs">
                 {applicant.projectTitle && (
                   <div>
-                    <span className="text-gray-400 text-[11px]">Project Title</span>
+                    <span className="text-gray-400 text-[11px]">
+                      Project Title
+                    </span>
                     <h4 className="font-bold text-gray-900 text-sm mt-0.5">
                       {applicant.projectTitle}
                     </h4>
@@ -314,7 +322,9 @@ export function DonationDetailDrawer({
 
                 {applicant.quote && (
                   <div className="pt-2 border-t border-amber-200/50">
-                    <span className="text-gray-400 text-[11px]">Grantee Quote</span>
+                    <span className="text-gray-400 text-[11px]">
+                      Grantee Quote
+                    </span>
                     <p className="text-xs text-gray-700 italic mt-1 bg-white/70 p-2.5 rounded-xl border border-amber-200/60 leading-relaxed">
                       &ldquo;{applicant.quote}&rdquo;
                     </p>

@@ -61,15 +61,15 @@ export function DonationDetailModal({
   const getPaymentMethodLabel = (method?: string) => {
     switch (method) {
       case "cash":
-        return "💵 Cash Payment";
+        return "Cash Payment";
       case "bank_transfer":
-        return "🏦 Bank Transfer / ACH";
+        return "Bank Transfer / ACH";
       case "direct":
-        return "💳 Direct Wire";
+        return "Direct Wire";
       case "stripe":
-        return "⚡ Stripe Checkout / POS";
+        return "Stripe Checkout / POS";
       case "other":
-        return "📋 Cheque / Other";
+        return "Cheque / Other";
       default:
         return donation.transactionId?.startsWith("cs_")
           ? "⚡ Stripe Checkout"

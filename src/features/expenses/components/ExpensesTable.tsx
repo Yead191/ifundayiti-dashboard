@@ -277,11 +277,11 @@ export function ExpensesTable({
 
       render: (_, record) => {
         const methodLabels: Record<string, string> = {
-          cash: "💵 Cash",
-          bank_transfer: "🏦 Bank Transfer",
-          card: "💳 Card",
-          direct: "⚡ Wire Transfer",
-          other: "📋 Other",
+          cash: "Cash",
+          bank_transfer: "Bank Transfer",
+          card: "Card",
+          direct: "Wire Transfer",
+          other: "Other",
         };
         return (
           <span className="text-xs text-gray-700 font-medium capitalize">

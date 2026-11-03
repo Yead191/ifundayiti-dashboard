@@ -30,8 +30,11 @@ export function RecordManualDonationModal({
   onSuccess,
 }: RecordManualDonationModalProps) {
   const [form] = Form.useForm();
-  const [entryType, setEntryType] = useState<"donation" | "fund_raising">("donation");
-  const [createManualDonation, { isLoading }] = useCreateManualDonationMutation();
+  const [entryType, setEntryType] = useState<"donation" | "fund_raising">(
+    "donation",
+  );
+  const [createManualDonation, { isLoading }] =
+    useCreateManualDonationMutation();
 
   const handleFinish = async (values: any) => {
     try {
@@ -49,7 +52,7 @@ export function RecordManualDonationModal({
       toast.success(
         payload.type === "donation"
           ? "Manual donation successfully recorded & fund synchronized"
-          : "Fundraising sale recorded & fund synchronized"
+          : "Fundraising sale recorded & fund synchronized",
       );
       form.resetFields();
       setEntryType("donation");
@@ -147,7 +150,9 @@ export function RecordManualDonationModal({
                 <div className="flex items-center justify-between gap-1">
                   <span
                     className={`text-xs font-bold leading-snug truncate ${
-                      entryType === "donation" ? "text-[#0B3D2E]" : "text-gray-800"
+                      entryType === "donation"
+                        ? "text-[#0B3D2E]"
+                        : "text-gray-800"
                     }`}
                   >
                     Donation
@@ -191,7 +196,9 @@ export function RecordManualDonationModal({
                 <div className="flex items-center justify-between gap-1">
                   <span
                     className={`text-xs font-bold leading-snug truncate ${
-                      entryType === "fund_raising" ? "text-purple-900" : "text-gray-800"
+                      entryType === "fund_raising"
+                        ? "text-purple-900"
+                        : "text-gray-800"
                     }`}
                   >
                     Fund Raising & Sales
@@ -216,15 +223,23 @@ export function RecordManualDonationModal({
             name="name"
             label={
               <span className="text-xs font-semibold text-gray-700">
-                {entryType === "donation" ? "Donor Name" : "Buyer / Organization Name"}
+                {entryType === "donation"
+                  ? "Donor Name"
+                  : "Buyer / Organization Name"}
               </span>
             }
-            rules={[{ required: true, message: "Please provide a contributor name" }]}
+            rules={[
+              { required: true, message: "Please provide a contributor name" },
+            ]}
             className="mb-0"
           >
             <Input
               prefix={<UserOutlined className="text-gray-400 mr-1" />}
-              placeholder={entryType === "donation" ? "e.g. Marie Laurent" : "e.g. Gala Merchandise Booth"}
+              placeholder={
+                entryType === "donation"
+                  ? "e.g. Marie Laurent"
+                  : "e.g. Gala Merchandise Booth"
+              }
               className="h-10 rounded-xl bg-gray-50/60 hover:bg-white focus:bg-white transition-all text-xs"
             />
           </Form.Item>
@@ -239,7 +254,9 @@ export function RecordManualDonationModal({
                 </Tooltip>
               </span>
             }
-            rules={[{ type: "email", message: "Please enter a valid email address" }]}
+            rules={[
+              { type: "email", message: "Please enter a valid email address" },
+            ]}
             className="mb-0"
           >
             <Input
@@ -254,13 +271,19 @@ export function RecordManualDonationModal({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Form.Item
             name="amount"
-            label={<span className="text-xs font-semibold text-gray-700">Amount (USD)</span>}
+            label={
+              <span className="text-xs font-semibold text-gray-700">
+                Amount (USD)
+              </span>
+            }
             rules={[
               { required: true, message: "Please enter the amount" },
               {
                 validator: (_, value) => {
                   if (value && value > 0) return Promise.resolve();
-                  return Promise.reject(new Error("Amount must be greater than $0"));
+                  return Promise.reject(
+                    new Error("Amount must be greater than $0"),
+                  );
                 },
               },
             ]}
@@ -277,18 +300,22 @@ export function RecordManualDonationModal({
 
           <Form.Item
             name="payment_method"
-            label={<span className="text-xs font-semibold text-gray-700">Payment Method</span>}
+            label={
+              <span className="text-xs font-semibold text-gray-700">
+                Payment Method
+              </span>
+            }
             rules={[{ required: true, message: "Select payment method" }]}
             className="mb-0"
           >
             <Select
               className="h-10 rounded-xl w-full"
               options={[
-                { value: "cash", label: "💵 Cash in Person" },
-                { value: "bank_transfer", label: "🏦 Direct Bank Transfer / ACH" },
-                { value: "direct", label: "💳 Direct Wire Transfer" },
-                { value: "stripe", label: "⚡ Stripe Offline POS / Invoice" },
-                { value: "other", label: "📋 Other / Cheque" },
+                { value: "cash", label: "Cash in Person" },
+                { value: "bank_transfer", label: "Direct Bank Transfer / ACH" },
+                { value: "direct", label: "Direct Wire Transfer" },
+                { value: "stripe", label: "Stripe Offline POS / Invoice" },
+                { value: "other", label: "Other / Cheque" },
               ]}
             />
           </Form.Item>
@@ -317,7 +344,11 @@ export function RecordManualDonationModal({
         {/* Notes */}
         <Form.Item
           name="notes"
-          label={<span className="text-xs font-semibold text-gray-700">Internal Notes / Description</span>}
+          label={
+            <span className="text-xs font-semibold text-gray-700">
+              Internal Notes / Description
+            </span>
+          }
           className="mb-2"
         >
           <Input.TextArea
@@ -359,4 +390,3 @@ export function RecordManualDonationModal({
     </Modal>
   );
 }
-
