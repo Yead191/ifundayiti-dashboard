@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Button,
@@ -8,7 +7,6 @@ import {
   Popconfirm,
   Tag,
   Tooltip,
-  Modal,
 } from "antd";
 import {
   ArrowLeftOutlined,
@@ -19,8 +17,6 @@ import {
   GlobalOutlined,
   EnvironmentOutlined,
   DollarCircleOutlined,
-  EyeOutlined,
-  DownloadOutlined,
   TrophyFilled,
   CloseCircleOutlined,
   CheckCircleOutlined,
@@ -29,9 +25,6 @@ import {
   RollbackOutlined,
   InboxOutlined,
   DeleteOutlined,
-  FilePdfOutlined,
-  FileImageOutlined,
-  FileOutlined,
 } from "@ant-design/icons";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { StatusTag } from "@/components/ui/StatusTag";
@@ -44,6 +37,7 @@ import {
 import { useApplicationWorkflow } from "./useApplicationWorkflow";
 import { ApplicationWorkflowModals } from "./components/ApplicationWorkflowModals";
 import { toFileUrl } from "@/config";
+import { AttachmentGallery } from "./components/AttachmentGallery";
 
 export default function ApplicationDetailPage() {
   const { applicationId } = useParams<{ applicationId: string }>();
@@ -62,13 +56,6 @@ export default function ApplicationDetailPage() {
   const workflow = useApplicationWorkflow(() => {
     refetch();
   });
-
-  // State to track which document or image is currently open in the viewer
-  const [activeFile, setActiveFile] = useState<{
-    type: string;
-    url: string;
-    label: string;
-  } | null>(null);
 
   const handleDelete = async () => {
     if (applicationId) {
@@ -106,26 +93,6 @@ export default function ApplicationDetailPage() {
   }
 
   const { personal, contact, identification, grant, background } = application;
-
-  const getDocumentLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      nid_card: "National ID Card",
-      government_id: "Government ID",
-      proof_of_address: "Proof of Address",
-      business_plan: "Business Plan Proposal",
-      supporting_image: "Supporting Project Photo",
-      supporting_document: "Supporting Attachment Document",
-      supporting_documents: "Supporting Document",
-    };
-    return (
-      labels[type] ||
-      type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-    );
-  };
-
-  const isPdf = activeFile?.url.toLowerCase().endsWith(".pdf");
-  const isImage =
-    activeFile?.url && /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(activeFile.url);
 
   return (
     <div className="space-y-6">
@@ -566,183 +533,13 @@ export default function ApplicationDetailPage() {
 
           {/* Attachments Card */}
           <GlassCard className="border border-navy-700/60 shadow-xs">
-            <h3 className="font-display text-sm font-bold text-violet-600 border-b border-navy-700/40 pb-2 mb-4 flex items-center justify-between">
-              <span>Application Materials & Attachments</span>
-              <span className="text-xs font-normal text-mist-500">
-                {(application.documents?.length || 0) +
-                  (application.projectGallery?.length || 0)}{" "}
-                files total
-              </span>
-            </h3>
-
-            <div className="space-y-6">
-              {/* Documents */}
-              <div>
-                <div className="text-[10px] font-bold text-mist-500 uppercase tracking-wider mb-2.5">
-                  Documents
-                </div>
-                {application.documents?.length === 0 ? (
-                  <div className="text-xs text-mist-400 italic py-2">
-                    No documents attached
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {application.documents?.map((doc, idx) => {
-                      const label = getDocumentLabel(doc.type);
-                      const isDocPdf = doc.url.toLowerCase().endsWith(".pdf");
-                      const icon = isDocPdf ? (
-                        <FilePdfOutlined className="text-red-500 text-lg" />
-                      ) : (
-                        <FileImageOutlined className="text-blue-500 text-lg" />
-                      );
-                      return (
-                        <div
-                          key={idx}
-                          onClick={() =>
-                            setActiveFile({
-                              type: doc.type,
-                              url: doc.url,
-                              label,
-                            })
-                          }
-                          className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 border border-navy-700/40 hover:bg-violet-600/5 hover:border-violet-600 bg-white/40 shadow-xs group"
-                        >
-                          <span className="text-base shrink-0">{icon}</span>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-xs font-semibold text-cloud-100 truncate group-hover:text-violet-600 transition-colors">
-                              {label}
-                            </div>
-                            <div className="text-[9px] text-mist-500 font-mono truncate">
-                              {doc.url.split("/").pop()}
-                            </div>
-                          </div>
-                          <EyeOutlined className="text-mist-400 group-hover:text-violet-600 transition-colors shrink-0" />
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Project Gallery */}
-              <div>
-                <div className="text-[10px] font-bold text-mist-500 uppercase tracking-wider mb-2.5">
-                  Project Gallery
-                </div>
-                {application.projectGallery?.length === 0 ? (
-                  <div className="text-xs text-mist-400 italic py-2">
-                    No gallery images uploaded
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {application.projectGallery?.map((url, idx) => {
-                      const label = `Gallery Image ${idx + 1}`;
-                      return (
-                        <div
-                          key={idx}
-                          onClick={() =>
-                            setActiveFile({
-                              type: "gallery_image",
-                              url,
-                              label,
-                            })
-                          }
-                          className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 border border-navy-700/40 hover:bg-violet-600/5 hover:border-violet-600 bg-white/40 shadow-xs group"
-                        >
-                          <span className="text-base shrink-0">
-                            <FileImageOutlined className="text-amber-500 text-lg" />
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-xs font-semibold text-cloud-100 truncate group-hover:text-violet-600 transition-colors">
-                              {label}
-                            </div>
-                            <div className="text-[9px] text-mist-500 font-mono truncate">
-                              {url.split("/").pop()}
-                            </div>
-                          </div>
-                          <EyeOutlined className="text-mist-400 group-hover:text-violet-600 transition-colors shrink-0" />
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
+            <AttachmentGallery
+              documents={application.documents}
+              gallery={application.projectGallery}
+            />
           </GlassCard>
         </div>
       </div>
-
-      {/* File Preview Modal */}
-      <Modal
-        open={!!activeFile}
-        title={
-          <div className="flex items-center justify-between pr-8 border-b border-navy-700/20 pb-3">
-            <div>
-              <h4 className="font-bold text-base text-violet-600">
-                {activeFile?.label}
-              </h4>
-              <div className="text-[10px] text-mist-500 font-mono truncate max-w-100">
-                {activeFile?.url.split("/").pop()}
-              </div>
-            </div>
-            {activeFile && (
-              <a
-                href={toFileUrl(activeFile.url)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-violet-600 font-semibold hover:underline mr-4"
-              >
-                <DownloadOutlined /> Download File
-              </a>
-            )}
-          </div>
-        }
-        onCancel={() => setActiveFile(null)}
-        footer={null}
-        width={950}
-        centered
-        destroyOnClose
-        className="document-preview-modal"
-      >
-        <div className="mt-4 flex items-center justify-center bg-white rounded-xl overflow-hidden shadow-inner border border-navy-700/10 p-2 min-h-125">
-          {activeFile && isImage && (
-            <img
-              src={toFileUrl(activeFile.url)}
-              alt={activeFile.label}
-              className="max-h-[70vh] max-w-full object-contain transition-all duration-300"
-            />
-          )}
-
-          {activeFile && isPdf && (
-            <iframe
-              src={toFileUrl(activeFile.url)}
-              title={activeFile.label}
-              className="w-full h-[70vh] border-0 rounded-lg"
-            />
-          )}
-
-          {activeFile && !isImage && !isPdf && (
-            <div className="text-center p-8">
-              <FileOutlined className="text-mist-400 text-6xl mb-3" />
-              <h5 className="font-bold text-sm text-cloud-100">
-                Preview Unsupported
-              </h5>
-              <p className="text-xs text-mist-500 mt-1 max-w-60 mx-auto">
-                This document format is not supported for inline display.
-              </p>
-              <Button
-                type="primary"
-                icon={<DownloadOutlined />}
-                href={toFileUrl(activeFile.url)}
-                target="_blank"
-                className="mt-4 btn-linear border-0 rounded-xl"
-              >
-                Download to View
-              </Button>
-            </div>
-          )}
-        </div>
-      </Modal>
 
       {/* Workflow Modals */}
       <ApplicationWorkflowModals wf={workflow} />
