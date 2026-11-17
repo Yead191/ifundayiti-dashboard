@@ -1,24 +1,12 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import {
-  Input,
-  Button,
-  Switch,
-  Segmented,
-  Tooltip,
-  Spin,
-  Alert,
-} from "antd";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Button, Switch, Segmented, Spin } from "antd";
 import {
   ArrowLeftOutlined,
-  UploadOutlined,
-  DeleteOutlined,
   StarFilled,
   LockOutlined,
   CheckCircleFilled,
   SoundOutlined,
-  InboxOutlined,
-  PictureOutlined,
   SaveOutlined,
   SendOutlined,
   ThunderboltOutlined,
@@ -26,7 +14,6 @@ import {
 import { toast } from "sonner";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { TiptapEditor } from "@/components/ui/TiptapEditor";
-import { getImageUrl } from "@/lib/getImageUrl";
 import {
   useGetCommunityPostByIdQuery,
   useCreateCommunityPostMutation,
@@ -36,13 +23,6 @@ import {
   COMMUNITY_STATUS,
   type CommunityStatus,
 } from "@/redux/features/community/community.types";
-
-interface ImageItem {
-  id: string;
-  url?: string;
-  file?: File;
-  isExisting?: boolean;
-}
 
 export default function CommunityPostEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -57,123 +37,50 @@ export default function CommunityPostEditorPage() {
   const [updatePost, { isLoading: isUpdating }] = useUpdateCommunityPostMutation();
   const isSubmitting = isCreating || isUpdating;
 
-  // Form states
-  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [status, setStatus] = useState<CommunityStatus>(COMMUNITY_STATUS.PUBLISHED);
   const [isPinned, setIsPinned] = useState<boolean>(false);
   const [isLocked, setIsLocked] = useState<boolean>(false);
 
-  // Images state
-  const [imagesList, setImagesList] = useState<ImageItem[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Prepopulate form in edit mode
   useEffect(() => {
     if (isEditing && existingPostRes?.data) {
       const post = existingPostRes.data;
-      setTitle(post.title || "");
       setContent(post.content || "");
       setStatus(post.status || COMMUNITY_STATUS.PUBLISHED);
       setIsPinned(Boolean(post.isPinned));
       setIsLocked(Boolean(post.isLocked));
-
-      if (Array.isArray(post.images) && post.images.length > 0) {
-        setImagesList(
-          post.images.map((imgUrl, index) => ({
-            id: `existing-${index}-${imgUrl}`,
-            url: imgUrl,
-            isExisting: true,
-          }))
-        );
-      }
     }
   }, [isEditing, existingPostRes]);
 
-  // Handle image files selection
-  const handleFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const newItems: ImageItem[] = Array.from(files).map((file) => ({
-      id: `file-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      file,
-      url: URL.createObjectURL(file),
-      isExisting: false,
-    }));
-
-    setImagesList((prev) => [...prev, ...newItems]);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const handleRemoveImage = (idToRemove: string) => {
-    setImagesList((prev) => prev.filter((item) => item.id !== idToRemove));
-  };
-
-  // Submit Handler
   const handleSubmit = async (targetStatus?: CommunityStatus) => {
     const finalStatus = targetStatus || status;
 
     if (!content.trim() || content === "<p></p>") {
-      toast.error("Announcement content is required");
+      toast.error("Post content is required");
       return;
     }
 
     try {
-      const newFiles = imagesList.filter((item) => item.file).map((item) => item.file!);
-      const existingUrls = imagesList.filter((item) => item.isExisting && item.url).map((item) => item.url!);
+      const payload = {
+        content: content.trim(),
+        images: [],
+        isPinned,
+        isLocked,
+        status: finalStatus,
+      };
 
-      if (newFiles.length > 0) {
-        // Use Multipart FormData
-        const formData = new FormData();
-        const metaData = {
-          title: title.trim() || undefined,
-          content: content.trim(),
-          images: existingUrls,
-          isPinned,
-          isLocked,
-          status: finalStatus,
-        };
-
-        formData.append("data", JSON.stringify(metaData));
-        newFiles.forEach((file) => {
-          formData.append("images", file);
-        });
-
-        if (isEditing && id) {
-          await updatePost({ id, data: formData }).unwrap();
-          toast.success("Announcement updated successfully");
-        } else {
-          const res = await createPost(formData).unwrap();
-          toast.success("Announcement broadcasted successfully");
-          navigate(`/community/${res.data._id}`);
-          return;
-        }
-      } else {
-        // Use standard JSON payload
-        const payload = {
-          title: title.trim() || undefined,
-          content: content.trim(),
-          images: existingUrls,
-          isPinned,
-          isLocked,
-          status: finalStatus,
-        };
-
-        if (isEditing && id) {
-          await updatePost({ id, data: payload }).unwrap();
-          toast.success("Announcement updated successfully");
-        } else {
-          const res = await createPost(payload).unwrap();
-          toast.success("Announcement published successfully");
-          navigate(`/community/${res.data._id}`);
-          return;
-        }
+      if (isEditing && id) {
+        await updatePost({ id, data: payload }).unwrap();
+        toast.success("Post updated");
+        navigate(`/community/${id}`);
+        return;
       }
 
-      navigate(`/community/${id}`);
+      const res = await createPost(payload).unwrap();
+      toast.success("Post published");
+      navigate(`/community/${res.data._id}`);
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to save announcement");
+      toast.error(err?.data?.message || "Failed to save post");
     }
   };
 
@@ -198,10 +105,10 @@ export default function CommunityPostEditorPage() {
           />
           <div>
             <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-cloud-100">
-              {isEditing ? "Edit Community Announcement" : "Create Community Announcement"}
+              {isEditing ? "Edit community post" : "New community post"}
             </h1>
             <p className="text-xs sm:text-sm text-mist-600 mt-0.5">
-              Draft official messages, attach images, and broadcast updates to verified members.
+              Write the post. Members can comment and like, but only admins can publish.
             </p>
           </div>
         </div>
@@ -237,118 +144,23 @@ export default function CommunityPostEditorPage() {
 
       {/* Two-Column Editor Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Title, Editor, and Images */}
         <div className="lg:col-span-2 space-y-5">
-          {/* Title Input */}
-          <GlassCard className="p-4 sm:p-6 border border-gray-200/80 bg-white space-y-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
-              Headline / Title <span className="text-gray-400 font-normal">(Optional but recommended)</span>
-            </label>
-            <Input
-              size="large"
-              placeholder="e.g., Welcome to the Official iFundAyiti Community Discussion"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="rounded-xl font-display font-semibold text-base sm:text-lg"
-            />
-          </GlassCard>
-
-          {/* Content Editor */}
           <GlassCard className="p-4 sm:p-6 border border-gray-200/80 bg-white space-y-3">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
-                Announcement Content <span className="text-rose-500">*</span>
+                Post content <span className="text-rose-500">*</span>
               </label>
-              <span className="text-xs text-gray-400">Rich text & formatted HTML supported</span>
+              <span className="text-xs text-gray-400">Rich text supported</span>
             </div>
 
             <div className="rounded-2xl border border-gray-200 overflow-hidden">
               <TiptapEditor
                 value={content}
                 onChange={setContent}
-                placeholder="Share instructions, progress updates, guidelines, or announcements with community members..."
+                placeholder="Write the community update..."
                 minHeight="340px"
               />
             </div>
-          </GlassCard>
-
-          {/* Multi-Image Attachments */}
-          <GlassCard className="p-4 sm:p-6 border border-gray-200/80 bg-white space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
-                  Attached Media & Images
-                </label>
-                <p className="text-xs text-gray-400 m-0">
-                  Upload multiple photos to display in an interactive grid or lightbox gallery.
-                </p>
-              </div>
-
-              <Button
-                icon={<UploadOutlined />}
-                onClick={() => fileInputRef.current?.click()}
-                className="rounded-xl text-xs font-medium"
-              >
-                Attach Images
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleFilesSelect}
-                className="hidden"
-              />
-            </div>
-
-            {imagesList.length === 0 ? (
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center cursor-pointer hover:border-[#0B3D2E] hover:bg-emerald-50/20 transition-all"
-              >
-                <PictureOutlined className="text-3xl text-gray-300 mb-2" />
-                <p className="text-xs font-semibold text-gray-700 m-0">
-                  Drag and drop images here, or click to browse
-                </p>
-                <span className="text-[11px] text-gray-400">
-                  Supports PNG, JPG, WEBP formats
-                </span>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-2">
-                {imagesList.map((item) => {
-                  const displaySrc = item.url
-                    ? item.isExisting
-                      ? getImageUrl(item.url)
-                      : item.url
-                    : "";
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="group relative h-28 rounded-xl overflow-hidden border border-gray-200 bg-gray-100 shadow-2xs"
-                    >
-                      <img
-                        src={displaySrc}
-                        alt="Attachment"
-                        className="h-full w-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        <Tooltip title="Remove photo">
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveImage(item.id)}
-                            className="h-8 w-8 rounded-full bg-rose-600 text-white flex items-center justify-center hover:bg-rose-700 transition-colors shadow-sm"
-                          >
-                            <DeleteOutlined className="text-xs" />
-                          </button>
-                        </Tooltip>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
           </GlassCard>
         </div>
 
