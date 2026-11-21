@@ -213,18 +213,18 @@ export default function ApplicationDetailPage() {
             <h3 className="font-display text-sm font-bold text-violet-600 border-b border-navy-700/40 pb-2 mb-4">
               Applicant Profile
             </h3>
-            <div className="flex items-center gap-4 mb-5">
+            <div className="flex items-start gap-4 mb-5">
               <Avatar
                 src={toFileUrl(personal?.image)}
                 icon={<UserOutlined />}
                 size={68}
-                className="border-2 border-violet-600/20"
+                className="border-2 border-violet-600/20 shrink-0"
               />
-              <div>
+              <div className="min-w-0 flex-1">
                 <h4 className="font-bold text-cloud-100 text-base">
                   {personal?.name}
                 </h4>
-                <p className="text-xs text-mist-500">
+                <p className="text-xs text-mist-500 wrap-break-word">
                   {background?.occupation || "Applicant"}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
